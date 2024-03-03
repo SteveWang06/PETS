@@ -2,10 +2,12 @@ package com.project.pet.services;
 
 import com.project.pet.exception.PostNotFoundException;
 import com.project.pet.models.Post;
+import com.project.pet.models.PostImage;
+import com.project.pet.repository.PostImageRepository;
 import com.project.pet.repository.PostRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,14 +16,19 @@ public class PostServiceImpl implements PostService{
 
   @Autowired
   private PostRepository postRepository;
+  private PostImageRepository postImageRepository;
 
-  public PostServiceImpl(PostRepository postRepository) {
+  public PostServiceImpl(PostRepository postRepository,
+                         PostImageRepository postImageRepository) {
     this.postRepository = postRepository;
+    this.postImageRepository = postImageRepository;
   }
 
   @Override
   public String createPost(Post post) {
+
     postRepository.save(post);
+
     return "Success";
   }
 
@@ -35,6 +42,8 @@ public class PostServiceImpl implements PostService{
     if (postRepository.findById(postId).isEmpty()) throw new PostNotFoundException("Post does not exit");
     return postRepository.findById(postId).get();
   }
+
+
 
 
 }
