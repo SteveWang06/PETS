@@ -3,7 +3,7 @@ package com.project.pet.models;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "postKind")
+@Table(name = "postKindEntity")
 public class PostKind {
 
   @Id

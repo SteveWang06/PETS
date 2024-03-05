@@ -3,7 +3,7 @@ package com.project.pet.models;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "postImage")
+@Table(name = "postImageEntity")
 public class PostImage {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
