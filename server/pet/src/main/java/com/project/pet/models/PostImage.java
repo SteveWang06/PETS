@@ -1,8 +1,11 @@
 package com.project.pet.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 @Entity
+@Data
 @Table(name = "postImageEntity")
 public class PostImage {
   @Id
@@ -14,8 +17,7 @@ public class PostImage {
 
   public PostImage() {}
 
-  public PostImage(Long id, String imageurl) {
-    this.id = id;
+  public PostImage(String imageurl) {
     this.imageurl = imageurl;
   }
 

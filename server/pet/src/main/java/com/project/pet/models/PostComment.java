@@ -1,8 +1,10 @@
 package com.project.pet.models;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
+@Data
 @Table(name = "postCommentEntity")
 public class PostComment {
 
@@ -15,8 +17,7 @@ public class PostComment {
 
   public PostComment() {}
 
-  public PostComment(Long id, String content) {
-    this.id = id;
+  public PostComment(String content) {
     this.content = content;
   }
 
