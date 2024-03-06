@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 
 @RestController
@@ -22,10 +23,15 @@ public class PostController {
     this.postService = postService;
   }
 
-  @GetMapping("/{postId}")
-  public ResponseEntity<Object> getPostById(@PathVariable("postId") Long postId) {
-    return ResponseHandler.responseBuilder("Requested Vendor Details are given here",
-        HttpStatus.OK, postService.getPostById(postId));
+  @GetMapping("/{id}")
+  public ResponseEntity<Post> getPostById(@PathVariable Long id) {
+    try {
+      Post post = postService.getPostById(id);
+      return new ResponseEntity<Post>(post, HttpStatus.OK);
+    }catch (NoSuchElementException e){
+      return new ResponseEntity<Post>(HttpStatus.NOT_FOUND);
+    }
+
   }
 
   @GetMapping("/")
