@@ -43,7 +43,13 @@ public class PostServiceImpl implements PostService{
     return postRepository.findById(postId).get();
   }
 
-
-
+  @Override
+  public void updatePost(Post updatedPost) {
+    postRepository.save(updatedPost);
+  }
+  @Override
+  public void deletePost(Long id) {
+    postRepository.deleteById(id);
+  }
 
 }
