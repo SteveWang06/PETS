@@ -13,9 +13,11 @@ public interface PostService {
   public String createPost(Post post);
   public Post getPostById(Long postId);
   public List<Post> getAllPost();
-
-
-
+  public void updatePost(Post updatedPost);
+  public void deletePost(Long id);
+  public void addComment(PostComment comment) {
+    this.comments.add(comment);
+  }
 
 
 }
