@@ -45,4 +45,36 @@ public class PostController {
     return "Created Successfully";
   }
 
+  @PutMapping("/{id}")
+  public ResponseEntity<String> updatePost(@PathVariable Long id, @RequestBody Post updatedPost) {
+    try {
+        Post existingPost = postService.getPostById(id);
+        existingPost.setCaption(updatedPost.getCaption());
+
+        postService.updatePost(existingPost);
+        return ResponseEntity.ok("Post updated successfully");
+    } catch (NoSuchElementException e) {
+        return ResponseEntity.notFound().build();
+    }
+}
+  @DeleteMapping("/{id}")
+  public ResponseEntity<String> deletePost(@PathVariable Long id) {
+    try {
+        postService.deletePost(id);
+        return ResponseEntity.ok("Post deleted successfully");
+    } catch (NoSuchElementException e) {
+        return ResponseEntity.notFound().build();
+    }
+}
+  @PostMapping("/{postId}/comment")
+  public ResponseEntity<String> addCommentToPost(@PathVariable Long postId, @RequestBody PostComment comment) {
+    try {
+        Post post = postService.getPostById(postId);
+        post.getComments().add(comment);
+        postService.updatePost(post); 
+        return ResponseEntity.ok("Comment added successfully");
+    } catch (NoSuchElementException e) {
+        return ResponseEntity.notFound().build();
+    }
+}
 }
