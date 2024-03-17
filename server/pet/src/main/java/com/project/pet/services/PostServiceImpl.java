@@ -2,6 +2,7 @@ package com.project.pet.services;
 
 import com.project.pet.exception.PostNotFoundException;
 import com.project.pet.models.Post;
+import com.project.pet.models.PostComment;
 import com.project.pet.models.PostImage;
 import com.project.pet.repository.PostImageRepository;
 import com.project.pet.repository.PostRepository;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class PostServiceImpl implements PostService{
@@ -39,8 +41,8 @@ public class PostServiceImpl implements PostService{
 
   @Override
   public Post getPostById(Long postId) {
-    if (postRepository.findById(postId).isEmpty()) throw new PostNotFoundException("Post does not exit");
     return postRepository.findById(postId).get();
+
   }
 
   @Override
@@ -51,5 +53,9 @@ public class PostServiceImpl implements PostService{
   public void deletePost(Long id) {
     postRepository.deleteById(id);
   }
+   @Override
+    public void addComment(PostComment comment) {
 
+    }
 }
+
