@@ -1,6 +1,7 @@
 package com.project.pet.controller;
 
 import com.project.pet.models.Post;
+import com.project.pet.models.PostComment;
 import com.project.pet.payload.response.ResponseHandler;
 import com.project.pet.services.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
