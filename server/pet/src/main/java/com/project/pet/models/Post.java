@@ -1,5 +1,6 @@
 package com.project.pet.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,8 +40,13 @@ public class Post {
   private Set<PostKind> postKinds = new HashSet<>();
 
   @OneToMany(cascade = CascadeType.ALL)
-  @JoinTable(name = "postComments", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "comment_id"))
+  @JoinTable(name = "comments",
+      joinColumns = @JoinColumn(name = "post_id", referencedColumnName = "id"),
+      inverseJoinColumns = @JoinColumn(name = "comments_id", referencedColumnName = "id"))
+
   private List<PostComment> comments = new ArrayList<>();
+
+
 
   public Post() {
   }
