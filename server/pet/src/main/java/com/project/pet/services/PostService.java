@@ -1,6 +1,7 @@
 package com.project.pet.services;
 
 import com.project.pet.models.Post;
+import com.project.pet.models.PostComment;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,9 +16,7 @@ public interface PostService {
   public List<Post> getAllPost();
   public void updatePost(Post updatedPost);
   public void deletePost(Long id);
-  public void addComment(PostComment comment) {
-    this.comments.add(comment);
-  }
+
 
 
 }

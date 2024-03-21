@@ -1,7 +1,7 @@
 package com.project.pet.controller;
 
 import com.project.pet.models.Post;
-import com.project.pet.payload.response.ResponseHandler;
+import com.project.pet.models.PostComment;
 import com.project.pet.services.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,7 +13,6 @@ import java.util.NoSuchElementException;
 
 
 @RestController
-@RequestMapping("api/post")
 public class PostController {
 
   @Autowired
@@ -56,7 +55,7 @@ public class PostController {
     } catch (NoSuchElementException e) {
         return ResponseEntity.notFound().build();
     }
-}
+  }
   @DeleteMapping("/{id}")
   public ResponseEntity<String> deletePost(@PathVariable Long id) {
     try {
@@ -65,16 +64,6 @@ public class PostController {
     } catch (NoSuchElementException e) {
         return ResponseEntity.notFound().build();
     }
-}
-  @PostMapping("/{postId}/comment")
-  public ResponseEntity<String> addCommentToPost(@PathVariable Long postId, @RequestBody PostComment comment) {
-    try {
-        Post post = postService.getPostById(postId);
-        post.getComments().add(comment);
-        postService.updatePost(post); 
-        return ResponseEntity.ok("Comment added successfully");
-    } catch (NoSuchElementException e) {
-        return ResponseEntity.notFound().build();
-    }
-}
+  }
+
 }
