@@ -9,14 +9,16 @@ import java.util.List;
 @Service
 public interface PostService {
 
-
-
   public String createPost(Post post);
   public Post getPostById(Long postId);
   public List<Post> getAllPost();
   public void updatePost(Post updatedPost);
   public void deletePost(Long id);
+<<<<<<< HEAD
 
 
+=======
+  public void addComment(PostComment comment) ;
+>>>>>>> refs/remotes/origin/master
 
 }
