@@ -19,14 +19,14 @@ public class PostServiceImpl implements PostService{
   @Autowired
   private PostRepository postRepository;
   private PostImageRepository postImageRepository;
-  private PostCommentRepository postCommentRepository;
+//  private PostCommentRepository postCommentRepository;
 
   public PostServiceImpl(PostRepository postRepository,
-                         PostImageRepository postImageRepository,
-                         PostCommentRepository postCommentRepository) {
+                         PostImageRepository postImageRepository
+                        ) {
     this.postRepository = postRepository;
     this.postImageRepository = postImageRepository;
-    this.postCommentRepository = postCommentRepository;
+
   }
 
   @Override

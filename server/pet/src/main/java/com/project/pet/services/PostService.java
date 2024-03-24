@@ -14,11 +14,8 @@ public interface PostService {
   public List<Post> getAllPost();
   public void updatePost(Post updatedPost);
   public void deletePost(Long id);
-<<<<<<< HEAD
 
-
-=======
   public void addComment(PostComment comment) ;
->>>>>>> refs/remotes/origin/master
+
 
 }
