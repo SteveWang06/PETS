@@ -9,6 +9,7 @@ import { Text } from "react-native-paper";
 import Facebook from "../components/loginWithSocialMedia/Facebook";
 import Google from "../components/loginWithSocialMedia/Google";
 import { AuthContext } from "../context/AuthContext";
+import Header from "../components/Header";
 
 const LoginScreen = ({ navigation }) => {
 
@@ -16,8 +17,15 @@ const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   return (
+    
     <Background>
-      <Logo />
+
+
+      
+      <Text style={styles.loginText}>登入</Text>
+      
+      
+
       <TextInput
         label='Email'
         returnKeyType='next'
@@ -32,7 +40,7 @@ const LoginScreen = ({ navigation }) => {
       />
 
       <TextInput
-        label='Password'
+        label='密碼'
         returnKeyType='done'
         value={password}
         onChangeText={text => setPassword(text)}
@@ -42,19 +50,19 @@ const LoginScreen = ({ navigation }) => {
       />
 
       <Button style={styles.button} onPress={() => {login(email, password)}}>
-        <Text style={styles.text}>Login</Text>
+        <Text style={styles.text}>登入</Text>
       </Button>
       <View style={styles.row}>
-        <Text>Don’t have an account? </Text>
+        <Text>還沒有張號? </Text>
         <TouchableOpacity onPress={() => navigation.replace("RegisterScreen")}>
-          <Text style={styles.link}>Sign up</Text>
+          <Text style={styles.link}>註冊</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.row}>
         <TouchableOpacity
           onPress={() => navigation.replace("ForgotPasswordScreen")}>
-          <Text style={styles.forgot}>Forgot Password</Text>
+          <Text style={styles.forgot}>忘記密碼了</Text>
         </TouchableOpacity>
       </View>
 
@@ -107,6 +115,10 @@ const styles = StyleSheet.create({
   text: {
     color: theme.colors.white,
   },
+
+  loginText: {
+    fontSize: 50
+  }
 });
 
 export default LoginScreen;
