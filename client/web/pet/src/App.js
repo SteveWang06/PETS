@@ -1,6 +1,6 @@
 import './App.css';
 import logo from './petlogo.png';
-import search from './search.png';
+//import search from './search.png';
 
 function Web(){
   return(
@@ -11,7 +11,7 @@ function Web(){
       <input type="checkbox"  id="sideMenu-active" />
       <div className="sideMenu">
         <form>
-        <img src={search} className="search-icon" alt="search"/>
+        {/* <img src={search} className="search-icon" alt="search"/> */}
             <input class="search-box" type="search" placeholder="Search"/>
         </form>
         <ul className="menu">
