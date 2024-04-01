@@ -1,0 +1,77 @@
+.links{
+    position: fixed;
+    bottom: 180px;
+    width: 100%;
+    left:50px;
+    z-index:-5;
+}
+
+.logo {
+    width:100px;
+    height:100px;
+    left:150px;
+    position:absolute;
+}
+
+.facebook{
+    width:30px;
+    height:30px;
+    position:absolute;
+}
+
+.twitter{
+    width:30px;
+    height:30px;
+    position:absolute;
+    left:35px;
+}
+
+.instagram{
+    width:30px;
+    height:30px;
+    position:absolute;
+    left:70px;
+}
+
+.in{
+    width:30px;
+    height:30px;
+    position:absolute;
+    left:105px;
+}
+
+.about{
+    position:fixed;
+    width:100%;
+    bottom:100px;
+    left:400px;
+}
+
+.support{
+    position:fixed;
+    width:100%;
+    bottom:100px;
+    left:550px;
+}
+
+.platform{
+    position:fixed;
+    width:100%;
+    bottom:100px;
+    left:750px;
+}
+
+.contact{
+    position:fixed;
+    width:100%;
+    bottom:100px;
+    left:950px;
+}
+
+.copyright{
+    position:fixed;
+    bottom:20px;
+    width:100%;
+    text-align:center;
+    z-index: -5;
+}
