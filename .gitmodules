@@ -1,0 +1,3 @@
+[submodule "client/app/Pets/PETS"]
+	path = client/app/Pets/PETS
+	url = https://github.com/SteveWang06/PETS.git

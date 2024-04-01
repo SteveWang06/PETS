@@ -1,10 +1,13 @@
 package com.project.pet.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.*;
-import java.util.List;
 
 @Entity
 @Table(name = "post")
@@ -16,39 +19,44 @@ public class Post {
   private Long id;
 
   @Column()
-  @Temporal(TemporalType.DATE)
-  private Date uploadAt;
+  @Temporal(TemporalType.TIMESTAMP)
+  private LocalDateTime uploadAt;
 
   @Column()
   private String caption;
 
   @Column()
-  private Integer status;
+  private Integer postStatus;
 
   @Column()
-  private Integer like;
+  private Integer postLike;
 
-  @OneToMany
-  @JoinColumn(name = "image_id")
+  @OneToMany(cascade = CascadeType.ALL)
+  @JoinTable(name = "postImages", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "image_id"))
   private List<PostImage> postImages = new ArrayList<>();
 
-  @OneToOne
-  @JoinColumn(name = "postKind_id")
-  private PostKind postKinds;
+  @ManyToMany(cascade = CascadeType.ALL)
+  @JoinTable(name = "postKinds", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "kind_id"))
+  private Set<PostKind> postKinds = new HashSet<>();
 
-  @OneToMany
-  @JoinColumn(name = "comment_id")
-  private Set<PostComment> comments = new HashSet<>();
+  @OneToMany(cascade = CascadeType.ALL)
+  @JoinTable(name = "comments",
+      joinColumns = @JoinColumn(name = "post_id", referencedColumnName = "id"),
+      inverseJoinColumns = @JoinColumn(name = "comments_id", referencedColumnName = "id"))
+
+  private List<PostComment> comments = new ArrayList<>();
+
+
 
   public Post() {
   }
 
-  public Post(Long id, Date uploadAt, String caption, Integer status, Integer like, List<PostImage> postImages, PostKind postKinds, Set<PostComment> comments) {
+  public Post(Long id, LocalDateTime uploadAt, String caption, Integer postStatus, Integer postLike, List<PostImage> postImages, Set<PostKind> postKinds, List<PostComment> comments) {
     this.id = id;
     this.uploadAt = uploadAt;
     this.caption = caption;
-    this.status = status;
-    this.like = like;
+    this.postStatus = postStatus;
+    this.postLike = postLike;
     this.postImages = postImages;
     this.postKinds = postKinds;
     this.comments = comments;
@@ -62,11 +70,11 @@ public class Post {
     this.id = id;
   }
 
-  public Date getUploadAt() {
+  public LocalDateTime getUploadAt() {
     return uploadAt;
   }
 
-  public void setUploadAt(Date uploadAt) {
+  public void setUploadAt(LocalDateTime uploadAt) {
     this.uploadAt = uploadAt;
   }
 
@@ -79,19 +87,19 @@ public class Post {
   }
 
   public Integer getStatus() {
-    return status;
+    return postStatus;
   }
 
-  public void setStatus(Integer status) {
-    this.status = status;
+  public void setStatus(Integer postStatus) {
+    this.postStatus = postStatus;
   }
 
   public Integer getLike() {
-    return like;
+    return postLike;
   }
 
-  public void setLike(Integer like) {
-    this.like = like;
+  public void setLike(Integer postLike) {
+    this.postLike = postLike;
   }
 
   public List<PostImage> getPostImages() {
@@ -102,19 +110,19 @@ public class Post {
     this.postImages = postImages;
   }
 
-  public PostKind getPostKinds() {
+  public Set<PostKind> getPostKinds() {
     return postKinds;
   }
 
-  public void setPostKinds(PostKind postKinds) {
+  public void setPostKinds(Set<PostKind> postKinds) {
     this.postKinds = postKinds;
   }
 
-  public Set<PostComment> getComments() {
+  public List<PostComment> getComments() {
     return comments;
   }
 
-  public void setComments(Set<PostComment> comments) {
+  public void setComments(List<PostComment> comments) {
     this.comments = comments;
   }
 }
