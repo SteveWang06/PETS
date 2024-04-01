@@ -3,7 +3,7 @@ package com.project.pet.models;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "postKind")
+@Table(name = "postKindEntity")
 public class PostKind {
 
   @Id
@@ -19,8 +19,7 @@ public class PostKind {
 
 
 
-  public PostKind(Integer id, String kind) {
-    this.id = id;
+  public PostKind(String kind) {
     this.kind = kind;
   }
 
