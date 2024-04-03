@@ -3,7 +3,6 @@ package com.project.pet.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -30,6 +29,7 @@ public class User implements UserDetails {
   @NotBlank
   private String username;
 
+  private String avatar;
 
   @NotBlank
   @Email
@@ -96,12 +96,12 @@ public class User implements UserDetails {
     return this;
   }
 
-  public String getFullName() {
+  public String getUserName() {
     return username;
   }
 
-  public User setFullName(String fullName) {
-    this.username = fullName;
+  public User setUserName(String username) {
+    this.username = username;
     return this;
   }
 
@@ -117,6 +117,15 @@ public class User implements UserDetails {
   public User setPassword(String password) {
     this.password = password;
     return this;
+  }
+
+
+  public String getAvatar() {
+    return avatar;
+  }
+
+  public void setAvatar(String avatar) {
+    this.avatar = avatar;
   }
 
   public Date getCreatedAt() {
@@ -136,6 +145,8 @@ public class User implements UserDetails {
     this.updatedAt = updatedAt;
     return this;
   }
+
+
 
   public Role getRole() {
     return role;

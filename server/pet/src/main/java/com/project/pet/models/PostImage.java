@@ -15,6 +15,7 @@ public class PostImage {
   @Column
   private String imageurl;
 
+
   public PostImage() {}
 
   public PostImage(String imageurl) {

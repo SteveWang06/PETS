@@ -1,5 +1,6 @@
 package com.project.pet.controller;
 
+import com.project.pet.dto.PostDTO;
 import com.project.pet.models.Post;
 import com.project.pet.models.PostComment;
 //import com.project.pet.payload.response.ResponseHandler;
@@ -8,11 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-
+@RequestMapping("api/auth/post")
 @RestController
 public class PostController {
 
@@ -35,14 +38,26 @@ public class PostController {
   }
 
   @GetMapping("/")
-  public List<Post> getAllPost() {
+  public List<PostDTO> getAllPost() {
     return postService.getAllPost();
   }
 
   @PostMapping("/")
-  public String createPost(@RequestBody Post post) {
-    postService.createPost(post);
-    return "Created Successfully";
+//  public String createPost(@RequestBody Post post) {
+//    postService.createPost(post);
+//    return "Created Successfully";
+//
+//  }
+  public ResponseEntity<?> createPost(@RequestParam("caption") String caption,
+                                      @RequestParam("images") MultipartFile[] images,
+                                      @RequestParam("userId") Long userId) {
+    try {
+      Long postId = postService.createPost(caption, images, userId);
+      return ResponseEntity.ok("Post created successfully with ID: " + postId);
+    } catch (IOException e) {
+      return ResponseEntity.badRequest().body("Error creating post: " + e.getMessage());
+    }
+
   }
 
   @PutMapping("/{id}")

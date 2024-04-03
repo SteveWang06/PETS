@@ -80,12 +80,12 @@ export const AuthProvider = ({children}) => {
         try {
           const value = await AsyncStorage.getItem('userToken');
           if (value !== null) {
-            console.log('Giá trị đã được lưu trong AsyncStorage:', value);
+            console.log('user token value saved in AsyncStorage:', value);
           } else {
-            console.log('Không có giá trị nào được lưu trong AsyncStorage');
+            console.log('no any value saved in AsyncStorage');
           }
         } catch (error) {
-          console.error('Lỗi khi kiểm tra AsyncStorage:', error);
+          console.error('error AsyncStorage:', error);
         }
     };
 
