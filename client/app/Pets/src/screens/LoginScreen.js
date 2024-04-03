@@ -27,7 +27,7 @@ const LoginScreen = ({ navigation }) => {
       
 
       <TextInput
-        label='Email'
+        label='電子郵件'
         returnKeyType='next'
         value={email}
         onChangeText={text => setEmail(text)}
@@ -53,7 +53,7 @@ const LoginScreen = ({ navigation }) => {
         <Text style={styles.text}>登入</Text>
       </Button>
       <View style={styles.row}>
-        <Text>還沒有張號? </Text>
+        <Text>還沒有帳號? </Text>
         <TouchableOpacity onPress={() => navigation.replace("RegisterScreen")}>
           <Text style={styles.link}>註冊</Text>
         </TouchableOpacity>

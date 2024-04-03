@@ -44,7 +44,7 @@ public class AuthServiceImpl implements AuthService{
     }
 
     var user = new User()
-        .setFullName(input.getUsername())
+        .setUserName(input.getUsername())
         .setEmail(input.getEmail())
         .setPassword(passwordEncoder.encode(input.getPassword()))
         .setRole(optionalRole.get());

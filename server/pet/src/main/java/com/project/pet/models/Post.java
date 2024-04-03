@@ -1,10 +1,12 @@
 package com.project.pet.models;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -20,7 +22,7 @@ public class Post {
 
   @Column()
   @Temporal(TemporalType.TIMESTAMP)
-  private LocalDateTime uploadAt;
+  private Date uploadAt;
 
   @Column()
   private String caption;
@@ -31,9 +33,19 @@ public class Post {
   @Column()
   private Integer postLike;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private User author;
+
+//  @OneToMany(cascade = CascadeType.ALL)
+//  @JoinTable(name = "postImages", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "image_id"))
+//  private List<PostImage> postImages = new ArrayList<>();
+
   @OneToMany(cascade = CascadeType.ALL)
-  @JoinTable(name = "postImages", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "image_id"))
-  private List<PostImage> postImages = new ArrayList<>();
+  @JoinColumn(name = "post_id")
+  @JsonManagedReference
+  private List<Image> postImages;
+
 
   @ManyToMany(cascade = CascadeType.ALL)
   @JoinTable(name = "postKinds", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "kind_id"))
@@ -51,12 +63,13 @@ public class Post {
   public Post() {
   }
 
-  public Post(Long id, LocalDateTime uploadAt, String caption, Integer postStatus, Integer postLike, List<PostImage> postImages, Set<PostKind> postKinds, List<PostComment> comments) {
+  public Post(Long id, Date uploadAt, String caption, Integer postStatus, Integer postLike, User author, List<Image> postImages, Set<PostKind> postKinds, List<PostComment> comments) {
     this.id = id;
     this.uploadAt = uploadAt;
     this.caption = caption;
     this.postStatus = postStatus;
     this.postLike = postLike;
+    this.author = author;
     this.postImages = postImages;
     this.postKinds = postKinds;
     this.comments = comments;
@@ -70,11 +83,11 @@ public class Post {
     this.id = id;
   }
 
-  public LocalDateTime getUploadAt() {
+  public Date getUploadAt() {
     return uploadAt;
   }
 
-  public void setUploadAt(LocalDateTime uploadAt) {
+  public void setUploadAt(Date uploadAt) {
     this.uploadAt = uploadAt;
   }
 
@@ -86,27 +99,35 @@ public class Post {
     this.caption = caption;
   }
 
-  public Integer getStatus() {
+  public Integer getPostStatus() {
     return postStatus;
   }
 
-  public void setStatus(Integer postStatus) {
+  public void setPostStatus(Integer postStatus) {
     this.postStatus = postStatus;
   }
 
-  public Integer getLike() {
+  public Integer getPostLike() {
     return postLike;
   }
 
-  public void setLike(Integer postLike) {
+  public void setPostLike(Integer postLike) {
     this.postLike = postLike;
   }
 
-  public List<PostImage> getPostImages() {
+  public User getAuthor() {
+    return author;
+  }
+
+  public void setAuthor(User author) {
+    this.author = author;
+  }
+
+  public List<Image> getPostImages() {
     return postImages;
   }
 
-  public void setPostImages(List<PostImage> postImages) {
+  public void setPostImages(List<Image> postImages) {
     this.postImages = postImages;
   }
 
@@ -125,4 +146,87 @@ public class Post {
   public void setComments(List<PostComment> comments) {
     this.comments = comments;
   }
+
+  //  public Post(Long id, LocalDateTime uploadAt, String caption, Integer postStatus, Integer postLike, List<PostImage> postImages, Set<PostKind> postKinds, List<PostComment> comments) {
+//    this.id = id;
+//    this.uploadAt = uploadAt;
+//    this.caption = caption;
+//    this.postStatus = postStatus;
+//    this.postLike = postLike;
+//    this.postImages = postImages;
+//    this.postKinds = postKinds;
+//    this.comments = comments;
+//  }
+//
+//  public Long getId() {
+//    return id;
+//  }
+//
+//  public void setId(Long id) {
+//    this.id = id;
+//  }
+//
+//  public LocalDateTime getUploadAt() {
+//    return uploadAt;
+//  }
+//
+//  public void setUploadAt(LocalDateTime uploadAt) {
+//    this.uploadAt = uploadAt;
+//  }
+//
+//  public User getAuthor() {
+//    return author;
+//  }
+//
+//  public void setAuthor(User author) {
+//    this.author = author;
+//  }
+//
+//  public String getCaption() {
+//    return caption;
+//  }
+//
+//  public void setCaption(String caption) {
+//    this.caption = caption;
+//  }
+//
+//  public Integer getPostStatus() {
+//    return postStatus;
+//  }
+//
+//  public void setPostStatus(Integer postStatus) {
+//    this.postStatus = postStatus;
+//  }
+//
+//  public Integer getPostLike() {
+//    return postLike;
+//  }
+//
+//  public void setPostLike(Integer postLike) {
+//    this.postLike = postLike;
+//  }
+//
+//  public List<PostImage> getPostImages() {
+//    return postImages;
+//  }
+//
+//  public void setPostImages(List<PostImage> postImages) {
+//    this.postImages = postImages;
+//  }
+//
+//  public Set<PostKind> getPostKinds() {
+//    return postKinds;
+//  }
+//
+//  public void setPostKinds(Set<PostKind> postKinds) {
+//    this.postKinds = postKinds;
+//  }
+//
+//  public List<PostComment> getComments() {
+//    return comments;
+//  }
+//
+//  public void setComments(List<PostComment> comments) {
+//    this.comments = comments;
+//  }
 }
