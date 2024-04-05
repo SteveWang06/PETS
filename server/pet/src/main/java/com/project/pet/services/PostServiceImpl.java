@@ -64,8 +64,9 @@ public class PostServiceImpl implements PostService{
     for (MultipartFile image : images) {
       String imageUrl = saveImage(image);
       Image savedImage = new Image();
-      savedImage.setName(image.getOriginalFilename());
+      savedImage.setName(imageUrl);
       savedImage.setImageUrl(imageUrl);
+
       savedImage.setPost(post);
       savedImages.add(savedImage);
     }
