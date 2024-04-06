@@ -14,8 +14,8 @@ public class Image {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private String name;
-  private String imageUrl; // Đường dẫn đến tệp ảnh, nếu lưu trữ trong hệ thống file
+  private String imageUrl;
+  private String imagePath; // Đường dẫn đến tệp ảnh lưu trữ trong hệ thống file
 
   @ManyToOne
   @JoinColumn(name = "post_id")
@@ -30,20 +30,20 @@ public class Image {
     this.id = id;
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
   public String getImageUrl() {
     return imageUrl;
   }
 
   public void setImageUrl(String imageUrl) {
     this.imageUrl = imageUrl;
+  }
+
+  public String getImagePath() {
+    return imagePath;
+  }
+
+  public void setImagePath(String imagePath) {
+    this.imagePath = imagePath;
   }
 
   public Post getPost() {

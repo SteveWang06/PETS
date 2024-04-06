@@ -28,24 +28,24 @@ public class ImageController {
     this.imageService = imageService;
   }
 
-  @GetMapping("/url")
-  public ResponseEntity<byte[]> getImage(@PathVariable String imageUrl) throws IOException {
-    // Đọc dữ liệu từ tệp hình ảnh
-    Path imagePath = Paths.get(uploadDir + imageUrl);
-    byte[] imageData = Files.readAllBytes(imagePath);
+//  @GetMapping("/url")
+//  public ResponseEntity<byte[]> getImage(@PathVariable String imageUrl) throws IOException {
+//    // Đọc dữ liệu từ tệp hình ảnh
+//    Path imagePath = Paths.get(uploadDir + imageUrl);
+//    byte[] imageData = Files.readAllBytes(imagePath);
+//
+//    // Trả về dữ liệu hình ảnh trong phản hồi HTTP
+//    HttpHeaders headers = new HttpHeaders();
+//    headers.setContentType(MediaType.IMAGE_JPEG); // hoặc MediaType.IMAGE_PNG nếu là hình PNG
+//    return new ResponseEntity<>(imageData, headers, HttpStatus.OK);
+//  }
 
-    // Trả về dữ liệu hình ảnh trong phản hồi HTTP
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.IMAGE_JPEG); // hoặc MediaType.IMAGE_PNG nếu là hình PNG
-    return new ResponseEntity<>(imageData, headers, HttpStatus.OK);
-  }
-
-  @GetMapping("/{imageName}")
-  public ResponseEntity<byte[]> getImageByName(@PathVariable String imageName) {
-    Image image = imageService.getImageByName(imageName);
+  @GetMapping("/{imageUrl}")
+  public ResponseEntity<byte[]> getImageByName(@PathVariable String imageUrl) {
+    Image image = imageService.getImageByUrl(imageUrl);
     if (image != null) {
       try {
-        Path imagePath = Paths.get(image.getImageUrl());
+        Path imagePath = Paths.get(image.getImagePath());
         byte[] imageData = Files.readAllBytes(imagePath);
         // Trả về dữ liệu hình ảnh trong ResponseEntity
         return ResponseEntity.ok()

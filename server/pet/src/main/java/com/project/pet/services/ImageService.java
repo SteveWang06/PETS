@@ -16,10 +16,10 @@ public class ImageService {
   @Autowired
   private ImageRepository imageRepository;
 
-  public Image getImageByName(String imageName) {
-    return imageRepository.findByName(imageName);
-  }
   public Image getImageByUrl(String imageUrl) {
     return imageRepository.findByImageUrl(imageUrl);
   }
+//  public Image getImageByUrl(String imageUrl) {
+//    return imageRepository.findByImageUrl(imageUrl);
+//  }
 }
