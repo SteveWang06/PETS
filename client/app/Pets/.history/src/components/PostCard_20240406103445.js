@@ -10,15 +10,6 @@ const PostCard = ({
   postKinds,
   like,
 }) => {
-
-  const renderItem = ({ item }) => (
-    <Image
-      source={{ uri: item }}
-      style={{ width: 100, height: 100, marginRight: 10 }}
-    />
-  );
-
-
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -31,13 +22,8 @@ const PostCard = ({
       </View>
       <Text style={styles.content}>{caption}</Text>
       <Text style={styles.content}>{postKinds}</Text>
+      <Image source={{ url: `http://localhost:8080/api/auth/${postImages}` }} style={styles.postImage} />
       
-      <FlatList
-      data={postImages}
-      renderItem={renderItem}
-      keyExtractor={(item, index) => index.toString()}
-      horizontal
-    />
       <View style={styles.likeIconAndLikeQuantity}>
         <MaterialCommunityIcons name='thumb-up' size={15} color={"#099BFA"} />
         <Text style={styles.likeQuantity}>{like}</Text>
