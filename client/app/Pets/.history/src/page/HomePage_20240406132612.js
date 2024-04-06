@@ -18,8 +18,7 @@ const HomePage = () => {
           authorAvatar: post.authorAvatar,
           caption: post.caption,
           like: post.postLike,
-          //images: post.postImages.map(image => image.imageUrl), 
-          images: post.postImages.map(image => `http://localhost:8080/api/auth/${image.imageUrl}`), 
+          images: post.postImages.map(image => image.imageUrl), 
         }));
 
         
@@ -55,6 +54,7 @@ const HomePage = () => {
           authorName={formattedPosts.authorName}
           authorAvatar={formattedPosts.authorAvatar}
           caption={formattedPosts.caption}
+          //postImages={formattedPosts.images}
           postImages={formattedPosts.images}
           postKinds={formattedPosts.postKinds}
           like={formattedPosts.like}
