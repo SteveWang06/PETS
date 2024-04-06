@@ -43,13 +43,7 @@ public class PostServiceImpl implements PostService{
 
   }
 
-//  @Override
-//  public String createPost(Post post) {
-//
-//    postRepository.save(post);
-//
-//    return "Success";
-//  }
+
 
 
 
@@ -62,11 +56,12 @@ public class PostServiceImpl implements PostService{
 
     List<Image> savedImages = new ArrayList<>();
     for (MultipartFile image : images) {
-      String imageUrl = saveImage(image);
-      Image savedImage = new Image();
-      savedImage.setName(imageUrl);
-      savedImage.setImageUrl(imageUrl);
 
+      ImageInfo imageInfo = saveImage(image);
+      Image savedImage = new Image();
+
+      savedImage.setImageUrl(imageInfo.getUniqueFileName());
+      savedImage.setImagePath(String.valueOf(imageInfo.getFilePath()));
       savedImage.setPost(post);
       savedImages.add(savedImage);
     }
@@ -75,16 +70,38 @@ public class PostServiceImpl implements PostService{
     return post.getId();
   }
 
-  private String saveImage(MultipartFile file) throws IOException {
+  public class ImageInfo {
+    private String uniqueFileName;
+    private Path filePath;
+
+    public ImageInfo(String uniqueFileName, Path filePath) {
+      this.uniqueFileName = uniqueFileName;
+      this.filePath = filePath;
+    }
+
+    public String getUniqueFileName() {
+      return uniqueFileName;
+    }
+
+    public Path getFilePath() {
+      return filePath;
+    }
+  }
+
+  private ImageInfo saveImage(MultipartFile file) throws IOException {
     // Tạo tên duy nhất cho hình ảnh
     String uniqueFileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
     // Tạo đường dẫn đầy đủ của hình ảnh
     Path filePath = Paths.get(uploadDir + uniqueFileName);
     // Lưu trữ hình ảnh vào đường dẫn
     Files.copy(file.getInputStream(), filePath);
-    // Trả về đường dẫn của hình ảnh
-    return uniqueFileName;
+    // Trả về thông tin hình ảnh
+    return new ImageInfo(uniqueFileName, filePath);
   }
+
+
+
+
 
   @Override
   public List<PostDTO> getAllPost() {
