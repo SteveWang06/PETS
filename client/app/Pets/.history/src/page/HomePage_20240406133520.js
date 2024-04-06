@@ -55,7 +55,7 @@ const HomePage = () => {
           authorName={formattedPosts.authorName}
           authorAvatar={formattedPosts.authorAvatar}
           caption={formattedPosts.caption}
-          postImages={formattedPosts.images}
+          //postImages={formattedPosts.images}
           postKinds={formattedPosts.postKinds}
           like={formattedPosts.like}
         />

@@ -31,7 +31,7 @@ const PostCard = ({
       </View>
       <Text style={styles.content}>{caption}</Text>
       <Text style={styles.content}>{postKinds}</Text>
-      
+      {/* <Image source={{ url: postImages }} style={styles.postImage} /> */}
       <FlatList
       data={postImages}
       renderItem={renderItem}
