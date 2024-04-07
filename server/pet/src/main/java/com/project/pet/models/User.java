@@ -1,5 +1,6 @@
 package com.project.pet.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -29,7 +30,10 @@ public class User implements UserDetails {
   @NotBlank
   private String username;
 
-  private String avatar;
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "user_id")
+  @JsonManagedReference
+  private Image avatar;
 
   @NotBlank
   @Email
@@ -120,11 +124,11 @@ public class User implements UserDetails {
   }
 
 
-  public String getAvatar() {
+  public Image getAvatar() {
     return avatar;
   }
 
-  public void setAvatar(String avatar) {
+  public void setAvatar(Image avatar) {
     this.avatar = avatar;
   }
 

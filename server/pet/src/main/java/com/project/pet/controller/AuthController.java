@@ -8,9 +8,13 @@ import com.project.pet.payload.response.LoginResponse;
 //import com.project.pet.services.UserDetailsImpl;
 import com.project.pet.services.AuthService;
 import com.project.pet.services.JwtService;
+import jakarta.validation.constraints.Email;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 
 @RestController
@@ -43,7 +47,10 @@ public class AuthController {
   }
 
   @PostMapping("/register")
-  public ResponseEntity<User> register(@RequestBody SignupDTO signupDTO) {
+  public ResponseEntity<?> register(@RequestParam("username") String username,
+                                       @RequestParam("email") String email,
+                                       @RequestParam("password") String password,
+                                       @RequestParam("image") MultipartFile images) throws IOException {
 
 //    if (userRepository.existsByUsername(signupDTO.getUsername())) {
 //      return ResponseEntity
@@ -57,7 +64,9 @@ public class AuthController {
 //          .body(new MessageResponse("Error: Email is already in use!"));
 //    }
 
-    User registerUser = authService.createUser(signupDTO);
+
+
+    User registerUser = authService.createUser(username, email, password, images);
     return ResponseEntity.ok(registerUser);
 
 //    User createdUser = authService.createUser(signupDTO);
@@ -100,7 +109,13 @@ public class AuthController {
 
     String jwtToken = jwtService.generateToken(authenticatedUser);
 
-    LoginResponse loginResponse = new LoginResponse().setToken(jwtToken).setExpiresIn(jwtService.getExpirationTime());
+    String username = authenticatedUser.getUserName();
+    Long userId = authenticatedUser.getId();
+    LoginResponse loginResponse = new LoginResponse()
+        .setToken(jwtToken)
+        .setExpiresIn(jwtService.getExpirationTime())
+        .setUserName(username)
+        .setUserId(userId);
 
     return ResponseEntity.ok(loginResponse);
   }
