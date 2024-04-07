@@ -18,7 +18,7 @@ public class PostDTO {
 
 
   private String authorName;
-  private String authorAvatar;
+  private Image authorAvatar;
   private Integer postLike;
 
   public Long getId() {
@@ -61,11 +61,11 @@ public class PostDTO {
     this.authorName = authorName;
   }
 
-  public String getAuthorAvatar() {
+  public Image getAuthorAvatar() {
     return authorAvatar;
   }
 
-  public void setAuthorAvatar(String authorAvatar) {
+  public void setAuthorAvatar(Image authorAvatar) {
     this.authorAvatar = authorAvatar;
   }
 
