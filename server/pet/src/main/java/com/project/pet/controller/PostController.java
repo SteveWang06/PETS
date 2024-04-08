@@ -15,8 +15,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-@RequestMapping("api/auth/post")
+@CrossOrigin(origins = "http://localhost:8080")
 @RestController
+@RequestMapping("api/auth/post")
+
 public class PostController {
 
   @Autowired

@@ -6,6 +6,8 @@ import com.project.pet.services.CommentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
+@CrossOrigin(origins = "http://localhost:8080")
 @RestController
 @RequestMapping("api/post")
 public class CommentController {
