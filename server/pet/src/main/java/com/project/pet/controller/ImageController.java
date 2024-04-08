@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+@CrossOrigin(origins = "http://localhost:8080")
 @RestController
 @RequestMapping("/api/auth")
 public class ImageController {
