@@ -2,7 +2,7 @@ import axios from 'axios';
 import { ApiPaths } from '../ApiPaths';
 import { BASE_URL } from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { Alert } from 'react-native';
 
 
 const getPostsFromDatabase = async () => {
@@ -32,8 +32,27 @@ const getUserIdFromAsyncStorage = async () => {
   }
 };
 
+const getUserNameAndAvatarFromAsyncStorage = async () => {
+  try {
+    const userInfo = await AsyncStorage.getItem('userInfo');
+    if (userInfo === null) {
+      console.log('No userId found in AsyncStorage');
+      return null;
+    } 
+    const { userName, avatar } = JSON.parse(userInfo);
+    const imageUrl = avatar.imageUrl;
+    console.log('UserName:', userName);
+    console.log('Avatar:', imageUrl);
+    return { userName, imageUrl };
 
-const uploadImages = async (caption, images, callback) => {
+  } catch (error) {
+    console.error('Error getting userId from AsyncStorage:', error);
+    return null;
+  }
+};
+
+
+const uploadImages = async (caption, images, callback, kind) => {
   try {
     // Lấy userId từ AsyncStorage
     const userInfo = await getUserIdFromAsyncStorage();
@@ -48,6 +67,7 @@ const uploadImages = async (caption, images, callback) => {
     const formData = new FormData();
     formData.append('userId', userId);
     formData.append('caption', caption);
+    formData.append('kind', kind)
     images.forEach((uri, index) => {
       formData.append(`images`, {
         uri: uri,
@@ -63,9 +83,9 @@ const uploadImages = async (caption, images, callback) => {
         'Authorization': `Bearer ${token}`,
       },
     });
+    Alert.alert('Success', 'Post successfully');
 
-
-
+   
     if (callback) {
       callback();
     }
@@ -76,5 +96,58 @@ const uploadImages = async (caption, images, callback) => {
   }
 };
 
+const handleUpdatePost = async (postId, caption, images, callback, kind) => {
+  try {
+    const formData = new FormData();
+    formData.append('postId', postId);
+    formData.append('caption', caption);
+    images.forEach((uri, index) => {
+      formData.append(`images`, {
+        uri: uri,
+        name: `image${index}.jpeg`,
+        type: 'image/jpeg',
+      });
+    });
+    formData.append('kind', kind);
 
-export { getPostsFromDatabase, uploadImages };
+
+
+    // Gửi yêu cầu cập nhật bài post lên server
+    const response = await axios.put(`${ApiPaths.updatePost}${postId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        
+      },
+    });
+    Alert.alert('Success', 'Post updated successfully');
+    
+
+    if (callback) {
+      callback();
+    }
+
+
+  } catch (error) {
+    console.error('Error updating post:', error);
+    Alert.alert('Error', 'An error occurred while updating post');
+  }
+
+  
+};
+
+const getPostKindFromDataBase = async () => {
+  try {
+    const response = await axios.get(ApiPaths.getAllPostKind);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    throw error;
+  }
+}
+
+
+export { getPostsFromDatabase, 
+  uploadImages, 
+  getUserNameAndAvatarFromAsyncStorage, 
+  handleUpdatePost, 
+  getPostKindFromDataBase };

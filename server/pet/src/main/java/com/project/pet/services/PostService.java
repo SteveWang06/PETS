@@ -12,10 +12,10 @@ import java.util.List;
 @Service
 public interface PostService {
 
-  public Long createPost(String caption, MultipartFile[] images, Long userId) throws IOException;
+  public Long createPost(String caption, MultipartFile[] images, Long userId, String kind) throws IOException;
   public Post getPostById(Long postId);
   public List<PostDTO> getAllPost();
-  public void updatePost(Post updatedPost);
+  public Post updatePost(Long postId, String caption, MultipartFile[] images, String kind) throws IOException;
   public void deletePost(Long id);
 
   public void addComment(PostComment comment) ;

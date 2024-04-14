@@ -47,12 +47,12 @@ public class PostServiceImpl implements PostService{
 
 
 
-  public Long createPost(String caption, MultipartFile[] images, Long userId ) throws IOException {
+  public Long createPost(String caption, MultipartFile[] images, Long userId, String kind ) throws IOException {
     Post post = new Post();
     post.setCaption(caption);
     User user = userRepository.findById(userId).orElse(null);
     post.setAuthor(user);
-
+    post.setPostKind(kind);
 
     List<Image> savedImages = new ArrayList<>();
     for (MultipartFile image : images) {
@@ -68,6 +68,35 @@ public class PostServiceImpl implements PostService{
     post.setPostImages(savedImages);
     postRepository.save(post);
     return post.getId();
+  }
+
+  public Post updatePost(Long postId, String caption, MultipartFile[] newImages, String kind) throws IOException {
+    // Lấy bài post từ cơ sở dữ liệu
+    Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Post not found"));
+    List<Image> oldImages = post.getPostImages();
+    // Cập nhật tiêu đề (caption) của bài post
+    post.setCaption(caption);
+    post.setPostKind(kind);
+
+    List<Image> newImagesList = new ArrayList<>();
+
+    // Lưu trữ hình ảnh mới và thêm vào danh sách mới
+    for (MultipartFile image : newImages) {
+      ImageInfo imageInfo = saveImage(image);
+      Image newImage = new Image();
+      newImage.setImageUrl(imageInfo.getUniqueFileName());
+      newImage.setImagePath(String.valueOf(imageInfo.getFilePath()));
+      newImage.setPost(post);
+      newImagesList.add(newImage);
+    }
+
+    // Xóa hết các hình ảnh cũ và thêm vào danh sách mới
+    post.getPostImages().clear();
+    post.getPostImages().addAll(newImagesList);
+
+    // Lưu bài post đã được cập nhật vào cơ sở dữ liệu
+    postRepository.save(post);
+    return post;
   }
 
   public class ImageInfo {
@@ -116,7 +145,8 @@ public class PostServiceImpl implements PostService{
     dto.setId(post.getId());
     dto.setCaption(post.getCaption());
     dto.setPostImages(post.getPostImages());
-    dto.setPostKinds(post.getPostKinds());
+    //dto.setPostKinds(post.getPostKinds());
+    dto.setPostKind(post.getPostKind());
     dto.setAuthorName(post.getAuthor().getUserName());
     dto.setAuthorAvatar(post.getAuthor().getAvatar());
     dto.setPostLike(post.getPostLike());
@@ -129,10 +159,7 @@ public class PostServiceImpl implements PostService{
 
   }
 
-  @Override
-  public void updatePost(Post updatedPost) {
-    postRepository.save(updatedPost);
-  }
+
   @Override
   public void deletePost(Long id) {
     postRepository.deleteById(id);

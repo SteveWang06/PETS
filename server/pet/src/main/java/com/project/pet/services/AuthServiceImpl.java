@@ -54,14 +54,18 @@ public class AuthServiceImpl implements AuthService{
     }
 
     ImageInfo avatarUrl = saveImage(images);
+    if (avatarUrl == null) {
+      return null;
+    }
+
     Image savedImage = new Image();
     savedImage.setImageUrl(avatarUrl.getUniqueFileName());
     savedImage.setImagePath(String.valueOf(avatarUrl.getFilePath()));
     User user = new User();
-    user.setUserName(user.getUsername());
-    user.setEmail(user.getEmail());
+    user.setUserName(username);
+    user.setEmail(email);
     user.setAvatar(savedImage);
-    user.setPassword(passwordEncoder.encode(user.getPassword()));
+    user.setPassword(passwordEncoder.encode(password)); // Encode the provided password
     user.setRole(optionalRole.get());
     return userRepository.save(user);
 

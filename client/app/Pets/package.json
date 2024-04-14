@@ -19,13 +19,18 @@
     "@uiw/react-native-image-picker": "^4.1.1",
     "axios": "^1.6.8",
     "expo": "~50.0.14",
+    "expo-file-system": "~16.0.8",
     "expo-image-picker": "^14.7.1",
     "expo-status-bar": "~1.11.1",
+    "native-base": "^3.4.28",
     "react": "18.2.0",
     "react-native": "0.73.6",
+    "react-native-actions-sheet": "^0.9.3",
+    "react-native-actionsheet": "^2.4.2",
+    "react-native-element-dropdown": "^2.10.4",
+    "react-native-image-crop-picker": "^0.40.3",
     "react-native-paper": "^5.12.3",
-    "react-native-vector-icons": "^10.0.3",
-    "expo-file-system": "~16.0.8"
+    "react-native-vector-icons": "^10.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

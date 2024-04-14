@@ -1,5 +1,8 @@
 package com.project.pet.payload.response;
 
+import com.project.pet.models.Image;
+import org.springframework.web.multipart.MultipartFile;
+
 public class LoginResponse {
   private String token;
 
@@ -7,6 +10,8 @@ public class LoginResponse {
 
   private String username;
   private long userId;
+
+  private Image avatar;
 
   public String getToken() {
     return token;
@@ -45,6 +50,15 @@ public class LoginResponse {
     return this;
   }
 
+  public Image getAvatar() {
+    return avatar;
+  }
+
+  public LoginResponse setAvatar(Image avatar) {
+    this.avatar = avatar;
+    return this;
+  }
+
   @Override
   public String toString() {
     return "LoginResponse{" +
@@ -52,6 +66,7 @@ public class LoginResponse {
         ", expiresIn=" + expiresIn +
         ", username=" + username +
         ", userId=" + userId +
+        ", userId=" + avatar +
         '}';
   }
 }

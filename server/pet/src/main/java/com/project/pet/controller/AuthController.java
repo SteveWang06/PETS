@@ -2,6 +2,7 @@ package com.project.pet.controller;
 
 import com.project.pet.dto.LoginDto;
 import com.project.pet.dto.SignupDTO;
+import com.project.pet.models.Image;
 import com.project.pet.models.User;
 import com.project.pet.payload.response.LoginResponse;
 //import com.project.pet.services.RefreshTokenService;
@@ -25,19 +26,7 @@ public class AuthController {
   @Autowired
   private final AuthService authService;
 
-//  @Autowired
-//  private AuthenticationManager authenticationManager;
-//  @Autowired
-//  private JwtUtils jwtUtils;
-//
-//  @Autowired
-//  private UserDetailsServiceImpl userDetailsService;
-//
-//  @Autowired
-//  private UserRepository userRepository;
-//
-//  @Autowired
-//  private RoleRepository roleRepository;
+
 
 
   public AuthController(JwtService jwtService, AuthService authService) {
@@ -51,53 +40,15 @@ public class AuthController {
                                        @RequestParam("password") String password,
                                        @RequestParam("image") MultipartFile images) throws IOException {
 
-//    if (userRepository.existsByUsername(signupDTO.getUsername())) {
-//      return ResponseEntity
-//          .badRequest()
-//          .body(new MessageResponse("Error: Username is already taken!"));
-//    }
-//
-//    if (userRepository.existsByEmail(signupDTO.getEmail())) {
-//      return ResponseEntity
-//          .badRequest()
-//          .body(new MessageResponse("Error: Email is already in use!"));
-//    }
-
 
 
     User registerUser = authService.createUser(username, email, password, images);
+    if (registerUser == null) {
+      return ResponseEntity.badRequest().body("Failed to register user."); // Handle the case where user creation fails
+    }
     return ResponseEntity.ok(registerUser);
 
-//    User createdUser = authService.createUser(signupDTO);
-//    Set<String> strRoles = signupDTO.getRoles();
-//    Set<Role> roles = new HashSet<>();
 
-//    if (strRoles == null) {
-//      Role userRole = roleRepository.findByName(RoleEnum.ROLE_USER)
-//          .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-//      roles.add(userRole);
-//    } else {
-//      strRoles.forEach(role -> {
-//        switch (role) {
-//          case "admin":
-//            Role adminRole = roleRepository.findByName(RoleEnum.ROLE_ADMIN)
-//                .orElseThrow(() -> new RuntimeException("Error: Role is not found1."));
-//            roles.add(adminRole);
-//
-//            break;
-//
-//          default:
-//            Role userRole = roleRepository.findByName(RoleEnum.ROLE_USER)
-//                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-//            roles.add(userRole);
-//
-//        }
-//      });
-//    }
-
-
-
-    //return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
   }
 
 
@@ -110,41 +61,18 @@ public class AuthController {
 
     String username = authenticatedUser.getUserName();
     Long userId = authenticatedUser.getId();
+    Image avatar = authenticatedUser.getAvatar();
+
     LoginResponse loginResponse = new LoginResponse()
         .setToken(jwtToken)
         .setExpiresIn(jwtService.getExpirationTime())
         .setUserName(username)
-        .setUserId(userId);
+        .setUserId(userId)
+        .setAvatar(avatar);
 
     return ResponseEntity.ok(loginResponse);
   }
-
-
-
-
-
-//  @PostMapping("/login")
-//  public AuthenticationResponse createAuthenticationToken(@RequestBody LoginDto authenticationDTO, HttpServletResponse response) throws BadCredentialsException, DisabledException, UsernameNotFoundException, IOException {
-//    try {
-//      authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationDTO.getEmail(), authenticationDTO.getPassword()));
-//    } catch (BadCredentialsException e) {
-//      throw new BadCredentialsException("Incorrect username or password!");
-//    } catch (DisabledException disabledException) {
-//      response.sendError(HttpServletResponse.SC_NOT_FOUND, "User is not activated");
-//      return null;
-//    }
-//
-//    final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationDTO.getEmail());
-//
-//
-//    final String jwt = jwtUtils.generateToken(userDetails.getUsername());
-//
-//
-//    return new AuthenticationResponse(jwt);
-//
-//  }
-
-
+  
 }
 
 
