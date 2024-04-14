@@ -47,9 +47,11 @@ public class Post {
   private List<Image> postImages;
 
 
-  @ManyToMany(cascade = CascadeType.ALL)
-  @JoinTable(name = "postKinds", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "kind_id"))
-  private Set<PostKind> postKinds = new HashSet<>();
+//  @OneToOne(cascade = CascadeType.ALL)
+//  @JoinTable(name = "postKinds", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "kind_id"))
+//  private Set<PostKind> postKinds = new HashSet<>();
+  @Column()
+  private String postKind;
 
   @OneToMany(cascade = CascadeType.ALL)
   @JoinTable(name = "comments",
@@ -63,15 +65,15 @@ public class Post {
   public Post() {
   }
 
-  public Post(Long id, Date uploadAt, String caption, Integer postStatus, Integer postLike, User author, List<Image> postImages, Set<PostKind> postKinds, List<PostComment> comments) {
+  public Post(Long id, Date uploadAt, String caption, Integer postStatus, Integer postLike, String postKind, User author, List<Image> postImages, List<PostComment> comments) {
     this.id = id;
     this.uploadAt = uploadAt;
     this.caption = caption;
     this.postStatus = postStatus;
     this.postLike = postLike;
+    this.postKind = postKind;
     this.author = author;
     this.postImages = postImages;
-    this.postKinds = postKinds;
     this.comments = comments;
   }
 
@@ -131,13 +133,21 @@ public class Post {
     this.postImages = postImages;
   }
 
-  public Set<PostKind> getPostKinds() {
-    return postKinds;
+  public String getPostKind() {
+    return postKind;
   }
 
-  public void setPostKinds(Set<PostKind> postKinds) {
-    this.postKinds = postKinds;
+  public void setPostKind(String postKind) {
+    this.postKind = postKind;
   }
+
+  //  public Set<PostKind> getPostKinds() {
+//    return postKinds;
+//  }
+//
+//  public void setPostKinds(Set<PostKind> postKinds) {
+//    this.postKinds = postKinds;
+//  }
 
   public List<PostComment> getComments() {
     return comments;

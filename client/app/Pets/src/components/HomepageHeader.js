@@ -2,19 +2,30 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Modal,
-  Button,
   Pressable,
 } from "react-native";
 import React, { useState } from "react";
 import SearchBar from "./Search";
 import { AntDesign } from "@expo/vector-icons";
 import AddNewPost from "./AddNewPost";
-import HomePage from "../page/HomePage";
+import { getUserNameAndAvatarFromAsyncStorage } from "../services/requester/UserRequester";
+
+
+
+
 
 const HomepageHeader = () => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [userInfo, setUserInfo] = useState({});
+
+  const handlePress = async () => {
+    const userInfo = await getUserNameAndAvatarFromAsyncStorage(); 
+    if (userInfo) {
+      setUserInfo(userInfo);
+      setModalVisible(true);
+    }
+  };
 
   const handleModalVisibility = (visibility) => {
     setModalVisible(visibility);
@@ -30,7 +41,7 @@ const HomepageHeader = () => {
         <SearchBar />
         <Pressable
           style={styles.iconAddPost}
-          onPress={() => setModalVisible(true)}>
+          onPress={handlePress}>
           <AntDesign name='pluscircleo' size={24} color='black' />
         </Pressable>
         <View>
@@ -45,7 +56,10 @@ const HomepageHeader = () => {
             <View style={styles.centeredView}>
               <View style={styles.modalView}>
                 
-                <AddNewPost setModalVisible={handleModalVisibility}/>
+                <AddNewPost setModalVisible={handleModalVisibility}
+                            authorName={userInfo.userName}
+                            avatar={userInfo.imageUrl}
+                            />
                 
               </View>
             </View>
@@ -97,10 +111,11 @@ const styles = StyleSheet.create({
   },
   modalView: {
     width: "90%",
-    height: "60%",
+    height: "70%",
     backgroundColor: "white",
     borderRadius: 20,
     padding: 35,
+    marginTop: 10,
 
     shadowColor: "#000",
     shadowOffset: {

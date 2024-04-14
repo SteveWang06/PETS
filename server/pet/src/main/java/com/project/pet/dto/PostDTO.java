@@ -14,7 +14,7 @@ public class PostDTO {
   //private List<PostImage> postImages;
   //private MultipartFile postImages;
   private List<Image> postImages;
-  private Set<PostKind> postKinds;
+  private String postKind;
 
 
   private String authorName;
@@ -45,12 +45,21 @@ public class PostDTO {
     this.postImages = postImages;
   }
 
-  public Set<PostKind> getPostKinds() {
-    return postKinds;
+//  public Set<PostKind> getPostKinds() {
+//    return postKinds;
+//  }
+//
+//  public void setPostKinds(Set<PostKind> postKinds) {
+//    this.postKinds = postKinds;
+//  }
+
+
+  public String getPostKind() {
+    return postKind;
   }
 
-  public void setPostKinds(Set<PostKind> postKinds) {
-    this.postKinds = postKinds;
+  public void setPostKind(String postKind) {
+    this.postKind = postKind;
   }
 
   public String getAuthorName() {

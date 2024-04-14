@@ -17,7 +17,10 @@ public class PostKind {
 
   public PostKind() {}
 
-
+  public PostKind(Integer id, String kind) {
+    this.id = id;
+    this.kind = kind;
+  }
 
   public PostKind(String kind) {
     this.kind = kind;

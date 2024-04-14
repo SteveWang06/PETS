@@ -10,16 +10,14 @@ import {
   FlatList,
   ImageBackground,
 } from "react-native";
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import * as ImagePicker from "expo-image-picker";
-import axios from "axios";
-import { handlePost } from "../services/requester/UserRequester";
 import * as FileSystem from "expo-file-system";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { AntDesign } from "@expo/vector-icons";
-import { uploadImages } from "../services/requester/UserRequester";
-
-
+import { uploadImages, getPostKindFromDataBase } from "../services/requester/UserRequester";
+import { BASE_URL } from "../config";
+import { Dropdown } from "react-native-element-dropdown";
+import ActionSheet from 'react-native-actionsheet'
 
 const imgDir = FileSystem.documentDirectory + "images/";
 const ensureDirExists = async () => {
@@ -29,14 +27,41 @@ const ensureDirExists = async () => {
   }
 };
 
-const AddNewPost = ({ setModalVisible }) => {
+const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
   const [caption, setCaption] = useState("");
-  const [imageUri, setImageUri] = useState(null);
-
+  const [kind, setKind] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [images, setImages] = useState([]);
-
+  const [dataDropdown, setDataDropdown] = useState([]);
   const [imageSelected, setImageSelected] = useState([]);
+
+  useEffect(() => {
+    const fetchPostKind = async () => {
+      try {
+        const data = await getPostKindFromDataBase(); 
+        const formattedData = data.map(item => ({ label: item.kind, kind: item.kind }));
+        
+        setDataDropdown(formattedData)
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    };
+
+    fetchPostKind();
+  }, []);
+  
+  const [isFocus, setIsFocus] = useState(false);
+  //const [value, setValue] = useState(null);
+  const renderLabel = () => {
+    if (kind || isFocus) {
+      return (
+        <Text style={[styles.label, isFocus && { color: "blue" }]}>
+          Select kind
+        </Text>
+      );
+    }
+    return null;
+  };
 
   const handleModalVisibility = () => {
     images.forEach((uri) => deleteImage(uri));
@@ -44,13 +69,12 @@ const AddNewPost = ({ setModalVisible }) => {
     setModalVisible(false);
   };
 
-
-  // Load images on startup
+  //Load images on startup
   useEffect(() => {
     loadImages();
   }, []);
 
-  // Load images from file system
+  //Load images from file system
   const loadImages = async () => {
     await ensureDirExists();
     const files = await FileSystem.readDirectoryAsync(imgDir);
@@ -59,57 +83,56 @@ const AddNewPost = ({ setModalVisible }) => {
     }
   };
 
-  // Select image from library or camera
-  const selectImage = async (useLibrary) => {
-    let result;
-    const options = {
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 0.75,
-    };
+  
+  
 
-    if (useLibrary) {
-      result = await ImagePicker.launchImageLibraryAsync(options);
-    } else {
-      await ImagePicker.requestCameraPermissionsAsync();
-      result = await ImagePicker.launchCameraAsync(options);
-    }
+  const choosePhotosFromGallery = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission denied', 'You need to grant permission to access the photo library');
+        return;
+      }
 
-    // Save image if not cancelled
-    if (!result.canceled) {
-      saveImage(result.assets[0].uri);
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: false,
+        allowsMultipleSelection: true,
+        quality: 1,
+        multiple: true,
+      });
+
+      
+      
+      if (!result.cancelled) {
+        const newUris = [];
+        const uris = result.assets || result.images || result.selected || [];
+            uris.forEach(async (asset) => {
+                newUris.push(asset.uri);
+                
+            });
+            setImages([...images, ...newUris]);
+            
+      }
+    } catch (error) {
+      console.error('Error selecting multiple images:', error);
     }
   };
 
-  const saveImage = async (uri) => {
-    await ensureDirExists();
-    const filename = new Date().getTime() + ".jpeg";
-    const dest = imgDir + filename;
-    await FileSystem.copyAsync({ from: uri, to: dest });
-    setImages([...images, dest]);
-    setImageSelected(true);
-  };
+  const buttons = ["Camera", "Photo Library", "Cancel"];
+  const actionSheet = useRef()
+  const showActionSheet = () => {
+    actionSheet.current.show()
+  }
 
-  // Upload images to server
-  // const uploadImages = async () => {
-  //   setUploading(true);
-
-  //   await Promise.all(
-  //     images.map(async (uri) => {
-  //       await FileSystem.uploadAsync(
-  //         "http://localhost:8080/api/auth/post/",
-  //         uri,
-  //         {
-  //           httpMethod: "POST",
-  //           uploadType: FileSystem.FileSystemUploadType.MULTIPART,
-  //           fieldName: "file",
-  //         }
-  //       );
-  //     })
-  //   );
-
-  //   setUploading(false);
+  
+  // const saveImage = async (uri) => {
+  //   await ensureDirExists();
+  //   const filename = new Date().getTime() + ".jpeg";
+  //   const dest = imgDir + filename;
+  //   await FileSystem.copyAsync({ from: uri, to: dest });
+  //   setImages([...images, ...dest]);
+  //   setImageSelected(true);
   // };
 
   // Delete image from file system
@@ -124,11 +147,12 @@ const AddNewPost = ({ setModalVisible }) => {
       <View
         style={{
           flexDirection: "row",
-          margin: 4,
+          margin: 1,
           alignItems: "center",
+          justifyContent: "center",
         }}>
         <ImageBackground
-          style={{ width: 100, height: 100 }}
+          style={{ width: 90, height: 90 }}
           source={{ uri: item }}>
           <AntDesign.Button
             name='close'
@@ -140,8 +164,7 @@ const AddNewPost = ({ setModalVisible }) => {
           />
         </ImageBackground>
 
-        {/* <Image style={{ width: 80, height: 80 }} source={{ uri: item }} />
-        <Ionicons.Button name='trash' onPress={() => deleteImage(item)} /> */}
+        
       </View>
     );
   };
@@ -151,12 +174,12 @@ const AddNewPost = ({ setModalVisible }) => {
       <View style={styles.header}>
         <Image
           source={{
-            uri: "http://localhost:8080/api/auth/84c2f3a8-ed99-4809-970d-f9e0ed06d290_dog3.jpeg",
+            uri: `${BASE_URL}/${avatar}`,
           }}
           style={styles.avatar}
         />
 
-        <Text style={styles.author}>{"authorName"}</Text>
+        <Text style={styles.author}>{authorName}</Text>
       </View>
 
       <View>
@@ -166,15 +189,68 @@ const AddNewPost = ({ setModalVisible }) => {
           onChangeText={(text) => setCaption(text)}
           style={styles.input}
         />
+
+        <View style={styles.container}>
+          {renderLabel()}
+          <Dropdown
+            style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            inputSearchStyle={styles.inputSearchStyle}
+            iconStyle={styles.iconStyle}
+            data={dataDropdown}
+            search
+            maxHeight={300}
+            labelField='label'
+            valueField='kind'
+            placeholder={!isFocus ? "Select kind" : "..."}
+            searchPlaceholder='Search...'
+            value={kind}
+            onFocus={() => setIsFocus(true)}
+            onBlur={() => setIsFocus(false)}
+            onChange={(item) => {
+              setKind(item.kind);
+              setIsFocus(false);
+            }}
+            renderLeftIcon={() => (
+              <AntDesign
+                style={styles.icon}
+                color={isFocus ? "blue" : "black"}
+                name='Safety'
+                size={20}
+              />
+            )}
+          />
+        </View>
+
         <SafeAreaView style={{ height: 300 }}>
           <View
             style={{
               flexDirection: "row",
               justifyContent: "space-evenly",
-              marginVertical: 20,
+              //marginVertical: 20,
             }}>
-            <Button title='Photo Library' onPress={() => selectImage(true)} />
-            <Button title='Capture Image' onPress={() => selectImage(false)} />
+            <Button title='Photo Library' onPress={showActionSheet} />
+
+            <ActionSheet
+              ref={actionSheet}
+              title='choose image in'
+              options={buttons}
+              cancelButtonIndex={2}
+              onPress={(index) => {
+                switch (index) {
+                  case 0:
+                    takePhotoFromCamera();
+                    break;
+                  case 1:
+                    choosePhotosFromGallery();
+                    break;
+                  default:
+                    break;
+                }
+              }}
+            
+            />
           </View>
 
           <FlatList
@@ -216,8 +292,7 @@ const AddNewPost = ({ setModalVisible }) => {
               },
             ]}
             onPress={() => {
-              uploadImages(caption, images, handleModalVisibility);
-              
+              uploadImages(caption, images, handleModalVisibility, kind);
             }}
             disabled={images.length <= 0}>
             <Text style={styles.text}>Post</Text>
@@ -229,10 +304,6 @@ const AddNewPost = ({ setModalVisible }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    // alignItems: 'center',
-    // justifyContent: 'flex-start'
-  },
   input: {
     width: "100%",
     height: 40,
@@ -287,6 +358,43 @@ const styles = StyleSheet.create({
     width: 18,
     textAlign: "center",
     opacity: 0.7,
+  },
+  container: {
+    backgroundColor: "white",
+    padding: 16,
+  },
+  dropdown: {
+    height: 50,
+    borderColor: "gray",
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  label: {
+    position: "absolute",
+    backgroundColor: "white",
+    left: 22,
+    top: 8,
+    zIndex: 999,
+    paddingHorizontal: 8,
+    fontSize: 14,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
   },
 });
 

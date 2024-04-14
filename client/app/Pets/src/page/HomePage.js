@@ -22,25 +22,18 @@ const HomePage = () => {
         const formattedPosts = data.map(post => ({
           id: post.id,
           authorName: post.authorName,
-          authorAvatar: post.authorAvatar,
+          authorAvatar: post.authorAvatar ? `${BASE_URL}/${post.authorAvatar.imageUrl}` : null,
           caption: post.caption,
           like: post.postLike,
-          //images: post.postImages.map(image => image.imageUrl), 
+          kind: post.postKind,
           images: post.postImages.map(image => `${BASE_URL}/${image.imageUrl}`), 
         }));
 
         
         setPosts(formattedPosts);
-        console.log('Formatted Posts:', formattedPosts);
-        formattedPosts.forEach(post => {
-          console.log('Author Name:', post.authorName);
-          console.log('Caption:', post.caption);
-          console.log('Images:');
-          // Lặp qua mỗi đường dẫn imageUrl của từng bức ảnh trong mảng images
-          post.images.forEach(image => {
-            console.log(image);
-          });
-        });
+        
+        
+
       } catch (error) {
         console.error('Error fetching posts:', error);
       }
@@ -70,11 +63,12 @@ const HomePage = () => {
       {posts.slice().reverse().map(formattedPosts => (
         <PostCard
           key={formattedPosts.id}
+          id={formattedPosts.id}
           authorName={formattedPosts.authorName}
           authorAvatar={formattedPosts.authorAvatar}
           caption={formattedPosts.caption}
           postImages={formattedPosts.images}
-          postKinds={formattedPosts.postKinds}
+          kind={formattedPosts.kind}
           like={formattedPosts.like}
           
         />
