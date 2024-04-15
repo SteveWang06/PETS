@@ -1,0 +1,25 @@
+.NavigationTopBar{
+    text-align:center;
+}
+
+.lang{
+    z-index:30;
+    position:absolute;
+    width:200px;
+    right:120px;
+    top:20px;
+    border-color:gray;
+}
+
+.Search{
+    position:absolute;
+    top:35px;
+    right:50px;
+}
+
+.account{
+    position:absolute;
+    font-size:12px;
+    top:20px;
+    right:30px;
+}

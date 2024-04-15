@@ -1,11 +1,13 @@
 import './css/ContainerDashboard.css';
 
-
 const ContainerDashboard = () => {
   return(
-
+    
     <div className="ContainerDashboard">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"></link>
+
       <h1 className="title">PET ADMIN</h1>
+      <nav>
       <input type="checkbox"  id="sideMenu-active" />
       <div className="sideMenu">
         <ul className="menu">
@@ -154,7 +156,8 @@ const ContainerDashboard = () => {
 
 
 
-        <li><a className="post" href="#post">
+        <li>
+        <a className="post" href="#post">
           <div className="post-icon">
           <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -183,10 +186,11 @@ const ContainerDashboard = () => {
         <a className="settings" href="#settings">Settings</a>
         <a className="logout" href="#logout">Logout</a>
 
-        <label for="sideMenu-active">
-          <i class="fas fa-angle-right"></i>
+        <label for="sideMenu-active" className="arrow-label">     
+          <i class="fas fa-angle-left"></i>
         </label>
       </div>
+      </nav>
     </div>
   );
 }
