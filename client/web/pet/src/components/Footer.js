@@ -1,12 +1,11 @@
 import React from "react";
-import logo from './petlogo.png';
 import './css/Footer.css';
 
 const Footer = () => {
   return (
     <footer>
       <div className="container">
-        <div className="links">
+        {/* <div className="links">
         <h2>Pet Social Application</h2>
         <a href="#home">
         <img src={logo} className="logo" alt="logo" />
@@ -119,7 +118,7 @@ const Footer = () => {
         <li>Request a Quote</li>
         <li>+123-456-7890</li>
         </div>
-      </nav>
+      </nav> */}
       
       <div className="copyright">
         <p>© 2024 Create by Pet Group</p>
