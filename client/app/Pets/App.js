@@ -5,6 +5,7 @@ import { AuthProvider } from "./src/context/AuthContext";
 import { NavigationContainer } from "@react-navigation/native";
 import AppNav from "./src/navigation/AppNav";
 import './src/constants/config'
+import 'react-native-gesture-handler';
 export default function App() {
   return (
     <AuthProvider>
