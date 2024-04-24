@@ -1,0 +1,19 @@
+{
+    "home": "Home",
+    "friends": "Friends",
+    "shop": "Shop",
+    "hospital": "Hospital",
+    "profile": "Profile",
+    "change Language": "Change Language",
+    "English": "English",
+    "中文": "Chinese",
+    "camera": "Camera",
+    "photoLibrary": "Photo Library",
+    "cancel": "Cancel",
+    "inputCaption": "type something",
+    "search": "Search",
+    "selectKind": "Select Kind",
+    "addNewImage": "Add new image",
+    "chooseImageIn": "Choose Image In",
+    "post": "Post"
+}

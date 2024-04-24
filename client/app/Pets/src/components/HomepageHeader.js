@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
     height: "15%",
     width: "100%",
     backgroundColor: "#fff",
+    marginBottom: 35
   },
   rectangle: {
     position: "absolute",
