@@ -17,7 +17,9 @@ import { AntDesign } from "@expo/vector-icons";
 import { uploadImages, getPostKindFromDataBase } from "../services/requester/UserRequester";
 import { BASE_URL } from "../config";
 import { Dropdown } from "react-native-element-dropdown";
-import ActionSheet from 'react-native-actionsheet'
+import ActionSheet from 'react-native-actionsheet';
+import { useTranslation } from 'react-i18next';
+
 
 const imgDir = FileSystem.documentDirectory + "images/";
 const ensureDirExists = async () => {
@@ -34,7 +36,7 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
   const [images, setImages] = useState([]);
   const [dataDropdown, setDataDropdown] = useState([]);
   const [imageSelected, setImageSelected] = useState([]);
-
+  const { t } = useTranslation();
   useEffect(() => {
     const fetchPostKind = async () => {
       try {
@@ -56,7 +58,7 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
     if (kind || isFocus) {
       return (
         <Text style={[styles.label, isFocus && { color: "blue" }]}>
-          Select kind
+          {t('selectKind')}
         </Text>
       );
     }
@@ -119,7 +121,10 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
     }
   };
 
-  const buttons = ["Camera", "Photo Library", "Cancel"];
+  const buttons = [
+    t('camera'),
+    t('photoLibrary'),
+    t('cancel')];
   const actionSheet = useRef()
   const showActionSheet = () => {
     actionSheet.current.show()
@@ -184,7 +189,7 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
 
       <View>
         <TextInput
-          placeholder='Nhập caption...'
+          placeholder= {t('inputCaption')}
           value={caption}
           onChangeText={(text) => setCaption(text)}
           style={styles.input}
@@ -203,8 +208,8 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
             maxHeight={300}
             labelField='label'
             valueField='kind'
-            placeholder={!isFocus ? "Select kind" : "..."}
-            searchPlaceholder='Search...'
+            placeholder={!isFocus ? t('selectKind') : "..."}
+            searchPlaceholder={t('search')}
             value={kind}
             onFocus={() => setIsFocus(true)}
             onBlur={() => setIsFocus(false)}
@@ -230,11 +235,11 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
               justifyContent: "space-evenly",
               //marginVertical: 20,
             }}>
-            <Button title='Photo Library' onPress={showActionSheet} />
+            <Button title={t('addNewImage')} onPress={showActionSheet} />
 
             <ActionSheet
               ref={actionSheet}
-              title='choose image in'
+              title={t('chooseImageIn')}
               options={buttons}
               cancelButtonIndex={2}
               onPress={(index) => {
@@ -281,7 +286,7 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
           <TouchableOpacity
             style={styles.cancelButton}
             onPress={handleModalVisibility}>
-            <Text style={styles.text}>Cancel</Text>
+            <Text style={styles.text}>{t('cancel')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[
@@ -295,7 +300,7 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
               uploadImages(caption, images, handleModalVisibility, kind);
             }}
             disabled={images.length <= 0}>
-            <Text style={styles.text}>Post</Text>
+            <Text style={styles.text}>{t('post')}</Text>
           </TouchableOpacity>
         </View>
       </View>

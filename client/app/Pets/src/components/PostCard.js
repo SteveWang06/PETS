@@ -158,11 +158,6 @@ const PostCard = ({
         <View style={styles.like}>
           <MaterialCommunityIcons name='thumb-up' size={24} />
         </View>
-
-        <View>
-          <Text>{kind}</Text>
-        </View>
-
         <View style={styles.comment}>
           <MaterialCommunityIcons name='comment' size={24} />
         </View>
@@ -176,7 +171,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 10,
-    marginTop: 10,
+    margin: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,

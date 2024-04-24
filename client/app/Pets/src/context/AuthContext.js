@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
 
         console.log(`UserToken: ${userInfo.token}`);
 
-        checkAsyncStorage();
+        // checkAsyncStorage();
       })
       .catch((err) => {
         console.error(`Login error ${err}`);
