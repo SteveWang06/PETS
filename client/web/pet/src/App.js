@@ -1,20 +1,20 @@
-// import Contain from "./components/ContainerDashboard"
-// import Navi from "./components/NavigationTopBar"
+import Contain from "./components/ContainerDashboard"
+import Navi from "./components/NavigationTopBar"
 // import Post from "./pages/Post"
-// import Footer from "./components/Footer"
-// import Dashboard from "./pages/Dashboard"
-import Login from "./login"
+import Footer from "./components/Footer"
+import Dashboard from "./pages/Dashboard"
+// import Login from "./login"
 
 
 function App() {
   return (
     <div>
-      {/* <Contain/>
+      <Contain/>
       <Navi/>
-      <Post/> 
+      {/* <Post/>  */}
       <Footer/>
-      <Dashboard/> */}
-      <Login/>
+      <Dashboard/>
+      {/* <Login/> */}
     </div>
   );
 }
