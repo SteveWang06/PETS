@@ -20,7 +20,6 @@ import { Dropdown } from "react-native-element-dropdown";
 import ActionSheet from 'react-native-actionsheet';
 import { useTranslation } from 'react-i18next';
 
-
 const imgDir = FileSystem.documentDirectory + "images/";
 const ensureDirExists = async () => {
   const dirInfo = await FileSystem.getInfoAsync(imgDir);

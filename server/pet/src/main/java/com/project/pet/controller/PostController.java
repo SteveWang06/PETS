@@ -88,4 +88,44 @@ public class PostController {
     }
   }
 
+
+  @PostMapping("/{postId}/like")
+  public ResponseEntity<?> likePost(@PathVariable Long postId) {
+    Optional<Post> optionalPost = postRepository.findById(postId);
+    if (optionalPost.isPresent()) {
+      Post post = optionalPost.get();
+      post.setPostLike(post.getPostLike() + 1);
+      postRepository.save(post);
+      return ResponseEntity.ok("Liked post with ID: " + postId);
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
+    }
+  }
+
+  @GetMapping("/{postId}/likes")
+  public ResponseEntity<?> getLikes(@PathVariable Long postId) {
+    Optional<Post> optionalPost = postRepository.findById(postId);
+    if (optionalPost.isPresent()) {
+      Post post = optionalPost.get();
+      return ResponseEntity.ok(post.getPostLike());
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
+    }
+  }
+
+  @DeleteMapping("/{postId}/like")
+  public ResponseEntity<?> unlikePost(@PathVariable Long postId) {
+    Optional<Post> optionalPost = postRepository.findById(postId);
+    if (optionalPost.isPresent()) {
+      Post post = optionalPost.get();
+      if (post.getPostLike() > 0) {
+        post.setPostLike(post.getPostLike() - 1);
+        postRepository.save(post);
+      }
+      return ResponseEntity.ok("Unliked post with ID: " + postId);
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
+    }
+  }
+
 }

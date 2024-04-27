@@ -109,8 +109,8 @@ public class Post {
     this.postStatus = postStatus;
   }
 
-  public Integer getPostLike() {
-    return postLike;
+  public int getPostLike() {
+    return postLike != null ? postLike.intValue() : 0;
   }
 
   public void setPostLike(Integer postLike) {

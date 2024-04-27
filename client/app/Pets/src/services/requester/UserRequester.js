@@ -3,7 +3,7 @@ import { ApiPaths } from '../ApiPaths';
 import { BASE_URL } from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
-
+import FlashMessage, { showMessage } from 'react-native-flash-message';
 
 const getPostsFromDatabase = async () => {
   try {
@@ -83,7 +83,14 @@ const uploadImages = async (caption, images, callback, kind) => {
         'Authorization': `Bearer ${token}`,
       },
     });
-    Alert.alert('Success', 'Post successfully');
+    showMessage({
+      message: 'successfully',
+      type: 'success',
+      floating: true,
+      duration: 3000,
+      autoHide: true,
+      
+    });
 
    
     if (callback) {
@@ -119,8 +126,14 @@ const handleUpdatePost = async (postId, caption, images, callback, kind) => {
         
       },
     });
-    Alert.alert('Success', 'Post updated successfully');
-    
+    showMessage({
+      message: 'successfully',
+      type: 'success',
+      floating: true,
+      duration: 3000,
+      autoHide: true,
+      
+    });
 
     if (callback) {
       callback();
@@ -145,9 +158,46 @@ const getPostKindFromDataBase = async () => {
   }
 }
 
+const addLike = async (postId) => {
+  try {
+    console.log('Like post id:', postId);
+    const userInfo = await getUserIdFromAsyncStorage();
+    const { token } = userInfo;
+
+    const response = await axios.post(`${ApiPaths.addPostLike}${postId}/like`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    
+
+    console.log('Like added:', response.data);
+  } catch (error) {
+    console.error('Error adding like:', error);
+  }
+};
+
+const removeLike = async (postId) => {
+  try {
+    const userInfo = await getUserIdFromAsyncStorage();
+    const { token } = userInfo;
+    const response = await axios.delete(`${ApiPaths.addPostLike}${postId}/like`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    console.log('Like added:', response.data);
+  } catch (error) {
+    console.error('Error adding like:', error);
+  }
+};
+
+
 
 export { getPostsFromDatabase, 
   uploadImages, 
   getUserNameAndAvatarFromAsyncStorage, 
   handleUpdatePost, 
-  getPostKindFromDataBase };
+  getPostKindFromDataBase,
+  addLike,
+  removeLike };
