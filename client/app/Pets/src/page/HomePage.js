@@ -23,6 +23,7 @@ import AddNewPost from "../components/AddNewPost";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { getPostKindFromDataBase } from "../services/requester/UserRequester";
+import FlashMessage, { showMessage } from 'react-native-flash-message';
 
 const { width, height } = Dimensions.get("screen");
 
@@ -88,7 +89,6 @@ const Tabs = ({ data, scrollX, onItemPress, currentTabIndex }) => {
       item.ref.current.measureLayout(
         containerRef.current,
         (x, y, width, height) => {
-          console.log(x, y, width, height);
           m.push({
             x,
             y,
@@ -97,8 +97,7 @@ const Tabs = ({ data, scrollX, onItemPress, currentTabIndex }) => {
           });
           if (m.length === data.length) {
             setMeasures(m);
-            console.log("item: ", item);
-            console.log("data.length: ", data.length);
+            
           }
         }
       );
@@ -106,7 +105,6 @@ const Tabs = ({ data, scrollX, onItemPress, currentTabIndex }) => {
     });
   }, [data]);
 
-  console.log("measures: ", measures);
   return (
     <View
       style={{
@@ -180,7 +178,7 @@ const HomePage = () => {
       }
     };
     fetchPosts();
-  }, [refreshing]);
+  }, [posts]);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -200,7 +198,6 @@ const HomePage = () => {
     const fetchPostKind = async () => {
       try {
         const data = await getPostKindFromDataBase();
-        console.log("fetchPostKind", data);
         setTitles(data);
       } catch (error) {
         console.error("Error fetching posts:", error);
@@ -225,7 +222,7 @@ const HomePage = () => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1}}>
       <HomepageHeader />
       <Tabs
         data={dataWithRefs}
@@ -270,9 +267,11 @@ const HomePage = () => {
                   />
                 ))}
             </ScrollView>
+            
           </View>
         )}
       />
+      <FlashMessage position="top"/>
     </View>
   );
 };

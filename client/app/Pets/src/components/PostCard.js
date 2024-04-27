@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { AntDesign } from "@expo/vector-icons";
 import EditPostModal from "./EditPostModal";
-import { getUserNameAndAvatarFromAsyncStorage } from "../services/requester/UserRequester";
+import { addLike, removeLike, getUserNameAndAvatarFromAsyncStorage } from "../services/requester/UserRequester";
 
 const PostCard = ({
   id,
@@ -26,11 +26,13 @@ const PostCard = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [userInfo, setUserInfo] = useState({});
   const [postId, setPostId] = useState(id);
+  const [liked, setLiked] = useState(false);
+
   const handleModalVisibility = (visibility) => {
     setModalVisible(visibility);
   };
 
-  const handlePress = async () => {
+  const handlePressEditPost = async () => {
     const userInfo = await getUserNameAndAvatarFromAsyncStorage();
     if (userInfo) {
       setUserInfo(userInfo);
@@ -38,6 +40,11 @@ const PostCard = ({
       
     }
     console.log("postId:", postId);
+  };
+
+
+  const handlePressLiked = () => {
+    setLiked(!liked);
   };
 
   const renderItem = ({ item }) => (
@@ -98,6 +105,15 @@ const PostCard = ({
 
   const data = [{ key: "postImages" }];
 
+  useEffect(() => {
+    if (liked) {
+
+      addLike(postId);
+    } else {
+      removeLike(postId);
+    }
+  }, [liked]);
+
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -105,7 +121,7 @@ const PostCard = ({
 
         <View style={styles.cardHeader}>
           <Text style={styles.author}>{authorName}</Text>
-          <Pressable style={styles.iconEdit} onPress={handlePress}>
+          <Pressable style={styles.iconEdit} onPress={handlePressEditPost}>
             <AntDesign name='ellipsis1' size={24} color='black' />
           </Pressable>
 
@@ -155,12 +171,17 @@ const PostCard = ({
       <View style={styles.line}></View>
 
       <View style={styles.action}>
-        <View style={styles.like}>
-          <MaterialCommunityIcons name='thumb-up' size={24} />
-        </View>
-        <View style={styles.comment}>
-          <MaterialCommunityIcons name='comment' size={24} />
-        </View>
+        <Pressable style={styles.like} onPress={handlePressLiked}>
+          <MaterialCommunityIcons 
+            name={liked ? 'thumb-up' : 'thumb-up-outline'}
+            size={20}
+            color={liked ? 'blue' : 'black'} />
+          <Text style={styles.textActionButton}>{liked ? 'Liked' : 'Like'}</Text>
+        </Pressable>
+        <Pressable style={styles.comment}>
+          <MaterialCommunityIcons name='comment-outline' size={20} />
+          <Text style={styles.textActionButton}>Comment</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -208,16 +229,16 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   like: {
+    flexDirection: "row",
     width: "40%",
-    //borderWidth: 1,
     alignItems: "center",
-    //borderRadius: 10
+    justifyContent: "center",
   },
   comment: {
+    flexDirection: "row",
     width: "40%",
-    //borderWidth: 1,
     alignItems: "center",
-    //borderRadius: 10
+    justifyContent: "center",
   },
 
   line: {
@@ -277,6 +298,9 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+  textActionButton: {
+    marginLeft: 10,
+  }
 });
 
 export default PostCard;
