@@ -1,7 +1,8 @@
 package com.project.pet.services;
 
 
-import com.project.pet.dto.CommentRequest;
+import com.project.pet.dto.CommentDTO;
+import com.project.pet.exception.NotFoundException;
 import com.project.pet.models.Post;
 import com.project.pet.models.PostComment;
 import com.project.pet.repository.PostCommentRepository;
@@ -9,56 +10,60 @@ import com.project.pet.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
-public class CommentServiceImpl implements CommentService{
-  private PostRepository postRepository;
-  private PostCommentRepository postCommentRepository;
+public class CommentServiceImpl implements CommentService {
 
-  public CommentServiceImpl(PostRepository postRepository, PostCommentRepository postCommentRepository) {
-    this.postRepository = postRepository;
-    this.postCommentRepository = postCommentRepository;
+  @Autowired
+  private PostCommentRepository commentRepository;
+
+  @Override
+  public PostComment createComment(PostComment comment) {
+
+    return commentRepository.save(comment);
   }
 
-
-
-
-
-  public void addCommentToPost(Long postId, CommentRequest commentRequest) {
-    Optional<Post> optionalPost = postRepository.findById(postId);
-    if (!optionalPost.isPresent()) {
-      throw new EntityNotFoundException("Post not found with ID: " + postId);
-    }
-
-    Post post = optionalPost.get();
-    PostComment postComment = new PostComment();
-    postComment.setPost(post);
-    postComment.setContent(commentRequest.getContent());
-    postCommentRepository.save(postComment);
-
-    //insertDataFromCommentToPostAndComment(postId, postComment.getId());
-
-
+  @Override
+  public List<PostComment> getAllComments() {
+    return commentRepository.findAll();
   }
 
-  public void insertDataFromCommentToPostAndComment(Long postId, Long commentId) {
-    Optional<PostComment> commentOptional = postCommentRepository.findById(commentId);
-    Optional<Post> postOptional = postRepository.findById(postId);
+  @Override
+  public Optional<PostComment> getCommentById(Long commentId) {
+    return commentRepository.findById(commentId);
+  }
 
-    if (commentOptional.isPresent() && postOptional.isPresent()) {
-      PostComment comment = commentOptional.get();
-      Post post = postOptional.get();
-
-      // Thêm comment vào danh sách comments của post
-      post.getComments().add(comment);
-
-      // Lưu lại post để JPA tự động quản lý insert dữ liệu vào bảng postAndComment
-      postRepository.save(post);
-    } else {
-      throw new EntityNotFoundException("post id not found");
+  @Override
+  public PostComment updateComment(Long commentId, PostComment updatedComment) {
+    Optional<PostComment> optionalComment = commentRepository.findById(commentId);
+    if (!optionalComment.isPresent()) {
+      // Xử lý trường hợp không tìm thấy comment
+      throw new NotFoundException("Comment not found");
     }
+
+    PostComment comment = optionalComment.get();
+    // Cập nhật thông tin comment với thông tin mới từ updatedComment
+    // Ví dụ:
+    comment.setContent(updatedComment.getContent());
+    comment.setUploadAt(updatedComment.getUploadAt());
+
+    return commentRepository.save(comment);
+  }
+
+  @Override
+  public void deleteComment(Long commentId) {
+    Optional<PostComment> optionalComment = commentRepository.findById(commentId);
+    if (!optionalComment.isPresent()) {
+      // Xử lý trường hợp không tìm thấy comment
+      throw new NotFoundException("Comment not found");
+    }
+
+    commentRepository.deleteById(commentId);
   }
 }
