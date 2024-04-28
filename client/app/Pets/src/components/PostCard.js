@@ -13,6 +13,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { AntDesign } from "@expo/vector-icons";
 import EditPostModal from "./EditPostModal";
 import { addLike, removeLike, getUserNameAndAvatarFromAsyncStorage } from "../services/requester/UserRequester";
+import CommentModal from "./CommentModal";
 
 const PostCard = ({
   id,
@@ -24,12 +25,18 @@ const PostCard = ({
   like,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalCommentVisible, setModalCommentVisible] = useState(false);
   const [userInfo, setUserInfo] = useState({});
   const [postId, setPostId] = useState(id);
   const [liked, setLiked] = useState(false);
+  
 
   const handleModalVisibility = (visibility) => {
     setModalVisible(visibility);
+  };
+
+  const handleModalCommentVisibility = (visibility) => {
+    setModalCommentVisible(visibility);
   };
 
   const handlePressEditPost = async () => {
@@ -39,6 +46,12 @@ const PostCard = ({
       setModalVisible(true);
       
     }
+    console.log("postId:", postId);
+  };
+
+  const handleShowComment = async () => {
+    
+    setModalCommentVisible(true);
     console.log("postId:", postId);
   };
 
@@ -178,10 +191,28 @@ const PostCard = ({
             color={liked ? 'blue' : 'black'} />
           <Text style={styles.textActionButton}>{liked ? 'Liked' : 'Like'}</Text>
         </Pressable>
-        <Pressable style={styles.comment}>
+        
+        <Pressable style={styles.comment} onPress={handleShowComment}>
           <MaterialCommunityIcons name='comment-outline' size={20} />
           <Text style={styles.textActionButton}>Comment</Text>
+          <View style={styles.EditPostModal}>
+            <Modal
+              animationType='slide'
+              transparent={true}
+              visible={modalCommentVisible}
+              onRequestClose={() => {
+                Alert.alert("Modal has been closed.");
+                setModalCommentVisible(!modalCommentVisible);
+              }}>
+              <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                  <CommentModal setModalCommentVisible={handleModalCommentVisibility}/>
+                </View>
+              </View>
+            </Modal>
+          </View>
         </Pressable>
+        
       </View>
     </View>
   );

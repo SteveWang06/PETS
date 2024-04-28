@@ -1,64 +1,75 @@
 package com.project.pet.services;
 
 
-import com.project.pet.dto.CommentRequest;
-import com.project.pet.models.Post;
+import com.project.pet.exception.NotFoundException;
+import com.project.pet.exception.UnauthorizedException;
 import com.project.pet.models.PostComment;
+import com.project.pet.models.User;
 import com.project.pet.repository.PostCommentRepository;
-import com.project.pet.repository.PostRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Date;
 import java.util.Optional;
-import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
-public class CommentServiceImpl implements CommentService{
-  private PostRepository postRepository;
+public class CommentServiceImpl implements CommentService {
+
+  @Autowired
   private PostCommentRepository postCommentRepository;
 
-  public CommentServiceImpl(PostRepository postRepository, PostCommentRepository postCommentRepository) {
-    this.postRepository = postRepository;
-    this.postCommentRepository = postCommentRepository;
+
+  public PostComment createComment(Long postId, User userId, String content) {
+    PostComment comment = new PostComment();
+    comment.setPostId(postId);
+    comment.setUserId(userId);
+    comment.setContent(content);
+    comment.setUploadAt(new Date());
+
+    return postCommentRepository.save(comment);
   }
 
+  @Override
+  public PostComment updateComment(Long commentId, Long userId, String content) {
 
 
+    Long currentUserId = getUserIdByCommentId(commentId);
 
-
-  public void addCommentToPost(Long postId, CommentRequest commentRequest) {
-    Optional<Post> optionalPost = postRepository.findById(postId);
-    if (!optionalPost.isPresent()) {
-      throw new EntityNotFoundException("Post not found with ID: " + postId);
+    if (!userId.equals(currentUserId)) {
+      throw new UnauthorizedException("User is not authorized to update this comment");
     }
-
-    Post post = optionalPost.get();
-    PostComment postComment = new PostComment();
-    postComment.setPost(post);
-    postComment.setContent(commentRequest.getContent());
-    postCommentRepository.save(postComment);
-
-    //insertDataFromCommentToPostAndComment(postId, postComment.getId());
+    System.out.println("userId " + userId);
+    System.out.println("currentUserId " + currentUserId);
 
 
-  }
 
-  public void insertDataFromCommentToPostAndComment(Long postId, Long commentId) {
-    Optional<PostComment> commentOptional = postCommentRepository.findById(commentId);
-    Optional<Post> postOptional = postRepository.findById(postId);
+    Optional<PostComment> optionalComment = postCommentRepository.findById(commentId);
+    if (optionalComment.isPresent()) {
+      PostComment comment = optionalComment.get();
 
-    if (commentOptional.isPresent() && postOptional.isPresent()) {
-      PostComment comment = commentOptional.get();
-      Post post = postOptional.get();
+      comment.setContent(content);
+      comment.setUploadAt(new Date());
 
-      // Thêm comment vào danh sách comments của post
-      post.getComments().add(comment);
-
-      // Lưu lại post để JPA tự động quản lý insert dữ liệu vào bảng postAndComment
-      postRepository.save(post);
+      // Lưu comment đã cập nhật vào cơ sở dữ liệu
+      return postCommentRepository.save(comment);
     } else {
-      throw new EntityNotFoundException("post id not found");
+      // Nếu comment không tồn tại, bạn có thể throw một exception hoặc xử lý theo cách khác tùy thuộc vào yêu cầu của bạn.
+      throw new NotFoundException("Comment not found with ID: " + commentId);
     }
+
+
+  }
+
+  public Long getUserIdByCommentId(Long commentId) {
+    return postCommentRepository.findUserIdById(commentId);
+  }
+
+  @Override
+  public void deleteComment(Long commentId) {
+    PostComment existingComment = postCommentRepository.findById(commentId)
+        .orElseThrow(() -> new IllegalArgumentException("Comment not found with id: " + commentId));
+
+    postCommentRepository.delete(existingComment);
   }
 }
