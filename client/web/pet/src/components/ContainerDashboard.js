@@ -1,4 +1,6 @@
 import './css/ContainerDashboard.css';
+import '../pages/Post.js';
+import '../pages/Dashboard.js';
 
 const ContainerDashboard = () => {
   return(
@@ -195,5 +197,3 @@ const ContainerDashboard = () => {
   );
 }
 export default ContainerDashboard;
-
-

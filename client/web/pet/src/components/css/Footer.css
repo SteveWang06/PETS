@@ -70,7 +70,7 @@
 
 .copyright{
     position:fixed;
-    bottom:20px;
+    bottom:0;
     width:100%;
     text-align:center;
     z-index: -5;

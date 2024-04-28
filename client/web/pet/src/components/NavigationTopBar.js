@@ -13,9 +13,6 @@ const NavigationTopBar = () => {
       <p>Admin</p>
       </div>
       
-        <div className="Search">
-        <input type="text" class="Search" placeholder="Search"></input>
-        </div>
       </div>
     );
   }
