@@ -56,8 +56,7 @@ public class Post {
   @OneToMany(cascade = CascadeType.ALL)
   @JoinTable(name = "comments",
       joinColumns = @JoinColumn(name = "post_id", referencedColumnName = "id"),
-      inverseJoinColumns = @JoinColumn(name = "comments_id", referencedColumnName = "id"))
-
+      inverseJoinColumns = @JoinColumn(name = "id", referencedColumnName = "id"))
   private List<PostComment> comments = new ArrayList<>();
 
 

@@ -1,4 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useState
+} from "react";
 import {
   View,
   Text,
@@ -10,9 +13,15 @@ import {
   Modal,
 } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { AntDesign } from "@expo/vector-icons";
-import EditPostModal from "./EditPostModal";
-import { addLike, removeLike, getUserNameAndAvatarFromAsyncStorage } from "../services/requester/UserRequester";
+import {
+  AntDesign
+} from "@expo/vector-icons";
+import EditPostModal from "./modal/EditPostModal";
+import {
+  addLike,
+  removeLike,
+  getUserNameAndAvatarFromAsyncStorage
+} from "../services/requester/UserRequester";
 
 const PostCard = ({
   id,
@@ -37,7 +46,7 @@ const PostCard = ({
     if (userInfo) {
       setUserInfo(userInfo);
       setModalVisible(true);
-      
+
     }
     console.log("postId:", postId);
   };
@@ -47,10 +56,22 @@ const PostCard = ({
     setLiked(!liked);
   };
 
-  const renderItem = ({ item }) => (
-    <Image
-      source={{ uri: item }}
-      style={{ width: 200, height: 200, marginRight: 3, marginBottom: 3 }}
+  const renderItem = ({
+    item
+  }) => ( <
+    Image source = {
+      {
+        uri: item
+      }
+    }
+    style = {
+      {
+        width: 200,
+        height: 200,
+        marginRight: 3,
+        marginBottom: 3
+      }
+    }
     />
   );
 
@@ -103,7 +124,9 @@ const PostCard = ({
     // Xử lý khi người dùng bấm vào nút "more"
   };
 
-  const data = [{ key: "postImages" }];
+  const data = [{
+    key: "postImages"
+  }];
 
   useEffect(() => {
     if (liked) {
@@ -114,76 +137,201 @@ const PostCard = ({
     }
   }, [liked]);
 
-  return (
-    <View style={styles.card}>
-      <View style={styles.header}>
-        <Image source={{ uri: authorAvatar }} style={styles.avatar} />
+  return ( <
+    View style = {
+      styles.card
+    } >
+    <
+    View style = {
+      styles.header
+    } >
+    <
+    Image source = {
+      {
+        uri: authorAvatar
+      }
+    }
+    style = {
+      styles.avatar
+    }
+    />
 
-        <View style={styles.cardHeader}>
-          <Text style={styles.author}>{authorName}</Text>
-          <Pressable style={styles.iconEdit} onPress={handlePressEditPost}>
-            <AntDesign name='ellipsis1' size={24} color='black' />
-          </Pressable>
+    <
+    View style = {
+      styles.cardHeader
+    } >
+    <
+    Text style = {
+      styles.author
+    } > {
+      authorName
+    } < /Text> <
+    Pressable style = {
+      styles.iconEdit
+    }
+    onPress = {
+      handlePressEditPost
+    } >
+    <
+    AntDesign name = 'ellipsis1'
+    size = {
+      24
+    }
+    color = 'black' / >
+    <
+    /Pressable>
 
-          <View style={styles.EditPostModal}>
-            <Modal
-              animationType='slide'
-              transparent={true}
-              visible={modalVisible}
-              onRequestClose={() => {
-                Alert.alert("Modal has been closed.");
-                setModalVisible(!modalVisible);
-              }}>
-              <View style={styles.centeredView}>
-                <View style={styles.modalView}>
-                  <EditPostModal
-                    postId={postId}
-                    setModalVisible={handleModalVisibility}
-                    authorName={userInfo.userName}
-                    avatar={userInfo.imageUrl}
-                    caption={caption}
-                    postImages={postImages}
-                    postKind={kind}
-                  />
-                </View>
-              </View>
-            </Modal>
-          </View>
+    <
+    View style = {
+      styles.EditPostModal
+    } >
+    <
+    Modal animationType = 'slide'
+    transparent = {
+      true
+    }
+    visible = {
+      modalVisible
+    }
+    onRequestClose = {
+      () => {
+        Alert.alert("Modal has been closed.");
+        setModalVisible(!modalVisible);
+      }
+    } >
+    <
+    View style = {
+      styles.centeredView
+    } >
+    <
+    View style = {
+      styles.modalView
+    } >
+    <
+    EditPostModal postId = {
+      postId
+    }
+    setModalVisible = {
+      handleModalVisibility
+    }
+    authorName = {
+      userInfo.userName
+    }
+    avatar = {
+      userInfo.imageUrl
+    }
+    caption = {
+      caption
+    }
+    postImages = {
+      postImages
+    }
+    postKind = {
+      kind
+    }
+    /> < /
+    View > <
+    /View> < /
+    Modal > <
+    /View>
 
-          {/* <Text style={styles.time}>{time}</Text> */}
-        </View>
-      </View>
-      <Text style={styles.content}>{caption}</Text>
+    {
+      /* <Text style={styles.time}>{time}</Text> */
+    } <
+    /View> < /
+    View > <
+    Text style = {
+      styles.content
+    } > {
+      caption
+    } < /Text>
 
-      <View style={styles.listImage}>
-        <FlatList
-          data={postImages}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-          numColumns={2}
-        />
-      </View>
-      <View style={styles.likeIconAndLikeQuantity}>
-        <MaterialCommunityIcons name='thumb-up' size={15} color={"#099BFA"} />
-        <Text style={styles.likeQuantity}>{like}</Text>
-      </View>
+    <
+    View style = {
+      styles.listImage
+    } >
+    <
+    FlatList data = {
+      postImages
+    }
+    renderItem = {
+      renderItem
+    }
+    keyExtractor = {
+      (item, index) => index.toString()
+    }
+    numColumns = {
+      2
+    }
+    /> < /
+    View > <
+    View style = {
+      styles.likeIconAndLikeQuantity
+    } >
+    <
+    MaterialCommunityIcons name = 'thumb-up'
+    size = {
+      15
+    }
+    color = {
+      "#099BFA"
+    }
+    /> <
+    Text style = {
+      styles.likeQuantity
+    } > {
+      like
+    } < /Text> < /
+    View >
 
-      <View style={styles.line}></View>
+    <
+    View style = {
+      styles.line
+    } > < /View>
 
-      <View style={styles.action}>
-        <Pressable style={styles.like} onPress={handlePressLiked}>
-          <MaterialCommunityIcons 
-            name={liked ? 'thumb-up' : 'thumb-up-outline'}
-            size={20}
-            color={liked ? 'blue' : 'black'} />
-          <Text style={styles.textActionButton}>{liked ? 'Liked' : 'Like'}</Text>
-        </Pressable>
-        <Pressable style={styles.comment}>
-          <MaterialCommunityIcons name='comment-outline' size={20} />
-          <Text style={styles.textActionButton}>Comment</Text>
-        </Pressable>
-      </View>
-    </View>
+    <
+    View style = {
+      styles.action
+    } >
+    <
+    Pressable style = {
+      styles.like
+    }
+    onPress = {
+      handlePressLiked
+    } >
+    <
+    MaterialCommunityIcons name = {
+      liked ? 'thumb-up' : 'thumb-up-outline'
+    }
+    size = {
+      20
+    }
+    color = {
+      liked ? 'blue' : 'black'
+    }
+    /> <
+    Text style = {
+      styles.textActionButton
+    } > {
+      liked ? 'Liked' : 'Like'
+    } < /Text> < /
+    Pressable > <
+    Pressable style = {
+      styles.comment
+    } >
+    <
+    MaterialCommunityIcons name = 'comment-outline'
+    size = {
+      20
+    }
+    /> <
+    Text style = {
+      styles.textActionButton
+    } > Comment < /Text> < /
+    Pressable > <
+    /View> < /
+    View >
   );
 };
 
@@ -194,7 +342,10 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 10,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
@@ -275,7 +426,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 3,
   },
-  
+
   centeredView: {
     flex: 1,
     justifyContent: "center",

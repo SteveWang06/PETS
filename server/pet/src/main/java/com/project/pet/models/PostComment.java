@@ -1,12 +1,11 @@
 package com.project.pet.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Entity
 @Data
@@ -14,18 +13,29 @@ import java.util.Set;
 public class PostComment {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
 
-  @ManyToOne()
-  private Post post;
+  @Column(name = "post_id")
+  private Long postId;
+
+//  @Column(name = "user_id")
+//  private Long userId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private User author;
 
 
-
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+  @Column
+  private Date uploadAt;
 
   @Column
   private String content;
+
+
+
 
   public PostComment() {}
 
@@ -49,14 +59,36 @@ public class PostComment {
     this.content = content;
   }
 
+//  public Long getUserId() {
+//    return userId;
+//  }
+//
+//  public void setUserId(Long user) {
+//    this.userId = user;
+//  }
 
 
-
-  public Post getPost() {
-    return post;
+  public User getAuthor() {
+    return author;
   }
 
-  public void setPost(Post post) {
-    this.post = post;
+  public void setAuthor(User author) {
+    this.author = author;
+  }
+
+  public Date getUploadAt() {
+    return uploadAt;
+  }
+
+  public void setUploadAt(Date uploadAt) {
+    this.uploadAt = uploadAt;
+  }
+
+  public Long getPostId() {
+    return postId;
+  }
+
+  public void setPostId(Long post) {
+    this.postId = post;
   }
 }
