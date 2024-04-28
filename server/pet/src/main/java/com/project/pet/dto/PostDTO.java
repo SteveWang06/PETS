@@ -1,6 +1,7 @@
 package com.project.pet.dto;
 
 import com.project.pet.models.Image;
+import com.project.pet.models.PostComment;
 import com.project.pet.models.PostKind;
 import com.project.pet.models.User;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,8 +16,7 @@ public class PostDTO {
   //private MultipartFile postImages;
   private List<Image> postImages;
   private String postKind;
-
-
+  private List<PostComment> postComment;
   private String authorName;
   private Image authorAvatar;
   private Integer postLike;
@@ -84,6 +84,14 @@ public class PostDTO {
 
   public void setPostLike(Integer postLike) {
     this.postLike = postLike;
+  }
+
+  public List<PostComment> getPostComment() {
+    return postComment;
+  }
+
+  public void setPostComment(List<PostComment> postComment) {
+    this.postComment = postComment;
   }
 
   //  public List<String> getPostImages() {

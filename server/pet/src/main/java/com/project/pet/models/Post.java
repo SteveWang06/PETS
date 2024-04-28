@@ -47,17 +47,17 @@ public class Post {
   private List<Image> postImages;
 
 
-//  @OneToOne(cascade = CascadeType.ALL)
+  //  @OneToOne(cascade = CascadeType.ALL)
 //  @JoinTable(name = "postKinds", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "kind_id"))
 //  private Set<PostKind> postKinds = new HashSet<>();
   @Column()
   private String postKind;
 
   @OneToMany(cascade = CascadeType.ALL)
-  @JoinTable(name = "comments",
-      joinColumns = @JoinColumn(name = "post_id", referencedColumnName = "id"),
-      inverseJoinColumns = @JoinColumn(name = "comments_id", referencedColumnName = "id"))
-
+//  @JoinTable(name = "comments",
+//      joinColumns = @JoinColumn(name = "post_id", referencedColumnName = "id"),
+//      inverseJoinColumns = @JoinColumn(name = "id", referencedColumnName = "id"))
+  @JoinColumn(name = "post_id")
   private List<PostComment> comments = new ArrayList<>();
 
 

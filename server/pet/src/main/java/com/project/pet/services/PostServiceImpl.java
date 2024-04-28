@@ -1,23 +1,19 @@
 package com.project.pet.services;
 
 import com.project.pet.dto.PostDTO;
-import com.project.pet.exception.PostNotFoundException;
 import com.project.pet.models.*;
 import com.project.pet.repository.PostImageRepository;
 import com.project.pet.repository.PostRepository;
 import com.project.pet.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,7 +33,7 @@ public class PostServiceImpl implements PostService{
 
   public PostServiceImpl(PostRepository postRepository,
                          PostImageRepository postImageRepository
-                        ) {
+  ) {
     this.postRepository = postRepository;
     this.postImageRepository = postImageRepository;
 
@@ -150,6 +146,7 @@ public class PostServiceImpl implements PostService{
     dto.setAuthorName(post.getAuthor().getUserName());
     dto.setAuthorAvatar(post.getAuthor().getAvatar());
     dto.setPostLike(post.getPostLike());
+    dto.setPostComment(post.getComments());
     return dto;
   }
 
@@ -164,9 +161,8 @@ public class PostServiceImpl implements PostService{
   public void deletePost(Long id) {
     postRepository.deleteById(id);
   }
-   @Override
-    public void addComment(PostComment comment) {
+  @Override
+  public void addComment(PostComment comment) {
 
-    }
+  }
 }
-
