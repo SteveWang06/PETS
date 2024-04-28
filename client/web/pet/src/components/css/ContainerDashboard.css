@@ -11,9 +11,9 @@ body{
   color:#4880FF;
   font-size:25px;
   left:20px;
-  position:absolute;
+  position:fixed;
   top:20px;
-  z-index:5;
+  z-index:30;
 }
 
 label {
@@ -73,6 +73,7 @@ label {
   position: fixed;
   transform: translateX(0);
   transition: 0.5s;
+  z-index:20;
 }
 
 .settings {
@@ -114,6 +115,7 @@ ul.menu {
 ul.menu li {
   position: relative;
   white-space: nowrap;
+  z-index:110;
 }
 
 ul.menu a {

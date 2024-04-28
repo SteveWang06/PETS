@@ -1,13 +1,20 @@
 // login.js
 
 import React, { useState } from 'react';
+import axios from 'axios'
 import './login.css';
 import logo from './petlogo.png';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberPassword, setRememberPassword] = useState(false);
+  function handleSubmit(event){
+    event.preventDefault();
+    axios.post('localhost:8080/api/auth/login',{email,password})
+    .then(res => console.log(res))
+    .cath(err => console.log(err))
+  }
+   const [rememberPassword, setRememberPassword] = useState(false);
 
   const handleLogin = () => {
     console.log('Email:', email);
@@ -24,7 +31,7 @@ const Login = () => {
       <center><img src={logo} className="login"/></center>
       <h2 align="center">Login to Account</h2>
       <center><p>Please enter your email and password to continue</p></center>
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="input-group">
           <label>Email:</label>
           <input
