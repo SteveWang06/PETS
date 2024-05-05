@@ -12,7 +12,11 @@ import {
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { AntDesign } from "@expo/vector-icons";
 import EditPostModal from "./EditPostModal";
-import { addLike, removeLike, getUserNameAndAvatarFromAsyncStorage } from "../services/requester/UserRequester";
+import {
+  addLike,
+  removeLike,
+  getUserNameAndAvatarFromAsyncStorage,
+} from "../services/requester/UserRequester";
 import CommentModal from "./CommentModal";
 
 const PostCard = ({
@@ -26,11 +30,13 @@ const PostCard = ({
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalCommentVisible, setModalCommentVisible] = useState(false);
+  const [modalInCommentVisible, setModalInCommentVisible] = useState(true);
+
   const [userInfo, setUserInfo] = useState({});
   const [postId, setPostId] = useState(id);
   const [liked, setLiked] = useState(false);
-  
 
+ 
   const handleModalVisibility = (visibility) => {
     setModalVisible(visibility);
   };
@@ -44,17 +50,17 @@ const PostCard = ({
     if (userInfo) {
       setUserInfo(userInfo);
       setModalVisible(true);
-      
     }
     console.log("postId:", postId);
   };
 
   const handleShowComment = async () => {
-    
     setModalCommentVisible(true);
+    setModalInCommentVisible(false);
+    //modalInCommentVisible=false;
+    console.log("setModalInCommentVisible: ", modalInCommentVisible);
     console.log("postId:", postId);
   };
-
 
   const handlePressLiked = () => {
     setLiked(!liked);
@@ -120,13 +126,13 @@ const PostCard = ({
 
   useEffect(() => {
     if (liked) {
-
       addLike(postId);
     } else {
       removeLike(postId);
     }
   }, [liked]);
 
+  
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -185,14 +191,20 @@ const PostCard = ({
 
       <View style={styles.action}>
         <Pressable style={styles.like} onPress={handlePressLiked}>
-          <MaterialCommunityIcons 
-            name={liked ? 'thumb-up' : 'thumb-up-outline'}
+          <MaterialCommunityIcons
+            name={liked ? "thumb-up" : "thumb-up-outline"}
             size={20}
-            color={liked ? 'blue' : 'black'} />
-          <Text style={styles.textActionButton}>{liked ? 'Liked' : 'Like'}</Text>
+            color={liked ? "blue" : "black"}
+          />
+          <Text style={styles.textActionButton}>
+            {liked ? "Liked" : "Like"}
+          </Text>
         </Pressable>
         
-        <Pressable style={styles.comment} onPress={handleShowComment}>
+        
+        <Pressable
+          style={styles.comment}
+          onPress={ handleShowComment }>
           <MaterialCommunityIcons name='comment-outline' size={20} />
           <Text style={styles.textActionButton}>Comment</Text>
           <View style={styles.EditPostModal}>
@@ -204,15 +216,19 @@ const PostCard = ({
                 Alert.alert("Modal has been closed.");
                 setModalCommentVisible(!modalCommentVisible);
               }}>
+              
               <View style={styles.centeredView}>
                 <View style={styles.modalView}>
-                  <CommentModal setModalCommentVisible={handleModalCommentVisibility}/>
+                  <CommentModal
+                    setModalCommentVisible={handleModalCommentVisibility}
+                    setModalInCommentVisible={setModalInCommentVisible}
+                    postId={postId}
+                  />
                 </View>
               </View>
             </Modal>
           </View>
         </Pressable>
-        
       </View>
     </View>
   );
@@ -306,7 +322,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 3,
   },
-  
+
   centeredView: {
     flex: 1,
     justifyContent: "center",
@@ -331,6 +347,9 @@ const styles = StyleSheet.create({
   },
   textActionButton: {
     marginLeft: 10,
+  },
+  commentModal: {
+    height: '100%'
   }
 });
 

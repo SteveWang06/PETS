@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.3.5",
+    "@markmccoid/react-native-hold-menu": "^0.1.1",
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-navigation/bottom-tabs": "^6.5.20",
     "@react-navigation/material-bottom-tabs": "^6.2.28",
@@ -19,7 +20,9 @@
     "@uiw/react-native-image-picker": "^4.1.1",
     "axios": "^1.6.8",
     "expo": "~50.0.14",
+    "expo-blur": "~12.9.2",
     "expo-file-system": "~16.0.8",
+    "expo-haptics": "~12.8.1",
     "expo-image-picker": "^14.7.1",
     "expo-linear-gradient": "~12.7.2",
     "expo-status-bar": "~1.11.1",
@@ -33,11 +36,13 @@
     "react-native-element-dropdown": "^2.10.4",
     "react-native-flash-message": "^0.4.2",
     "react-native-gesture-handler": "~2.14.0",
+    "react-native-hold-menu": "^0.1.6",
     "react-native-image-crop-picker": "^0.40.3",
     "react-native-localize": "^3.1.0",
     "react-native-paper": "^5.12.3",
     "react-native-reanimated": "~3.6.2",
     "react-native-super-alert": "^0.1.0",
+    "react-native-unimodules": "^0.14.10",
     "react-native-vector-icons": "^10.0.3"
   },
   "devDependencies": {
