@@ -33,15 +33,15 @@ public class PostController {
     this.postService = postService;
   }
 
-  @GetMapping("/{id}")
-  public ResponseEntity<Post> getPostById(@PathVariable Long id) {
-    try {
-      Post post = postService.getPostById(id);
-      return new ResponseEntity<Post>(post, HttpStatus.OK);
-    }catch (NoSuchElementException e){
-      return new ResponseEntity<Post>(HttpStatus.NOT_FOUND);
-    }
 
+  @GetMapping("/{postId}")
+  public ResponseEntity<PostDTO> getPostById(@PathVariable Long postId) {
+    PostDTO postDTO = postService.getPostById(postId);
+    if (postDTO != null) {
+      return ResponseEntity.ok().body(postDTO);
+    } else {
+      return ResponseEntity.notFound().build();
+    }
   }
 
   @GetMapping("/")

@@ -150,10 +150,21 @@ public class PostServiceImpl implements PostService{
     return dto;
   }
 
-  @Override
-  public Post getPostById(Long postId) {
-    return postRepository.findById(postId).get();
+//  @Override
+//  public Post getPostById(Long postId) {
+//    return postRepository.findById(postId).get();
+//
+//  }
 
+  @Override
+  public PostDTO getPostById(Long postId) {
+    Optional<Post> postOptional = postRepository.findById(postId);
+    if (postOptional.isPresent()) {
+      Post post = postOptional.get();
+      return convertToDTO(post);
+    } else {
+      throw new IllegalArgumentException("Post not found with ID: " + postId);
+    }
   }
 
 

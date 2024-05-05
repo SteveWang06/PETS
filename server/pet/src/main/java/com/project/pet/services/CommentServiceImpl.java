@@ -31,16 +31,16 @@ public class CommentServiceImpl implements CommentService {
   }
 
   @Override
-  public PostComment updateComment(Long commentId, Long userId, String content) {
+  public PostComment updateComment(Long commentId, String content) {
 
 
-    Long currentUserId = getUserIdByCommentId(commentId);
-
-    if (!userId.equals(currentUserId)) {
-      throw new UnauthorizedException("User is not authorized to update this comment");
-    }
-    System.out.println("userId " + userId);
-    System.out.println("currentUserId " + currentUserId);
+//    Long currentUserId = getUserIdByCommentId(commentId);
+//
+//    if (!userId.equals(currentUserId)) {
+//      throw new UnauthorizedException("User is not authorized to update this comment");
+//    }
+//    System.out.println("userId " + userId);
+//    System.out.println("currentUserId " + currentUserId);
 
 
 

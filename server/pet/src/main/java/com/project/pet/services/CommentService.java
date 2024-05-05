@@ -10,7 +10,7 @@ import java.util.Optional;
 @Service
 public interface CommentService {
   PostComment createComment(Long postId, User userId, String content);
-  PostComment updateComment(Long commentId, Long userId, String content);
+  PostComment updateComment(Long commentId, String content);
   void deleteComment(Long commentId);
 
 

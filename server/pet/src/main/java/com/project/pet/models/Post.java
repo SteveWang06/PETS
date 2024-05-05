@@ -1,9 +1,6 @@
 package com.project.pet.models;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +11,7 @@ import java.util.*;
 @Entity
 @Table(name = "post")
 @Data
+
 public class Post {
 
   @Id
@@ -33,6 +31,7 @@ public class Post {
   @Column()
   private Integer postLike;
 
+  @JsonIgnore
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User author;
