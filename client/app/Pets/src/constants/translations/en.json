@@ -15,5 +15,12 @@
     "selectKind": "Select Kind",
     "addNewImage": "Add new image",
     "chooseImageIn": "Choose Image In",
-    "post": "Post"
+    "post": "Post",
+    "logout": "Logout",
+    "save": "Save",
+    "liked": "Liked",
+    "like": "Like",
+    "comment": "Comment",
+    "selectImage": "Select Image",
+    "notComment": "No Comment Available"
 }

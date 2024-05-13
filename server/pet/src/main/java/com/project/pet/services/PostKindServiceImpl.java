@@ -1,5 +1,6 @@
 package com.project.pet.services;
 
+import com.project.pet.models.PostComment;
 import com.project.pet.models.PostKind;
 import com.project.pet.models.User;
 import com.project.pet.repository.PostKindRepository;
@@ -29,5 +30,13 @@ public class PostKindServiceImpl implements PostKindService{
     PostKind postKind = new PostKind();
     postKind.setKind(kind);
     return postKindRepository.save(postKind);
+  }
+
+  @Override
+  public void deleteKind(Integer kindId) {
+    PostKind existingKind = postKindRepository.findById(kindId)
+        .orElseThrow(() -> new IllegalArgumentException("Comment not found with id: " + kindId));
+
+    postKindRepository.delete(existingKind);
   }
 }

@@ -1,36 +1,32 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Modal,
-  Pressable,
-} from "react-native";
+import { View, Text, StyleSheet, Modal, Pressable } from "react-native";
 import React, { useState } from "react";
 import SearchBar from "./Search";
 import { AntDesign } from "@expo/vector-icons";
 import AddNewPost from "./AddNewPost";
 import { getUserNameAndAvatarFromAsyncStorage } from "../services/requester/UserRequester";
-
-
-
-
-
+import { useSelector } from "react-redux";
+import { BASE_URL } from "../config";
 const HomepageHeader = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [userInfo, setUserInfo] = useState({});
-
+  const userData = useSelector((state) => state.auth.userData);
+  const userId = userData.userId;
+  const userToken = userData.token;
+  const userName = userData.userName;
+  const userAvatar = userData.avatar.imageUrl;
   const handlePress = async () => {
-    const userInfo = await getUserNameAndAvatarFromAsyncStorage(); 
-    if (userInfo) {
-      setUserInfo(userInfo);
-      setModalVisible(true);
-    }
+    // const userInfo = await getUserNameAndAvatarFromAsyncStorage();
+    // if (userInfo) {
+    //   //setUserInfo(userInfo);
+    //   setModalVisible(true);
+    // }
+    setModalVisible(true);
   };
 
   const handleModalVisibility = (visibility) => {
     setModalVisible(visibility);
   };
-  
+
   return (
     <View style={styles.container}>
       <View style={styles.rectangle}>
@@ -39,9 +35,7 @@ const HomepageHeader = () => {
 
       <View style={styles.search}>
         <SearchBar />
-        <Pressable
-          style={styles.iconAddPost}
-          onPress={handlePress}>
+        <Pressable style={styles.iconAddPost} onPress={handlePress}>
           <AntDesign name='pluscircleo' size={24} color='black' />
         </Pressable>
         <View>
@@ -55,12 +49,11 @@ const HomepageHeader = () => {
             }}>
             <View style={styles.centeredView}>
               <View style={styles.modalView}>
-                
-                <AddNewPost setModalVisible={handleModalVisibility}
-                            authorName={userInfo.userName}
-                            avatar={userInfo.imageUrl}
-                            />
-                
+                <AddNewPost
+                  setModalVisible={handleModalVisibility}
+                  authorName={userName}
+                  avatar={userAvatar}
+                />
               </View>
             </View>
           </Modal>
@@ -75,7 +68,7 @@ const styles = StyleSheet.create({
     height: "15%",
     width: "100%",
     backgroundColor: "#fff",
-    marginBottom: 35
+    marginBottom: 35,
   },
   rectangle: {
     position: "absolute",
@@ -129,4 +122,3 @@ const styles = StyleSheet.create({
   },
 });
 export default HomepageHeader;
-

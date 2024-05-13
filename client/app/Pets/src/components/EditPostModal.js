@@ -18,6 +18,7 @@ import { getPostKindFromDataBase, handleUpdatePost } from "../services/requester
 import { BASE_URL } from "../config";
 import { Dropdown } from "react-native-element-dropdown";
 import ActionSheet from "react-native-actionsheet";
+import { useTranslation } from 'react-i18next';
 
 const imgDir = FileSystem.documentDirectory + "images/";
 const ensureDirExists = async () => {
@@ -46,6 +47,8 @@ const EditPostModal = ({
   const [postImagesAfterDelete, setPostImagesAfterDelete] = useState(null);
   const [imageSelected, setImageSelected] = useState([]);
   const [dataDropdown, setDataDropdown] = useState([]);
+  const { t } = useTranslation();
+
   useEffect(() => {
     const fetchPostKind = async () => {
       try {
@@ -66,7 +69,7 @@ const EditPostModal = ({
     if (kind || isFocus) {
       return (
         <Text style={[styles.label, isFocus && { color: "blue" }]}>
-          Select kind
+          {t("selectKind")}
         </Text>
       );
     }
@@ -128,7 +131,7 @@ const EditPostModal = ({
     }
   };
 
-  const buttons = ["Camera", "Photo Library", "Cancel"];
+  const buttons = [t("camera"), t("photoLibrary"), t("cancel")];
   const actionSheet = useRef();
   const showActionSheet = () => {
     actionSheet.current.show();
@@ -248,7 +251,7 @@ const EditPostModal = ({
               justifyContent: "space-evenly",
               //marginVertical: 20,
             }}>
-            <Button title='Photo Library' onPress={showActionSheet} />
+            <Button title={t("selectImage")} onPress={showActionSheet} />
 
             <ActionSheet
               ref={actionSheet}
@@ -298,7 +301,7 @@ const EditPostModal = ({
           <TouchableOpacity
             style={styles.cancelButton}
             onPress={handleModalVisibility}>
-            <Text style={styles.text}>Cancel</Text>
+            <Text style={styles.text}>{t("cancel")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[
@@ -312,7 +315,7 @@ const EditPostModal = ({
                 handleUpdatePost(id, postCaption, images, handleModalVisibility, kind);
             }}
             disabled={images.length <= 0}>
-            <Text style={styles.text}>Save</Text>
+            <Text style={styles.text}>{t("save")}</Text>
           </TouchableOpacity>
         </View>
       </View>

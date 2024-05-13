@@ -10,4 +10,5 @@ import java.util.List;
 public interface PostKindService {
   public List<PostKind> getAllKinds();
   public PostKind createKind(String kind);
+  public  void deleteKind (Integer kindId);
 }
