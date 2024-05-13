@@ -4,6 +4,7 @@ import { BASE_URL } from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
 import FlashMessage, { showMessage } from 'react-native-flash-message';
+import { useSelector } from 'react-redux';
 
 const getPostsFromDatabase = async () => {
   try {
@@ -28,10 +29,15 @@ const getPostsByIdFromDatabase = async (postId) => {
 
 const getUserIdFromAsyncStorage = async () => {
   try {
-    const userInfo = await AsyncStorage.getItem('userInfo');
-    if (userInfo !== null) {
-      const { userId, userName, token } = JSON.parse(userInfo);
-      return { userId: parseInt(userId), userName, token };
+    //const userInfo = await AsyncStorage.getItem('userInfo');
+    const userData = useSelector(state => state.auth.userData);
+    const userId = userData.userId;
+    const userToken = userData.token;
+    const userName = userData.userName;
+    if (userData !== null) {
+      // const { userId, userName, token } = JSON.parse(userInfo);
+      // return { userId: parseInt(userId), userName, token };
+      return { userId: parseInt(userId), userName, userToken };
     } else {
       console.log('No userId found in AsyncStorage');
       return null;
@@ -44,16 +50,23 @@ const getUserIdFromAsyncStorage = async () => {
 
 const getUserNameAndAvatarFromAsyncStorage = async () => {
   try {
-    const userInfo = await AsyncStorage.getItem('userInfo');
-    if (userInfo === null) {
+    //const userInfo = await AsyncStorage.getItem('userInfo');
+
+    const userData = useSelector(state => state.auth.userData);
+    const userId = userData.userId;
+    const userToken = userData.token;
+    const userName = userData.userName;
+    const userAvatar = userData.userAvatar;
+    if (userData === null) {
       console.log('No userId found in AsyncStorage');
       return null;
     } 
-    const { userName, avatar } = JSON.parse(userInfo);
-    const imageUrl = avatar.imageUrl;
+
+    // const { userName, avatar } = JSON.parse(userInfo);
+    // const imageUrl = avatar.imageUrl;
     console.log('UserName:', userName);
     console.log('Avatar:', imageUrl);
-    return { userName, imageUrl };
+    return { userName, userAvatar };
 
   } catch (error) {
     console.error('Error getting userId from AsyncStorage:', error);
@@ -168,11 +181,11 @@ const getPostKindFromDataBase = async () => {
   }
 }
 
-const addLike = async (postId) => {
+const addLike = async (postId, token) => {
   try {
-    console.log('Like post id:', postId);
-    const userInfo = await getUserIdFromAsyncStorage();
-    const { token } = userInfo;
+    // console.log('Like post id:', postId);
+    // const userInfo = await getUserIdFromAsyncStorage();
+    // const { token } = userInfo;
 
     const response = await axios.post(`${ApiPaths.addPostLike}${postId}/like`, {
       headers: {
@@ -187,10 +200,10 @@ const addLike = async (postId) => {
   }
 };
 
-const removeLike = async (postId) => {
+const removeLike = async (postId, token) => {
   try {
-    const userInfo = await getUserIdFromAsyncStorage();
-    const { token } = userInfo;
+    // const userInfo = await getUserIdFromAsyncStorage();
+    // const { token } = userInfo;
     const response = await axios.delete(`${ApiPaths.addPostLike}${postId}/like`, {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -287,6 +300,23 @@ const handleEditComment = async (commentId, content) => {
 
 }
 
+const getUserByIdFromDatabase = async (userId, token) => {
+  try {
+    
+    // const userInfo = await getUserIdFromAsyncStorage();
+    // const { userId, token } = userInfo;
+    const response = await axios.get(`${ApiPaths.getUserById}/${userId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    throw error;
+  }
+};
+
 
 
 
@@ -301,4 +331,5 @@ export { getPostsFromDatabase,
   handleAddCommentToPost,
   handleDeleteComment,
   handleEditComment,
-  getUserIdFromAsyncStorage };
+  getUserIdFromAsyncStorage,
+  getUserByIdFromDatabase };

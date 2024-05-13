@@ -137,26 +137,26 @@ const styles = StyleSheet.create({
   },
   commentTextContainer: {
     flex: 1,
+    backgroundColor: "#EBEFF4",
+    borderRadius: 10
   },
   authorName: {
     fontWeight: "bold",
+    marginLeft: 10,
   },
   content: {
     marginBottom: 10,
+    marginLeft: 10,
   },
   textInputContent: {
     marginBottom: 10,
-    borderWidth: 1,
-    borderColor: "gray",
-    borderRadius: 5,
     padding: 5,
   },
   uploadTime: {
     fontSize: 10,
+    marginLeft: 10,
   },
-  editButton: {
-    color: "blue",
-  },
+  
 });
 
 export default RenderItemComments;

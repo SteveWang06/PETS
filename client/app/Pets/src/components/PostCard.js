@@ -18,6 +18,8 @@ import {
   getUserNameAndAvatarFromAsyncStorage,
 } from "../services/requester/UserRequester";
 import CommentModal from "./CommentModal";
+import { updatePostLike } from "../redux/actions/postActions";
+import { useDispatch, useSelector } from "react-redux";
 
 const PostCard = ({
   id,
@@ -27,6 +29,7 @@ const PostCard = ({
   postImages,
   kind,
   like,
+  onLikeToggle
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalCommentVisible, setModalCommentVisible] = useState(false);
@@ -35,7 +38,6 @@ const PostCard = ({
   const [userInfo, setUserInfo] = useState({});
   const [postId, setPostId] = useState(id);
   const [liked, setLiked] = useState(false);
-
  
   const handleModalVisibility = (visibility) => {
     setModalVisible(visibility);
@@ -63,6 +65,7 @@ const PostCard = ({
   };
 
   const handlePressLiked = () => {
+    onLikeToggle(id, like);
     setLiked(!liked);
   };
 
@@ -122,17 +125,12 @@ const PostCard = ({
     // Xử lý khi người dùng bấm vào nút "more"
   };
 
-  const data = [{ key: "postImages" }];
-
-  useEffect(() => {
-    if (liked) {
-      addLike(postId);
-    } else {
-      removeLike(postId);
-    }
-  }, [liked]);
-
   
+  const isLiked = useSelector(state => state.post?.posts[postId] || false);
+  const userData = useSelector(state => state.auth.userData);
+  const userId = userData.userId;
+  const userToken = userData.token;
+  const dispatch = useDispatch();
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -190,14 +188,14 @@ const PostCard = ({
       <View style={styles.line}></View>
 
       <View style={styles.action}>
-        <Pressable style={styles.like} onPress={handlePressLiked}>
+        <Pressable style={styles.like} onPress={() => dispatch(updatePostLike(id, !isLiked, userToken))}>
           <MaterialCommunityIcons
-            name={liked ? "thumb-up" : "thumb-up-outline"}
+            name={isLiked ? "thumb-up" : "thumb-up-outline"}
             size={20}
-            color={liked ? "blue" : "black"}
+            color={isLiked ? "blue" : "black"}
           />
           <Text style={styles.textActionButton}>
-            {liked ? "Liked" : "Like"}
+            {isLiked ? "Liked" : "Like"}
           </Text>
         </Pressable>
         

@@ -234,7 +234,7 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
               justifyContent: "space-evenly",
               //marginVertical: 20,
             }}>
-            <Button title={t('addNewImage')} onPress={showActionSheet} />
+            <Button title={t('selectImage')} onPress={showActionSheet} />
 
             <ActionSheet
               ref={actionSheet}

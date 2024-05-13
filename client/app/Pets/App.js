@@ -1,30 +1,21 @@
-import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
-import LoginScreen from "./src/screens/LoginScreen";
 import { AuthProvider } from "./src/context/AuthContext";
-import { NavigationContainer } from "@react-navigation/native";
 import AppNav from "./src/navigation/AppNav";
-import './src/constants/config'
-import 'react-native-gesture-handler';
-import { HoldMenuProvider } from 'react-native-hold-menu';
-
+import "./src/constants/config";
+import "react-native-gesture-handler";
+import { Provider } from "react-redux";
+import store from "./src/redux/store/store"
 export default function App() {
   return (
-    
+    <Provider store={store}>
 
-    <AuthProvider>
-      <AppNav/>
-    </AuthProvider>
-
+      <AppNav />
+      {/* <AuthProvider>
+        <AppNav />
+      </AuthProvider> */}
+    </Provider>
     
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+
