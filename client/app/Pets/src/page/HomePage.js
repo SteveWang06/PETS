@@ -1,13 +1,9 @@
-import React, { useEffect, useState, useRef, useLayoutEffect, useMemo } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   ScrollView,
   View,
   RefreshControl,
   Dimensions,
-  findNodeHandle,
-  FlatList,
-  FlatListProps,
-  StatusBar,
   Text,
   Animated,
   TouchableOpacity,
@@ -15,13 +11,8 @@ import {
 import PostCard from "../components/PostCard";
 import { getPostsFromDatabase } from "../services/requester/UserRequester"; // Import hàm từ module UserRequester
 import HomepageHeader from "../components/HomepageHeader";
-import SearchBar from "../components/Search";
 import { BASE_URL } from "../config";
-import { ApiPaths } from "../services/ApiPaths";
-import AddNewPost from "../components/AddNewPost";
 
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { LinearGradient } from "expo-linear-gradient";
 import { getPostKindFromDataBase } from "../services/requester/UserRequester";
 import FlashMessage, { showMessage } from 'react-native-flash-message';
 
@@ -145,6 +136,7 @@ const Tabs = ({ data, scrollX, onItemPress, currentTabIndex }) => {
   );
 };
 
+
 const HomePage = () => {
   const [posts, setPosts] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -152,7 +144,6 @@ const HomePage = () => {
   const scrollX = useRef(new Animated.Value(0)).current;
   const ref = useRef();
   const [titles, setTitles] = useState([]);
-
 
   useEffect(() => {
     const fetchPosts = async () => {

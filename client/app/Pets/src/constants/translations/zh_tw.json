@@ -15,5 +15,12 @@
     "selectKind": "貼文類型",
     "addNewImage": "增新照片",
     "chooseImageIn": "選擇照片在",
-    "post": "上傳"
+    "post": "上傳",
+    "logout": "登出",
+    "save": "儲存",
+    "liked": "讚",
+    "like": "讚",
+    "comment": "留言",
+    "selectImage": "圖片上傳",
+    "notComment": "沒有留言"
 }

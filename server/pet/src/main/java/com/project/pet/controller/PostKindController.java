@@ -35,4 +35,10 @@ public class PostKindController {
     List<PostKind> postKinds = postKindService.getAllKinds();
     return ResponseEntity.ok(postKinds);
   }
+
+  @DeleteMapping("/{kindId}")
+  public ResponseEntity<String> deleteKind(@PathVariable Integer kindId) {
+    postKindService.deleteKind(kindId);
+    return ResponseEntity.ok("Kind deleted successfully");
+  }
 }

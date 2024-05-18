@@ -1,5 +1,6 @@
 package com.project.pet.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -51,7 +52,11 @@ public class User implements UserDetails {
   @Column(name = "updated_at")
   private Date updatedAt;
 
-  @OneToOne(cascade = CascadeType.REMOVE)
+  @JsonIgnore
+  @OneToMany(mappedBy = "author")
+  private List<Post> posts;
+
+  @OneToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
   private Role role;
 
@@ -60,6 +65,10 @@ public class User implements UserDetails {
     SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.getName().toString());
 
     return List.of(authority);
+  }
+
+  public List<Post> getPosts() {
+    return posts;
   }
 
   public String getPassword() {

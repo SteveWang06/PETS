@@ -21,6 +21,7 @@ import { AntDesign } from "@expo/vector-icons";
 import EditPostModal from "./EditPostModal";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import RenderItemComments from "./RenderItemComments";
+import { useTranslation } from 'react-i18next';
 
 const CommentModal = ({
   setModalCommentVisible,
@@ -33,6 +34,8 @@ const CommentModal = ({
   const [liked, setLiked] = useState(false);
   const [text, setText] = useState("");
   const [actionSheetCommentId, setActionSheetCommentId] = useState(null);
+  const { t } = useTranslation();
+
   const handleModalVisibility = () => {
     setModalCommentVisible(false);
     setModalInCommentVisible(true);
@@ -123,9 +126,9 @@ const CommentModal = ({
                     style={styles.iconEdit}
                     onPress={handlePressEditPost}>
                     <AntDesign name='ellipsis1' size={24} color='black' />
-                  </Pressable> */}
+                  </Pressable> 
 
-                  <View style={styles.EditPostModal}>
+                   <View style={styles.EditPostModal}>
                     <Modal
                       animationType='slide'
                       transparent={true}
@@ -148,7 +151,7 @@ const CommentModal = ({
                         </View>
                       </View>
                     </Modal>
-                  </View>
+                  </View> */}
                 </View>
               </View>
               <Text style={styles.content}>{post.caption}</Text>
@@ -204,7 +207,7 @@ const CommentModal = ({
                 ) : (
                   <View style={styles.noCommentsContainer}>
                     <Text style={styles.noCommentsText}>
-                      No comments available
+                      {t("notComment")}
                     </Text>
                   </View>
                 )}
