@@ -33,7 +33,7 @@ public class PostServiceImpl implements PostService{
 
   public PostServiceImpl(PostRepository postRepository,
                          PostImageRepository postImageRepository
-                        ) {
+  ) {
     this.postRepository = postRepository;
     this.postImageRepository = postImageRepository;
 
@@ -150,10 +150,21 @@ public class PostServiceImpl implements PostService{
     return dto;
   }
 
-  @Override
-  public Post getPostById(Long postId) {
-    return postRepository.findById(postId).get();
+//  @Override
+//  public Post getPostById(Long postId) {
+//    return postRepository.findById(postId).get();
+//
+//  }
 
+  @Override
+  public PostDTO getPostById(Long postId) {
+    Optional<Post> postOptional = postRepository.findById(postId);
+    if (postOptional.isPresent()) {
+      Post post = postOptional.get();
+      return convertToDTO(post);
+    } else {
+      throw new IllegalArgumentException("Post not found with ID: " + postId);
+    }
   }
 
 
@@ -161,9 +172,8 @@ public class PostServiceImpl implements PostService{
   public void deletePost(Long id) {
     postRepository.deleteById(id);
   }
-   @Override
-    public void addComment(PostComment comment) {
+  @Override
+  public void addComment(PostComment comment) {
 
-    }
+  }
 }
-

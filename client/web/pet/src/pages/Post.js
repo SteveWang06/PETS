@@ -1,5 +1,8 @@
 import "./css/Post.css";
 import React, { useState } from 'react';
+import Contain from "../components/ContainerDashboard";
+import Navi from "../components/NavigationTopBar";
+import Footer from "../components/Footer";
 
 const Post = () => {
 
@@ -77,7 +80,9 @@ const Post = () => {
                     <button onClick={handleSubmit}>Add</button>
                 </div>
             )}
-
+            <Contain/>
+            <Navi/>
+            <Footer/>
         </div>
     );
 }

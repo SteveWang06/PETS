@@ -6,11 +6,17 @@ import { NavigationContainer } from "@react-navigation/native";
 import AppNav from "./src/navigation/AppNav";
 import './src/constants/config'
 import 'react-native-gesture-handler';
+import { HoldMenuProvider } from 'react-native-hold-menu';
+
 export default function App() {
   return (
+    
+
     <AuthProvider>
       <AppNav/>
     </AuthProvider>
+
+    
   );
 }
 

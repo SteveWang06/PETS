@@ -1,4 +1,7 @@
 import "./css/Dashboard.css";
+import Contain from "../components/ContainerDashboard";
+import Navi from "../components/NavigationTopBar";
+import Footer from "../components/Footer";
 
 const Post = () => {
 
@@ -130,7 +133,9 @@ const Post = () => {
                     <p><span className="label">+52%</span>Down from yesterday</p>
                 </div>
             </div>
-
+            <Contain/>
+            <Navi/>
+            <Footer/>
         </div>
     );
 }

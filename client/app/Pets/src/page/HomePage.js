@@ -153,8 +153,7 @@ const HomePage = () => {
   const ref = useRef();
   const [titles, setTitles] = useState([]);
 
-  const [measures, setMeasures] = useState([]);
-  const containerRef = useRef();
+
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -173,6 +172,7 @@ const HomePage = () => {
           ),
         }));
         setPosts(formattedPosts);
+
       } catch (error) {
         console.error("Error fetching posts:", error);
       }

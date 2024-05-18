@@ -1,6 +1,4 @@
 import './css/ContainerDashboard.css';
-import '../pages/Post.js';
-import '../pages/Dashboard.js';
 
 const ContainerDashboard = () => {
   return(
@@ -13,7 +11,8 @@ const ContainerDashboard = () => {
       <input type="checkbox"  id="sideMenu-active" />
       <div className="sideMenu">
         <ul className="menu">
-        <li><a className="dashboard" href="#dashboard">
+        <li>
+          <a className="dashboard" href="/dashboard">
           <div className="dash-icon">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -38,7 +37,7 @@ const ContainerDashboard = () => {
 
 
 
-        <li><a className="user" href="#user">
+        <li><a className="user" href="/user">
           <div className="user-icon">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -63,7 +62,7 @@ const ContainerDashboard = () => {
 
 
 
-        <li><a className="shop" href="#shop">
+        <li><a className="shop" href="/shop">
           <div className="shop-icon">
           <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -87,7 +86,7 @@ const ContainerDashboard = () => {
 
 
 
-        <li><a className="products" href="#products">
+        <li><a className="products" href="/products">
           <div className="products-icon">
           <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -111,7 +110,7 @@ const ContainerDashboard = () => {
 
 
 
-        <li><a className="hospital" href="#hospital">
+        <li><a className="hospital" href="/hospital">
           <div className="hospital-icon">
           <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -135,7 +134,7 @@ const ContainerDashboard = () => {
 
 
 
-        <li><a className="doctor" href="#doctor">
+        <li><a className="doctor" href="/doctor">
           <div className="doctor-icon">
           <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -159,7 +158,7 @@ const ContainerDashboard = () => {
 
 
         <li>
-        <a className="post" href="#post">
+          <a className="post" href="/post">
           <div className="post-icon">
           <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -185,8 +184,8 @@ const ContainerDashboard = () => {
 
 
 
-        <a className="settings" href="#settings">Settings</a>
-        <a className="logout" href="#logout">Logout</a>
+        <a className="settings" href="/settings">Settings</a>
+        <a className="logout" href="/logout">Logout</a>
 
         <label for="sideMenu-active" className="arrow-label">     
           <i class="fas fa-angle-left"></i>
