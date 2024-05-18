@@ -1,5 +1,6 @@
 package com.project.pet.controller;
 
+import com.project.pet.dto.UserProfileDTO;
 import com.project.pet.models.User;
 import com.project.pet.services.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -7,10 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -40,5 +38,11 @@ public class UserController {
     List <User> users = userService.allUser();
 
     return ResponseEntity.ok(users);
+  }
+
+  @GetMapping("/user/{userId}")
+  public ResponseEntity<UserProfileDTO> getUserWithPostsById(@PathVariable Long userId) {
+    UserProfileDTO userWithPostsDTO = userService.getUserProfile(userId);
+    return ResponseEntity.ok(userWithPostsDTO);
   }
 }

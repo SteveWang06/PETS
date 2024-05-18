@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import Logo from "../components/Logo";
-
+import { theme } from "../core/theme";
 
 export default function Header(props) {
   return (
@@ -31,10 +31,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'red', 
+    backgroundColor: theme.colors.red, 
     borderBottomLeftRadius: 200,
     borderBottomRightRadius: 200,
-    opacity: 0.5, 
   },
 
   logo: {
