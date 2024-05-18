@@ -128,7 +128,7 @@ ul.menu a {
   text-align:center;
 }
 
-ul.menu li:hover>a {
+ul.menu li:hover>a{
   background-color: #4880FF;
   color: white;
 }

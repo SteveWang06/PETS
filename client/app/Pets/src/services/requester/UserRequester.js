@@ -15,6 +15,16 @@ const getPostsFromDatabase = async () => {
   }
 };
 
+const getPostsByIdFromDatabase = async (postId) => {
+  try {
+    const response = await axios.get(`${ApiPaths.getPostById}${postId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    throw error;
+  }
+};
+
 
 const getUserIdFromAsyncStorage = async () => {
   try {
@@ -87,7 +97,7 @@ const uploadImages = async (caption, images, callback, kind) => {
       message: 'successfully',
       type: 'success',
       floating: true,
-      duration: 3000,
+      duration: 500,
       autoHide: true,
       
     });
@@ -130,7 +140,7 @@ const handleUpdatePost = async (postId, caption, images, callback, kind) => {
       message: 'successfully',
       type: 'success',
       floating: true,
-      duration: 3000,
+      duration: 500,
       autoHide: true,
       
     });
@@ -192,6 +202,92 @@ const removeLike = async (postId) => {
   }
 };
 
+const handleAddCommentToPost = async (postId, content) => {
+  try {
+    const userInfo = await getUserIdFromAsyncStorage();
+    const { token, userId } = userInfo;
+
+    const formData = new FormData();
+    formData.append('userId', userId);
+    formData.append('content', content);
+    
+    const response = await axios.post(`${ApiPaths.addComment}/${postId}/create`, formData, {
+      
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    
+    showMessage({
+      message: 'successfully',
+      type: 'success',
+      floating: true,
+      duration: 500,
+      autoHide: true,
+      
+    });
+  } catch (error) {
+    console.error('Error: ', error);
+  }
+
+}
+
+const handleDeleteComment = async (commentId) => {
+  try {
+    const userInfo = await getUserIdFromAsyncStorage();
+    const { token } = userInfo;
+    console.log("commentId in handleDeleteComment: ", commentId);
+    const response = await axios.delete(`${ApiPaths.deleteComment}/${commentId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    showMessage({
+      message: 'successfully',
+      type: 'success',
+      floating: true,
+      duration: 500,
+      autoHide: true,
+      
+    });
+  } catch (error) {
+    console.log('Error: ', error);
+  }
+}
+
+const handleEditComment = async (commentId, content) => {
+  try {
+    const userInfo = await getUserIdFromAsyncStorage();
+    const { token } = userInfo;
+
+    const formData = new FormData();
+    formData.append('content', content);
+    
+    const response = await axios.put(`${ApiPaths.editComment}/${commentId}`, formData, {
+      
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    
+    showMessage({
+      message: 'successfully',
+      type: 'success',
+      floating: true,
+      duration: 500,
+      autoHide: true,
+      
+    });
+  } catch (error) {
+    console.error('Error: ', error);
+  }
+
+}
+
+
 
 
 export { getPostsFromDatabase, 
@@ -200,4 +296,9 @@ export { getPostsFromDatabase,
   handleUpdatePost, 
   getPostKindFromDataBase,
   addLike,
-  removeLike };
+  removeLike,
+  getPostsByIdFromDatabase,
+  handleAddCommentToPost,
+  handleDeleteComment,
+  handleEditComment,
+  getUserIdFromAsyncStorage };

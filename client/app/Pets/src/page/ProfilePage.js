@@ -14,7 +14,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { Container } from "../components/Wrappers";
-import i18next from 'i18next'
+import i18next from "i18next";
 const languages = [
   { code: "en", label: "English" },
   { code: "zh_tw", label: "中文" },
@@ -26,15 +26,12 @@ const ProfilePage = () => {
   const { t } = useTranslation();
   //const { i18next } = useTranslation();
 
-
   const changeLanguage = (code) => {
     i18next.changeLanguage(code);
   };
-  
+
   return (
     <View>
-      
-
       <View style={styles.search}>
         <SearchComponent />
         <TouchableOpacity style={styles.iconAddPost} onPress>
@@ -42,7 +39,11 @@ const ProfilePage = () => {
         </TouchableOpacity>
       </View>
 
+      {/* =============================================================================       */}
+
       
+
+      {/* =============================================================================       */}
 
       <Button
         style={styles.buttonLogout}
@@ -110,6 +111,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#002D6B",
   },
+
+  
 });
 
 export default ProfilePage;

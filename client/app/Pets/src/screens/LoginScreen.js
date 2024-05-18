@@ -14,8 +14,8 @@ import Header from "../components/Header";
 const LoginScreen = ({ navigation }) => {
 
   const {login} = useContext(AuthContext);
-  const [email, setEmail] = useState(null);
-  const [password, setPassword] = useState(null);
+  const [email, setEmail] = useState('user@gmail.com');
+  const [password, setPassword] = useState('user');
   return (
     
     <Background>
@@ -46,7 +46,7 @@ const LoginScreen = ({ navigation }) => {
         onChangeText={text => setPassword(text)}
         // error={!!password.error}
         // errorText={password.error}
-        secureTextEntry
+        secureTextEntry={true}
       />
 
       <Button style={styles.button} onPress={() => {login(email, password)}}>

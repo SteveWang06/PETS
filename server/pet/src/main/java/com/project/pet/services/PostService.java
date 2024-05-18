@@ -13,7 +13,7 @@ import java.util.List;
 public interface PostService {
 
   public Long createPost(String caption, MultipartFile[] images, Long userId, String kind) throws IOException;
-  public Post getPostById(Long postId);
+  public PostDTO getPostById(Long postId);
   public List<PostDTO> getAllPost();
   public Post updatePost(Long postId, String caption, MultipartFile[] images, String kind) throws IOException;
   public void deletePost(Long id);
