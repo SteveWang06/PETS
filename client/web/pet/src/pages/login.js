@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import AuthContext from '../context/AuthProvider';
 import './css/login.css';
 import logo from '../image/petlogo.png';
-import '../context/AuthContext.js';
 import axios from "axios";
 import { BASE_URL } from "../config";
 
@@ -11,27 +11,35 @@ const Login = () => {
   const [rememberPassword, setRememberPassword] = useState(false);
   const [inputEmail, setInputEmail] = useState('');
   const [inputPassword, setInputPassword] = useState('');
+  const [success,setSuccess]=useState(false);
+  const {setAuth} = useContext(AuthContext);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    axios
-      .post(`${BASE_URL}/login`, {
+    try {
+      const res = await axios.post(`${BASE_URL}/login`, {
         email: inputEmail,
         password: inputPassword,
-      })
-      .then((res) => {
-        let userInfo = res.data;
-        setUserToken(userInfo.token);
-        setUserInfo(userInfo);
-
-        sessionStorage.setItem("userInfo", JSON.stringify(userInfo));
-        sessionStorage.setItem("userToken", userInfo.token);
-        console.log(`UserToken: ${userInfo.token}`);
-      })
-      .catch((err) => {
-        console.error(`Login error ${err.message || err}`);
       });
-  }
+      const userInfo = res.data;
+      setUserToken(userInfo.token);
+      setUserInfo(userInfo);
+
+      sessionStorage.setItem("userInfo", JSON.stringify(userInfo));
+      sessionStorage.setItem("userToken", userInfo.token);
+      console.log(userInfo);
+
+      if (userInfo.token) {
+        setSuccess(true);
+        setAuth({ token: userInfo.token, userInfo });
+      } else {
+        throw new Error("Invalid token");
+      }
+    } catch (err) {
+      alert(`Failed`);
+      console.error(`error: ${err.message || err}`);
+    }
+  }; 
 
   const handleLogin = async () => {
     try {
@@ -52,6 +60,17 @@ const Login = () => {
     setRememberPassword(!rememberPassword);
   };
   return (
+    <>
+    {
+      success ? (
+        <section>
+          <h1>Success</h1>
+          <br></br>
+          <p>
+            <a href="#">Go to Home</a>
+          </p>
+        </section>
+      ):(
     <div className="login-container">
       <center><img src={logo} className="login"/></center>
       <h2 align="center">Login to Account</h2>
@@ -92,6 +111,8 @@ const Login = () => {
         </div>
       </form>
     </div>
+    )}
+    </>
   );
 };
 export default Login;
