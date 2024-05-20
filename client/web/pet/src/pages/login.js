@@ -1,9 +1,9 @@
 import { useState, useContext } from 'react';
-import AuthContext from '../context/AuthProvider';
+import AuthContext from '../context/AuthProvider.js';
 import './css/login.css';
-import logo from '../image/petlogo.png';
+import logo from '../public/dist/img/petlogo.png';
 import axios from "axios";
-import { BASE_URL } from "../config";
+import { BASE_URL } from "../context/config.js";
 
 const Login = () => {
   const [userToken, setUserToken] = useState(null);
