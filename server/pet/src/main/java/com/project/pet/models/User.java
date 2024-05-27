@@ -32,7 +32,7 @@ public class User implements UserDetails {
   private String username;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "user_id")
+  @JoinColumn(name = "id")
   @JsonManagedReference
   private Image avatar;
 

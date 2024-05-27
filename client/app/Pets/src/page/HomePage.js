@@ -15,10 +15,16 @@ import { BASE_URL } from "../config";
 
 import { getPostKindFromDataBase } from "../services/requester/UserRequester";
 import FlashMessage, { showMessage } from 'react-native-flash-message';
-
+import { useTranslation } from 'react-i18next';
 const { width, height } = Dimensions.get("screen");
 
+const capitalizeFirstLetter = (string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+};
+
 const Tab = React.forwardRef(({ data, item, onItemPress, isSelected }, ref) => {
+  const { t } = useTranslation();
+  const title = capitalizeFirstLetter(t(item.title));
   return (
     <TouchableOpacity onPress={onItemPress}>
       <View ref={ref}>
@@ -27,9 +33,9 @@ const Tab = React.forwardRef(({ data, item, onItemPress, isSelected }, ref) => {
             color: isSelected ? "#8B0000" : "#ABB2B9",
             fontSize: 80 / data.length,
             fontWeight: "800",
-            textTransform: "uppercase",
+            //textTransform: "uppercase",
           }}>
-          {item.title}
+          {title}
         </Text>
       </View>
     </TouchableOpacity>

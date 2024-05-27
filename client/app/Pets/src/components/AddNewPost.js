@@ -34,13 +34,12 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
   const [uploading, setUploading] = useState(false);
   const [images, setImages] = useState([]);
   const [dataDropdown, setDataDropdown] = useState([]);
-  const [imageSelected, setImageSelected] = useState([]);
   const { t } = useTranslation();
   useEffect(() => {
     const fetchPostKind = async () => {
       try {
         const data = await getPostKindFromDataBase(); 
-        const formattedData = data.map(item => ({ label: item.kind, kind: item.kind }));
+        const formattedData = data.map(item => ({ label: t(item.kind), kind: item.kind }));
         
         setDataDropdown(formattedData)
       } catch (error) {

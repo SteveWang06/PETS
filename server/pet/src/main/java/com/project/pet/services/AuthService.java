@@ -9,6 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public interface AuthService {
-  User createUser(String username, String email, String password, MultipartFile images) throws IOException;
+  User createUser(String username, String email, String password) throws IOException;
   User authenticate(LoginDto input);
 }

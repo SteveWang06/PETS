@@ -37,12 +37,13 @@ public class AuthController {
   @PostMapping("/register")
   public ResponseEntity<?> register(@RequestParam("username") String username,
                                        @RequestParam("email") String email,
-                                       @RequestParam("password") String password,
-                                       @RequestParam("image") MultipartFile images) throws IOException {
+                                       @RequestParam("password") String password
+                                       //@RequestParam("image") MultipartFile images
+                                    ) throws IOException {
 
 
 
-    User registerUser = authService.createUser(username, email, password, images);
+    User registerUser = authService.createUser(username, email, password);
     if (registerUser == null) {
       return ResponseEntity.badRequest().body("Failed to register user."); // Handle the case where user creation fails
     }

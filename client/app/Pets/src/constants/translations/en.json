@@ -22,5 +22,8 @@
     "like": "Like",
     "comment": "Comment",
     "selectImage": "Select Image",
-    "notComment": "No Comment Available"
+    "notComment": "No Comment Available",
+    "Stray Pet": "Stray Pet",
+    "Stray Dog": "Stray Dog",
+    "My Pet": "My Pet"
 }

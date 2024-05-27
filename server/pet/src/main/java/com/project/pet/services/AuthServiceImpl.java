@@ -46,21 +46,21 @@ public class AuthServiceImpl implements AuthService{
   }
 
 
-  public User createUser(String username, String email, String password, MultipartFile images) throws IOException {
+  public User createUser(String username, String email, String password) throws IOException {
     Optional<Role> optionalRole = roleRepository.findByName(RoleEnum.USER);
 
     if (optionalRole.isEmpty()) {
       return null;
     }
 
-    ImageInfo avatarUrl = saveImage(images);
-    if (avatarUrl == null) {
-      return null;
-    }
+//    ImageInfo avatarUrl = saveImage(images);
+//    if (avatarUrl == null) {
+//      return null;
+//    }
 
     Image savedImage = new Image();
-    savedImage.setImageUrl(avatarUrl.getUniqueFileName());
-    savedImage.setImagePath(String.valueOf(avatarUrl.getFilePath()));
+//    savedImage.setImageUrl(avatarUrl.getUniqueFileName());
+//    savedImage.setImagePath(String.valueOf(avatarUrl.getFilePath()));
     User user = new User();
     user.setUserName(username);
     user.setEmail(email);

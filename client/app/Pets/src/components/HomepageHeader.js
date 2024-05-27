@@ -13,7 +13,8 @@ const HomepageHeader = () => {
   const userId = userData.userId;
   const userToken = userData.token;
   const userName = userData.userName;
-  const userAvatar = userData.avatar.imageUrl;
+  //const userAvatar = userData.avatar.imageUrl;
+  const userAvatar = userData?.avatar?.imageUrl;
   const handlePress = async () => {
     // const userInfo = await getUserNameAndAvatarFromAsyncStorage();
     // if (userInfo) {
