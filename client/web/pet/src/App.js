@@ -1,21 +1,27 @@
-import Contain from "./components/ContainerDashboard"
-import Navi from "./components/NavigationTopBar"
-// import Post from "./pages/Post"
-import Footer from "./components/Footer"
-import Dashboard from "./pages/Dashboard"
-// import Login from "./login"
+import React from 'react';
+import './App.css';
+
+//UI import
+import Header from "./components/Header"; //介面的上面
+import SideNav from "./components/SideNav"; //介面左邊的menu
+import Footer from "./components/Footer"; //介面的底部
+
+//pages
+import Home from "./pages/Home";
+import Login from "./pages/login"
 
 
 function App() {
   return (
-    <div>
-      <Contain/>
-      <Navi/>
-      {/* <Post/>  */}
+    <div className="wrapper">
+      <Header/>
+      <Home/>
       <Footer/>
-      <Dashboard/>
+      <SideNav/>
+      <Login/>
       {/* <Login/> */}
     </div>
   );
 }
+
 export default App;
