@@ -215,11 +215,12 @@ const removeLike = async (postId, token) => {
   }
 };
 
-const handleAddCommentToPost = async (postId, content) => {
+const handleAddCommentToPost = async (postId, content, userId, token) => {
   try {
-    const userInfo = await getUserIdFromAsyncStorage();
-    const { token, userId } = userInfo;
+    // const userInfo = await getUserIdFromAsyncStorage();
+    // const { token, userId } = userInfo;
 
+    
     const formData = new FormData();
     formData.append('userId', userId);
     formData.append('content', content);
@@ -246,10 +247,10 @@ const handleAddCommentToPost = async (postId, content) => {
 
 }
 
-const handleDeleteComment = async (commentId) => {
+const handleDeleteComment = async (commentId, token) => {
   try {
-    const userInfo = await getUserIdFromAsyncStorage();
-    const { token } = userInfo;
+    // const userInfo = await getUserIdFromAsyncStorage();
+    // const { token } = userInfo;
     console.log("commentId in handleDeleteComment: ", commentId);
     const response = await axios.delete(`${ApiPaths.deleteComment}/${commentId}`, {
       headers: {
@@ -270,10 +271,10 @@ const handleDeleteComment = async (commentId) => {
   }
 }
 
-const handleEditComment = async (commentId, content) => {
+const handleEditComment = async (commentId, content, token) => {
   try {
-    const userInfo = await getUserIdFromAsyncStorage();
-    const { token } = userInfo;
+    // const userInfo = await getUserIdFromAsyncStorage();
+    // const { token } = userInfo;
 
     const formData = new FormData();
     formData.append('content', content);

@@ -13,5 +13,6 @@ export const ApiPaths = {
     addComment: 'http://localhost:8080/api/post/comment',
     deleteComment: 'http://localhost:8080/api/post/comment',
     editComment: 'http://localhost:8080/api/post/comment',
-    getUserById: 'http://localhost:8080/api/auth/user'
+    getUserById: 'http://localhost:8080/api/auth/user',
+    userRegister: 'http://localhost:8080/api/auth/register'
 }

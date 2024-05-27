@@ -22,7 +22,7 @@ import EditPostModal from "./EditPostModal";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import RenderItemComments from "./RenderItemComments";
 import { useTranslation } from 'react-i18next';
-
+import { useSelector } from "react-redux";
 const CommentModal = ({
   setModalCommentVisible,
   setModalInCommentVisible,
@@ -107,6 +107,10 @@ const CommentModal = ({
     };
     fetchPost(postId);
   }, [post]);
+
+  const userData = useSelector(state => state.auth.userData);
+  const userId = userData.userId;
+  const token = userData.token;
 
   return (
     <View>
@@ -228,7 +232,7 @@ const CommentModal = ({
           {text.length > 0 && (
             <TouchableOpacity
               onPress={() => {
-                handleAddCommentToPost(postId, text);
+                handleAddCommentToPost(postId, text, userId, token);
                 setText("");
               }}>
               <AntDesign name='arrowup' size={24} color='black' />

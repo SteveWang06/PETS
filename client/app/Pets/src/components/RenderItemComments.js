@@ -13,7 +13,7 @@ import {
   handleEditComment,
   getUserIdFromAsyncStorage,
 } from "../services/requester/UserRequester";
-
+import { useSelector } from "react-redux";
 const RenderItemComments = ({ item, commentAuthorId }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(item.content);
@@ -28,7 +28,7 @@ const RenderItemComments = ({ item, commentAuthorId }) => {
   };
 
   const handleSave = () => {
-    handleEditComment(commentId, editedContent);
+    handleEditComment(commentId, editedContent, token);
     setIsEditing(false);
   };
 
@@ -41,11 +41,14 @@ const RenderItemComments = ({ item, commentAuthorId }) => {
 
   const [isActionSheetVisible, setIsActionSheetVisible] = useState(false);
 
+  const userData = useSelector(state => state.auth.userData);
+  const userId = userData.userId;
+  const token = userData.token;
   const checkAuthorComment = async () => {
     try {
-      const userInfo = await getUserIdFromAsyncStorage();
-      const { userId } = userInfo;
-
+      // const userInfo = await getUserIdFromAsyncStorage();
+      // const { userId } = userInfo;
+      
       if (userId === commentAuthorId) {
         setIsAuthor(true);
       }
@@ -65,7 +68,7 @@ const RenderItemComments = ({ item, commentAuthorId }) => {
 
   const handleDelete = (actionSheetCommentId) => {
     console.log("item.id in handleDelete:", actionSheetCommentId);
-    handleDeleteComment(actionSheetCommentId);
+    handleDeleteComment(actionSheetCommentId, token);
   };
 
   return (

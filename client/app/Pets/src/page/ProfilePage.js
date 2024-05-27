@@ -9,6 +9,7 @@ import {
   Image,
   ScrollView,
   Dimensions,
+  Modal,
 } from "react-native";
 import { AuthContext } from "../context/AuthContext";
 import { Button } from "react-native-paper";
@@ -26,6 +27,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { updatePostLike, setPosts } from "../redux/actions/postActions";
 // import { useSelector } from 'react-redux';
 import { logout } from "../redux/actions/authAction";
+import { theme } from "../core/theme";
 
 const languages = [
   { code: "en", label: "English" },
@@ -35,15 +37,19 @@ const languages = [
 const { width, height } = Dimensions.get("screen");
 const ProfilePage = () => {
   //const { logout } = useContext(AuthContext);
-  const [showLanguagesList, setOpenLanguagesList] = useState(false);
+  const [showLanguagesList, setShowLanguagesList] = useState(false);
   const { t } = useTranslation();
   //const { i18next } = useTranslation();
   const [refreshing, setRefreshing] = useState(false);
   const [userName, setUserName] = useState();
   const [userAvatar, setUserAvatar] = useState();
   const [posts, setPosts] = useState([]);
+  const [selectedLanguage, setSelectedLanguage] = useState('en');
+
+
   const changeLanguage = (code) => {
     i18next.changeLanguage(code);
+    setSelectedLanguage(code)
   };
 
   const ref = useRef(null); // Use useRef without specifying ref type
@@ -58,10 +64,10 @@ const ProfilePage = () => {
     }
   };
 
-  const userData = useSelector(state => state.auth.userData);
+  const userData = useSelector((state) => state.auth.userData);
   const userId = userData.userId;
   const userToken = userData.token;
-  
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -78,7 +84,6 @@ const ProfilePage = () => {
               (image) => `${BASE_URL}/${image.imageUrl}`
             ),
             like: post.postLike,
-
           })),
         };
         //dispatch(setPosts(formattedUserProfile.posts));
@@ -103,7 +108,6 @@ const ProfilePage = () => {
   const handleLikeToggle = (postId, liked) => {
     dispatch(updatePostLike(postId, !liked));
   };
-  
 
   const handleLogout = () => {
     // Dispatch action logout
@@ -112,51 +116,66 @@ const ProfilePage = () => {
     // Ví dụ: navigation.navigate('LoginScreen');
   };
 
+  //const [showLanguagesList, setShowLanguagesList] = useState(false);
 
+  const openLanguagesList = () => {
+    setShowLanguagesList(true);
+  };
 
+  const closeLanguagesList = () => {
+    setShowLanguagesList(false);
+  };
 
   return (
     <View>
-      <GestureHandlerRootView style={{ }}>
-        <View style={styles.container}>
+      <GestureHandlerRootView style={{}}>
+        <View style={{}}>
           <StatusBar style='light' />
           <BottomSheet ref={ref} style={{}}>
-            <Button
-              style={styles.buttonLogout}
-              onPress={handleLogout}>
-              <Text style={styles.text}> {t("logout")} </Text>
-            </Button>
+            <View style={styles.containerInBottomSheet}>
+              <TouchableOpacity
+                style={styles.buttonLogout}
+                onPress={handleLogout}>
+                <Text style={styles.buttonText}>{t("logout")}</Text>
+              </TouchableOpacity>
 
-            <Container>
-              <TouchableNativeFeedback
-                onPress={() => {
-                  setOpenLanguagesList(!showLanguagesList);
-                  LayoutAnimation.configureNext(
-                    LayoutAnimation.create(200, "easeInEaseOut", "opacity")
-                  );
-                }}>
-                <View style={styles.buttonChangeLanguage}>
+              <View style={{}}>
+                <Modal
+                  visible={showLanguagesList}
+                  animationType='slide'
+                  transparent={true}
+                  onRequestClose={closeLanguagesList}>
+                  <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                      {languages.map((item, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          style={styles.languageButton}
+                          onPress={() => {
+                            changeLanguage(item.code);
+                            closeLanguagesList();
+                          }}>
+                          <Text style={styles.languageText}>{t(item.label)}</Text>
+                          {selectedLanguage === item.code && (
+                            <AntDesign name='check' size={20} color="#3AA03F" style={styles.checkIcon} />
+                          )}
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                </Modal>
+
+                <TouchableOpacity
+                  style={styles.buttonChangeLanguage}
+                  onPress={openLanguagesList}>
                   <Text style={styles.buttonText}>{t("change Language")}</Text>
-                </View>
-              </TouchableNativeFeedback>
-              {showLanguagesList && (
-                <>
-                  {languages.map((item, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      style={[styles.button, { paddingHorizontal: 24 }]}
-                      onPress={() => changeLanguage(item.code)}>
-                      <Text style={styles.buttonText}>{t(item.label)}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </>
-              )}
-            </Container>
+                </TouchableOpacity>
+              </View>
+            </View>
           </BottomSheet>
         </View>
       </GestureHandlerRootView>
 
-      
       <ScrollView style={{ zIndex: -1 }}>
         <View style={styles.headerContainer}>
           <View style={styles.header}>
@@ -175,26 +194,25 @@ const ProfilePage = () => {
             </TouchableOpacity>
           </View>
 
-        
           <View style={{ width }}>
-            {posts &&  (
+            {posts &&
               posts
-              .slice()
-              .reverse()
-              .map((post) => (
-                <PostCard
-                  key={post.id}
-                  id={post.id}
-                  authorName={userName}
-                  authorAvatar={userAvatar}
-                  caption={post.caption}
-                  postImages={post.images}
-                  kind={post.kind}
-                  like={post.like}
-                  onLikeToggle={handleLikeToggle}
-                />
-              )))}
-          </View> 
+                .slice()
+                .reverse()
+                .map((post) => (
+                  <PostCard
+                    key={post.id}
+                    id={post.id}
+                    authorName={userName}
+                    authorAvatar={userAvatar}
+                    caption={post.caption}
+                    postImages={post.images}
+                    kind={post.kind}
+                    like={post.like}
+                    onLikeToggle={handleLikeToggle}
+                  />
+                ))}
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -202,25 +220,12 @@ const ProfilePage = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#111",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  buttonLogout: {
-    backgroundColor: "blue",
-    width: "50%",
-    height: 50,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-    marginTop: 100,
-  },
-  text: {
-    color: "#FFFFFF",
-  },
+  // container: {
+  //   flex: 1,
+  //   backgroundColor: "#111",
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  // },
 
   buttonEdit: {
     position: "absolute",
@@ -235,7 +240,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 135,
     left: 45,
-    
   },
   header: {
     marginBottom: 10,
@@ -270,6 +274,79 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#FFFFFF",
     fontWeight: "bold",
+  },
+
+  containerInBottomSheet: {
+    padding: 16,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+  },
+  buttonLogout: {
+    backgroundColor: theme.colors.red,
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    marginVertical: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+  },
+  buttonChangeLanguage: {
+    backgroundColor: theme.colors.red,
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    marginVertical: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+  },
+  button: {
+    backgroundColor: "#0275d8",
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    marginVertical: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 16,
+    width: "80%",
+    maxHeight: "80%",
+    overflow: "auto",
+  },
+  checkIcon: {
+    marginLeft: 5,
+  },
+  languageButton: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });
 

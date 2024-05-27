@@ -1,3 +1,4 @@
+import { ApiPaths } from "../../services/ApiPaths";
 import { addLike, removeLike } from "../../services/requester/UserRequester";
 import { UPDATE_POST_LIKE } from "../types";
 
