@@ -7,8 +7,11 @@ import com.project.pet.models.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Date;
 
 public interface AuthService {
   User createUser(String username, String email, String password) throws IOException;
   User authenticate(LoginDto input);
+  User updateUser(Long id, String username, String email, String password, MultipartFile images, Date birthday) throws IOException;
+  String deleteUser(Long userId);
 }

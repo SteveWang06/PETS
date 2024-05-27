@@ -3,10 +3,7 @@ package com.project.pet.services;
 import com.project.pet.dto.LoginDto;
 import com.project.pet.dto.SignupDTO;
 import com.project.pet.dto.UserDTO;
-import com.project.pet.models.Image;
-import com.project.pet.models.Role;
-import com.project.pet.models.RoleEnum;
-import com.project.pet.models.User;
+import com.project.pet.models.*;
 import com.project.pet.repository.RoleRepository;
 import com.project.pet.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 
 @Service
@@ -114,6 +108,40 @@ public class AuthServiceImpl implements AuthService{
     List<User> users = new ArrayList<>();
     userRepository.findAll().forEach(users::add);
     return users;
+  }
+
+
+  public User updateUser(Long id, String username, String email, String password, MultipartFile images, Date birthday) throws IOException {
+    User user = userRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("User not found"));
+
+    ImageInfo avatarUrl = saveImage(images);
+    if (avatarUrl == null) {
+      return null;
+    }
+
+    Image savedImage = new Image();
+    savedImage.setImageUrl(avatarUrl.getUniqueFileName());
+    savedImage.setImagePath(String.valueOf(avatarUrl.getFilePath()));
+    user.setUserName(username);
+    user.setEmail(email);
+    user.setAvatar(savedImage);
+    user.setBirthday(birthday);
+    if (password != null && !password.isEmpty()) {
+      user.setPassword(passwordEncoder.encode(password));
+    }
+
+    return userRepository.save(user);
+  }
+
+
+
+  public String deleteUser(Long userId) {
+    User existingUser = userRepository.findById(userId)
+        .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+
+    userRepository.delete(existingUser);
+    return "User deleted";
   }
 
 }
