@@ -1,8 +1,13 @@
 import React from 'react';
+import Header from "../components/Header"; //介面的上面
+import SideNav from "../components/SideNav"; //介面左邊的menu
+import Footer from "../components/Footer"; //介面的底部
 
 function Home() {
     return (
+        
         <div>
+            <Header/>
             {/* Content Wrapper. Contains page content */}
             <div className="content-wrapper">
                 {/* Content Header (Page header) */}
@@ -575,7 +580,8 @@ function Home() {
                 </section>
                 {/* /.content */}
             </div>
-
+            <SideNav/>
+            <Footer/>
         </div>
     );
 }

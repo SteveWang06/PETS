@@ -1,25 +1,28 @@
 import React from 'react';
-import './App.css';
-
-//UI import
-import Header from "./components/Header"; //介面的上面
-import SideNav from "./components/SideNav"; //介面左邊的menu
-import Footer from "./components/Footer"; //介面的底部
-
-//pages
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import Login from "./pages/login"
-
+import Login from "./pages/login";
+import { AuthProvider } from './context/AuthProvider';
+import PrivateRoute from './PrivateRoute';
 
 function App() {
   return (
     <div className="wrapper">
-      <Header/>
-      <Home/>
-      <Footer/>
-      <SideNav/>
-      <Login/>
-      {/* <Login/> */}
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route
+              path="home"
+              element={
+                <PrivateRoute>
+                  <Home />
+                </PrivateRoute>
+              }
+            />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
     </div>
   );
 }
