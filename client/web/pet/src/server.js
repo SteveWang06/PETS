@@ -8,7 +8,7 @@ app.use(express.json());
 app.use(cors());
 
 const db = mysql.createConnection({
-  host: 'localhost:8080',
+  host: 'localhost',
   user: 'root',
   password: '1234',
   database: 'root'
@@ -37,4 +37,3 @@ connection.connect(err => {
 app.listen(8080, () => {
   console.log(`Server is running on port ${port}`);
 });
- 
