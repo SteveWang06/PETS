@@ -1,5 +1,6 @@
 package com.project.pet.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -44,13 +45,15 @@ public class User implements UserDetails {
   private String password;
 
 
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
   @CreationTimestamp
   @Column(updatable = false, name = "created_at")
   private Date createdAt;
 
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
   @UpdateTimestamp
-  @Column(name = "updated_at")
-  private Date updatedAt;
+  @Column(name = "birthday")
+  private Date birthday;
 
   @JsonIgnore
   @OneToMany(mappedBy = "author")
@@ -150,12 +153,12 @@ public class User implements UserDetails {
     return this;
   }
 
-  public Date getUpdatedAt() {
-    return updatedAt;
+  public Date getBirthday() {
+    return birthday;
   }
 
-  public User setUpdatedAt(Date updatedAt) {
-    this.updatedAt = updatedAt;
+  public User setBirthday(Date birthday) {
+    this.birthday = birthday;
     return this;
   }
 
@@ -174,10 +177,11 @@ public class User implements UserDetails {
   public String toString() {
     return "User{" +
         "id=" + id +
+        ", avatar=" + avatar +
         ", fullName='" + username + '\'' +
         ", email='" + email + '\'' +
         ", createdAt=" + createdAt +
-        ", updatedAt=" + updatedAt +
+        ", updatedAt=" + birthday +
         '}';
   }
 }

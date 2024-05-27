@@ -11,7 +11,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:8080")
 @RestController
-@RequestMapping("api/auth/")
+@RequestMapping("api/post/kind")
 public class PostKindController {
 
 
@@ -19,7 +19,7 @@ public class PostKindController {
   private PostKindService postKindService;
 
 
-  @PostMapping("createKind")
+  @PostMapping("/create")
   public ResponseEntity<?> createKind(@RequestParam("kind") String kind) {
     try {
       PostKind postKind = postKindService.createKind(kind);
@@ -30,7 +30,7 @@ public class PostKindController {
   }
 
 
-  @GetMapping("kind")
+  @GetMapping("/")
   public ResponseEntity<List<PostKind>> getAllKind() {
     List<PostKind> postKinds = postKindService.getAllKinds();
     return ResponseEntity.ok(postKinds);
