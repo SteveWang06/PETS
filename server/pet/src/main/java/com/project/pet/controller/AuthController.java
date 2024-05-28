@@ -12,12 +12,14 @@ import com.project.pet.services.AuthService;
 import com.project.pet.services.JwtService;
 import jakarta.validation.constraints.Email;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Date;
 
 @RestController
@@ -84,7 +86,7 @@ public class AuthController {
                                          @RequestParam("email") String email,
                                          @RequestParam("password") String password,
                                          @RequestParam("image") MultipartFile images,
-                                         @RequestParam("birthday") Date birthday) throws IOException {
+                                         @RequestParam("birthday") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthday) throws IOException {
     User updatedUser = authService.updateUser(id, username, email, password, images, birthday);
     return ResponseEntity.ok(updatedUser);
   }
