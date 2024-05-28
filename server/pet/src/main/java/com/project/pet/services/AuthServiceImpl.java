@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.*;
 
 
@@ -111,7 +112,7 @@ public class AuthServiceImpl implements AuthService{
   }
 
 
-  public User updateUser(Long id, String username, String email, String password, MultipartFile images, Date birthday) throws IOException {
+  public User updateUser(Long id, String username, String email, String password, MultipartFile images, LocalDate birthday) throws IOException {
     User user = userRepository.findById(id)
         .orElseThrow(() -> new RuntimeException("User not found"));
 

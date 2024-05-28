@@ -25,7 +25,6 @@ import { BASE_URL } from "../config";
 import PostCard from "../components/PostCard";
 import { useDispatch, useSelector } from "react-redux";
 import { updatePostLike, setPosts } from "../redux/actions/postActions";
-// import { useSelector } from 'react-redux';
 import { logout } from "../redux/actions/authAction";
 import { theme } from "../core/theme";
 
@@ -36,26 +35,23 @@ const languages = [
 
 const { width, height } = Dimensions.get("screen");
 const ProfilePage = () => {
-  //const { logout } = useContext(AuthContext);
   const [showLanguagesList, setShowLanguagesList] = useState(false);
   const { t } = useTranslation();
-  //const { i18next } = useTranslation();
   const [refreshing, setRefreshing] = useState(false);
   const [userName, setUserName] = useState();
+  const [userBirthDay, setUserBirthDay] = useState([]);
   const [userAvatar, setUserAvatar] = useState();
   const [posts, setPosts] = useState([]);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
 
-
   const changeLanguage = (code) => {
     i18next.changeLanguage(code);
-    setSelectedLanguage(code)
+    setSelectedLanguage(code);
   };
 
-  const ref = useRef(null); // Use useRef without specifying ref type
+  const ref = useRef(null);
 
   const onPress = () => {
-    // Use arrow function directly without importing useCallback
     const isActive = ref?.current?.isActive();
     if (isActive) {
       ref?.current?.scrollTo(0);
@@ -73,10 +69,9 @@ const ProfilePage = () => {
       try {
         const data = await getUserByIdFromDatabase(userId, userToken);
         const formattedUserProfile = {
-          // Lấy thông tin user
           userName: data.user.userName,
+          userBirthDay: data.user.birthday,
           userAvatar: `${BASE_URL}/${data.user.avatar.imageUrl}`,
-          // Lấy thông tin các bài post
           posts: data.posts.map((post) => ({
             id: post.id,
             caption: post.caption,
@@ -86,37 +81,32 @@ const ProfilePage = () => {
             like: post.postLike,
           })),
         };
-        //dispatch(setPosts(formattedUserProfile.posts));
-        //console.log(JSON.stringify(data, null, 2));
-        // Sử dụng hàm formattedUserProfile để lấy thông tin user
-        //const userProfile = formattedUserProfile(data);
         setUserName(formattedUserProfile.userName);
+        setUserBirthDay(formattedUserProfile.userBirthDay);
         setUserAvatar(formattedUserProfile.userAvatar);
         setPosts(formattedUserProfile.posts);
-        //console.log(JSON.stringify(posts, null, 2));
       } catch (error) {
-        console.error("Error fetching posts:", error);
+        console.error("Error fetching profile:", error);
       }
     };
 
     fetchUserProfile();
   }, [posts]);
 
+  const birthdayString = userBirthDay.length === 3
+    ? `${userBirthDay[0]}-${userBirthDay[1]}-${userBirthDay[1]}`
+    : '';
+
+  //console.log("birthdayString: ", birthdayString);
+
   const dispatch = useDispatch();
-  // const posts = useSelector((state) => state.post.posts);
-  // console.log(posts);
   const handleLikeToggle = (postId, liked) => {
     dispatch(updatePostLike(postId, !liked));
   };
 
   const handleLogout = () => {
-    // Dispatch action logout
     dispatch(logout());
-    // Điều hướng người dùng đến màn hình login hoặc màn hình khác tùy thuộc vào logic của ứng dụng
-    // Ví dụ: navigation.navigate('LoginScreen');
   };
-
-  //const [showLanguagesList, setShowLanguagesList] = useState(false);
 
   const openLanguagesList = () => {
     setShowLanguagesList(true);
@@ -188,6 +178,8 @@ const ProfilePage = () => {
               style={styles.avatar}
             />
             <Text style={styles.userName}>{userName}</Text>
+            <Text style={styles.birthdayText}>{birthdayString}</Text>
+
 
             <TouchableOpacity style={styles.buttonEdit} onPress={onPress}>
               <AntDesign name='setting' size={24} color='white' />
@@ -220,13 +212,6 @@ const ProfilePage = () => {
 };
 
 const styles = StyleSheet.create({
-  // container: {
-  //   flex: 1,
-  //   backgroundColor: "#111",
-  //   alignItems: "center",
-  //   justifyContent: "center",
-  // },
-
   buttonEdit: {
     position: "absolute",
     bottom: 10,
@@ -275,7 +260,6 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "bold",
   },
-
   containerInBottomSheet: {
     padding: 16,
     backgroundColor: "#fff",
@@ -322,7 +306,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-
   modalContainer: {
     flex: 1,
     justifyContent: "center",
@@ -348,6 +331,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  birthdayText: {
+    width: 200,
+    position: "absolute",
+    top: 45,
+    right: 20,
+    fontSize: 15,
+    color: "#FFFFFF",
+  }
 });
 
 export default ProfilePage;

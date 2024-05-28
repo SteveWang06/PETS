@@ -31,7 +31,7 @@ const Tab = React.forwardRef(({ data, item, onItemPress, isSelected }, ref) => {
         <Text
           style={{
             color: isSelected ? "#8B0000" : "#ABB2B9",
-            fontSize: 80 / data.length,
+            fontSize: 50 / data.length,
             fontWeight: "800",
             //textTransform: "uppercase",
           }}>

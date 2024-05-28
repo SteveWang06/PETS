@@ -13,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.*;
 
 
@@ -33,7 +34,7 @@ public class User implements UserDetails {
   private String username;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "id")
+  @JoinColumn(name = "image_id")
   @JsonManagedReference
   private Image avatar;
 
@@ -50,10 +51,10 @@ public class User implements UserDetails {
   @Column(updatable = false, name = "created_at")
   private Date createdAt;
 
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-  @UpdateTimestamp
+  //@JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+  //@UpdateTimestamp
   @Column(name = "birthday")
-  private Date birthday;
+  private LocalDate birthday;
 
   @JsonIgnore
   @OneToMany(mappedBy = "author")
@@ -153,11 +154,11 @@ public class User implements UserDetails {
     return this;
   }
 
-  public Date getBirthday() {
+  public LocalDate getBirthday() {
     return birthday;
   }
 
-  public User setBirthday(Date birthday) {
+  public User setBirthday(LocalDate birthday) {
     this.birthday = birthday;
     return this;
   }
