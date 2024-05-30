@@ -1,6 +1,8 @@
 package com.project.pet.controller;
 
 import com.project.pet.services.QRCodeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -22,6 +24,8 @@ public class QRCodeController {
   @Autowired
   private QRCodeService qrCodeService;
 
+  @Operation(summary = "Get QR Code", description = "Generate and retrieve QR code image for a user profile")
+  @ApiResponse(responseCode = "200", description = "QR code image generated successfully")
   @GetMapping("/{userId}")
   public ResponseEntity<byte[]> getQRCode(@PathVariable Long userId) {
     try {
@@ -41,4 +45,3 @@ public class QRCodeController {
     }
   }
 }
-
