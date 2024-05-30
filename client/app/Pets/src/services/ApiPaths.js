@@ -14,5 +14,6 @@ export const ApiPaths = {
     deleteComment: 'http://localhost:8080/api/post/comment',
     editComment: 'http://localhost:8080/api/post/comment',
     getUserById: 'http://localhost:8080/api/auth/user',
-    userRegister: 'http://localhost:8080/api/auth/register'
+    userRegister: 'http://localhost:8080/api/auth/register',
+    getQRcode: 'http://localhost:8080/api/auth/qr/'
 }

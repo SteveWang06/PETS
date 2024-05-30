@@ -22,6 +22,11 @@ public class Image {
   @JsonBackReference
   private Post post;
 
+  @ManyToOne
+  @JoinColumn(name = "product_id")
+  @JsonBackReference
+  private Product product;
+
   public Long getId() {
     return id;
   }
@@ -52,5 +57,13 @@ public class Image {
 
   public void setPost(Post post) {
     this.post = post;
+  }
+
+  public Product getProduct() {
+    return product;
+  }
+
+  public void setProduct(Product product) {
+    this.product = product;
   }
 }
