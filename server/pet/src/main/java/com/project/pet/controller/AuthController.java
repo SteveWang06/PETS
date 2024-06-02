@@ -68,10 +68,9 @@ public class AuthController {
   public ResponseEntity<User> updateUser(@PathVariable Long id,
                                          @RequestParam("username") String username,
                                          @RequestParam("email") String email,
-                                         @RequestParam("password") String password,
                                          @RequestParam("image") MultipartFile images,
                                          @RequestParam("birthday") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthday) throws IOException {
-    User updatedUser = authService.updateUser(id, username, email, password, images, birthday);
+    User updatedUser = authService.updateUser(id, username, email, images, birthday);
     return ResponseEntity.ok(updatedUser);
   }
 

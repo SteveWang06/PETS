@@ -73,16 +73,15 @@ const getUserNameAndAvatarFromAsyncStorage = async () => {
   }
 };
 
-const uploadImages = async (caption, images, callback, kind) => {
+const uploadImages = async (userId, userToken, caption, images, callback, kind) => {
   try {
-    // Lấy userId từ AsyncStorage
-    const userInfo = await getUserIdFromAsyncStorage();
-    if (!userInfo) {
-      console.log("No user info found in AsyncStorage");
+
+    if (!userId) {
+      console.log("No user found in Storage");
       return;
     }
 
-    const { userId, token } = userInfo;
+    
 
     // Tạo formData và thêm userId vào đó
     const formData = new FormData();
@@ -98,10 +97,10 @@ const uploadImages = async (caption, images, callback, kind) => {
     });
 
     // Gửi yêu cầu POST lên server
-    const response = await axios.post(`${BASE_URL}/post/`, formData, {
+    const response = await axios.post(ApiPaths.createPost, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${userToken}`,
       },
     });
     showMessage({
@@ -333,6 +332,45 @@ const getQRcode = async (userId, token) => {
   }
 };
 
+const handleSubmitEditProfile = async (userId, userToken, username, email, birthdayYear, birthdayMonth, birthdayDay, selectedImage) => {
+  const paddedMonth = String(birthdayMonth).padStart(2, '0');
+  const paddedDay = String(birthdayDay).padStart(2, '0');
+  const birthday = `${birthdayYear}-${paddedMonth}-${paddedDay}`;
+  console.log(birthday);
+  try {
+    const formData = new FormData();
+    formData.append("username", username);
+    formData.append("email", email);
+    formData.append("birthday", birthday);
+
+    if (selectedImage) {
+      formData.append(`image`, {
+        uri: selectedImage,
+        name: "profile.jpg",
+        type: "image/jpeg",
+      });
+    }
+
+    const response = await fetch(`http://localhost:8080/api/auth/${userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "multipart/form-data",
+        "Authorization": `Bearer ${userToken}` // Assuming you have userToken
+      },
+      body: formData,
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Profile updated successfully", data);
+    } else {
+      console.error("Failed to update profile");
+    }
+  } catch (error) {
+    console.error("Error updating profile", error);
+  }
+};
+
 export {
   getPostsFromDatabase,
   uploadImages,
@@ -348,6 +386,7 @@ export {
   getUserIdFromAsyncStorage,
   getUserByIdFromDatabase,
   getQRcode,
+  handleSubmitEditProfile,
 };
 
 
