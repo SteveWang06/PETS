@@ -11,6 +11,7 @@ import {
   ImageBackground,
 } from "react-native";
 import React, { useState, useContext, useEffect, useRef } from "react";
+import { useSelector } from 'react-redux';
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import { AntDesign } from "@expo/vector-icons";
@@ -102,7 +103,7 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
         multiple: true,
       });
 
-      
+      console.log("ad new: ",result);
       
       if (!result.cancelled) {
         const newUris = [];
@@ -171,6 +172,12 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
       </View>
     );
   };
+
+  const userData = useSelector((state) => state.auth.userData);
+    const userId = userData.userId;
+    const userToken = userData.token;
+    const userName = userData.userName;
+    const userAvatar = userData.userAvatar;
 
   return (
     <View style={styles.container}>
@@ -295,7 +302,7 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
               },
             ]}
             onPress={() => {
-              uploadImages(caption, images, handleModalVisibility, kind);
+              uploadImages(userId, userToken, caption, images, handleModalVisibility, kind);
             }}
             disabled={images.length <= 0}>
             <Text style={styles.text}>{t('post')}</Text>

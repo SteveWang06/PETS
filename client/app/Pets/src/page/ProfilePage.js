@@ -10,7 +10,8 @@ import {
   ScrollView,
   Dimensions,
   Modal,
-  ActivityIndicator
+  ActivityIndicator,
+  TextInput,
 } from "react-native";
 import { AuthContext } from "../context/AuthContext";
 import { Button } from "react-native-paper";
@@ -21,6 +22,7 @@ import i18next from "i18next";
 import {
   getQRcode,
   getUserByIdFromDatabase,
+  handleSubmitEditProfile,
 } from "../services/requester/UserRequester";
 import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -32,11 +34,15 @@ import { updatePostLike, setPosts } from "../redux/actions/postActions";
 import { logout } from "../redux/actions/authAction";
 import { theme } from "../core/theme";
 import { Buffer } from "buffer";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import RNPickerSelect from "react-native-picker-select";
+import EditProfileModal from "../components/EditProfileModal";
 
 const languages = [
   { code: "en", label: "English" },
   { code: "zh_tw", label: "中文" },
 ];
+
 
 const { width, height } = Dimensions.get("screen");
 const ProfilePage = () => {
@@ -44,12 +50,15 @@ const ProfilePage = () => {
   const { t } = useTranslation();
   const [refreshing, setRefreshing] = useState(false);
   const [userName, setUserName] = useState();
+  const [userEmail, setUserEmail] = useState();
   const [userBirthDay, setUserBirthDay] = useState([]);
   const [userAvatar, setUserAvatar] = useState();
   const [posts, setPosts] = useState([]);
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [imageBase64, setImageBase64] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showModalEditProfile, setShowModalEditProfile] = useState(false);
+  
 
   const changeLanguage = (code) => {
     i18next.changeLanguage(code);
@@ -77,6 +86,7 @@ const ProfilePage = () => {
         const data = await getUserByIdFromDatabase(userId, userToken);
         const formattedUserProfile = {
           userName: data.user.userName,
+          email: data.user.email,
           userBirthDay: data.user.birthday,
           userAvatar: `${BASE_URL}/${data.user.avatar.imageUrl}`,
           posts: data.posts.map((post) => ({
@@ -89,6 +99,7 @@ const ProfilePage = () => {
           })),
         };
         setUserName(formattedUserProfile.userName);
+        setUserEmail(formattedUserProfile.email);
         setUserBirthDay(formattedUserProfile.userBirthDay);
         setUserAvatar(formattedUserProfile.userAvatar);
         setPosts(formattedUserProfile.posts);
@@ -102,7 +113,7 @@ const ProfilePage = () => {
 
   const birthdayString =
     userBirthDay.length === 3
-      ? `${userBirthDay[0]}-${userBirthDay[1]}-${userBirthDay[1]}`
+      ? `${userBirthDay[0]}-${userBirthDay[1]}-${userBirthDay[2]}`
       : "";
 
   //console.log("birthdayString: ", birthdayString);
@@ -122,6 +133,13 @@ const ProfilePage = () => {
 
   const closeLanguagesList = () => {
     setShowLanguagesList(false);
+  };
+
+  const openModalEditProfile = () => {
+    setShowModalEditProfile(true);
+  };
+  const closeModalEditProfile = () => {
+    setShowModalEditProfile(false);
   };
 
   useEffect(() => {
@@ -201,24 +219,17 @@ const ProfilePage = () => {
               </View>
 
               <View style={{}}>
-                <Modal
-                  visible={showLanguagesList}
-                  animationType='slide'
-                  transparent={true}
-                  onRequestClose={closeLanguagesList}>
-                  <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-
-                      {/*========== do something in here ==========*/}
-
-                      
-                    </View>
-                  </View>
-                </Modal>
-
+                <EditProfileModal
+                  showModalEditProfile={showModalEditProfile}
+                  closeModalEditProfile={closeModalEditProfile}
+                  userAvatar={userAvatar}
+                  userName={userName}
+                  userEmail={userEmail}
+                  userBirthday={userBirthDay}
+                />
                 <TouchableOpacity
                   style={styles.buttonChangeLanguage}
-                  onPress={openLanguagesList}>
+                  onPress={openModalEditProfile}>
                   <Text style={styles.buttonText}>{t("editProfile")}</Text>
                 </TouchableOpacity>
               </View>
@@ -255,6 +266,17 @@ const ProfilePage = () => {
                   />
                 )
               )}
+            </View>
+
+            <View style={styles.textFollow}>
+              <View>
+                <Text style={styles.textFollowing}>Following</Text>
+                <Text style={styles.textFollowing}>0</Text>
+              </View>
+              <View>
+                <Text style={styles.textFollower}>Follower</Text>
+                <Text style={styles.textFollower}>0</Text>
+              </View>
             </View>
           </View>
 
@@ -414,11 +436,96 @@ const styles = StyleSheet.create({
   qrCodeContainer: {
     marginTop: 70,
     marginLeft: 20,
-    alignItems: 'left',
+    alignItems: "left",
   },
   qrCodeImage: {
     width: 100,
     height: 100,
+  },
+  textFollow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 8,
+    marginTop: 10,
+    marginLeft: 20,
+  },
+  textFollowing: {
+    width: 100,
+    fontSize: 18,
+    color: "#FFFFFF",
+    fontWeight: "bold",
+  },
+  textFollower: {
+    width: 100,
+    fontSize: 18,
+    color: "#FFFFFF",
+    fontWeight: "bold",
+  },
+
+  modalEditContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalEditContent: {
+    width: "80%",
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+  },
+  headerEdit: {
+    alignItems: "center",
+  },
+  circleEdit: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "#eee",
+    marginBottom: 20,
+  },
+  avatarEdit: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 20,
+  },
+  userNameEdit: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  birthdayTextEdit: {
+    fontSize: 16,
+    color: "#888",
+    marginBottom: 20,
+  },
+  inputEdit: {
+    width: "100%",
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    marginBottom: 20,
+  },
+  buttonSelectEditImage: {
+    padding: 10,
+    backgroundColor: "#007BFF",
+    borderRadius: 5,
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  buttonSaveEdit: {
+    padding: 10,
+    backgroundColor: "#28A745",
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  selectedImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 20,
   },
 });
 
