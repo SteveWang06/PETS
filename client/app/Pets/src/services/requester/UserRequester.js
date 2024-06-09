@@ -1,17 +1,18 @@
-import axios from 'axios';
-import { ApiPaths } from '../ApiPaths';
-import { BASE_URL } from '../../config';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Alert } from 'react-native';
-import FlashMessage, { showMessage } from 'react-native-flash-message';
-import { useSelector } from 'react-redux';
+import axios from "axios";
+import { ApiPaths } from "../ApiPaths";
+import { BASE_URL } from "../../config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Alert } from "react-native";
+import FlashMessage, { showMessage } from "react-native-flash-message";
+import { useSelector } from "react-redux";
+import { Buffer } from "buffer";
 
 const getPostsFromDatabase = async () => {
   try {
     const response = await axios.get(ApiPaths.getAllPost);
     return response.data;
   } catch (error) {
-    console.error('Error fetching posts:', error);
+    console.error("Error fetching posts:", error);
     throw error;
   }
 };
@@ -21,16 +22,15 @@ const getPostsByIdFromDatabase = async (postId) => {
     const response = await axios.get(`${ApiPaths.getPostById}${postId}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching posts:', error);
+    console.error("Error fetching posts:", error);
     throw error;
   }
 };
 
-
 const getUserIdFromAsyncStorage = async () => {
   try {
     //const userInfo = await AsyncStorage.getItem('userInfo');
-    const userData = useSelector(state => state.auth.userData);
+    const userData = useSelector((state) => state.auth.userData);
     const userId = userData.userId;
     const userToken = userData.token;
     const userName = userData.userName;
@@ -39,11 +39,11 @@ const getUserIdFromAsyncStorage = async () => {
       // return { userId: parseInt(userId), userName, token };
       return { userId: parseInt(userId), userName, userToken };
     } else {
-      console.log('No userId found in AsyncStorage');
+      console.log("No userId found in AsyncStorage");
       return null;
     }
   } catch (error) {
-    console.error('Error getting userId from AsyncStorage:', error);
+    console.error("Error getting userId from AsyncStorage:", error);
     return null;
   }
 };
@@ -52,123 +52,114 @@ const getUserNameAndAvatarFromAsyncStorage = async () => {
   try {
     //const userInfo = await AsyncStorage.getItem('userInfo');
 
-    const userData = useSelector(state => state.auth.userData);
+    const userData = useSelector((state) => state.auth.userData);
     const userId = userData.userId;
     const userToken = userData.token;
     const userName = userData.userName;
     const userAvatar = userData.userAvatar;
     if (userData === null) {
-      console.log('No userId found in AsyncStorage');
+      console.log("No userId found in AsyncStorage");
       return null;
-    } 
+    }
 
     // const { userName, avatar } = JSON.parse(userInfo);
     // const imageUrl = avatar.imageUrl;
-    console.log('UserName:', userName);
-    console.log('Avatar:', imageUrl);
+    console.log("UserName:", userName);
+    console.log("Avatar:", imageUrl);
     return { userName, userAvatar };
-
   } catch (error) {
-    console.error('Error getting userId from AsyncStorage:', error);
+    console.error("Error getting userId from AsyncStorage:", error);
     return null;
   }
 };
 
-
-const uploadImages = async (caption, images, callback, kind) => {
+const uploadImages = async (userId, userToken, caption, images, callback, kind) => {
   try {
-    // Lấy userId từ AsyncStorage
-    const userInfo = await getUserIdFromAsyncStorage();
-    if (!userInfo) {
-      console.log('No user info found in AsyncStorage');
+
+    if (!userId) {
+      console.log("No user found in Storage");
       return;
     }
 
-    const { userId, token } = userInfo;
+    
 
     // Tạo formData và thêm userId vào đó
     const formData = new FormData();
-    formData.append('userId', userId);
-    formData.append('caption', caption);
-    formData.append('kind', kind)
+    formData.append("userId", userId);
+    formData.append("caption", caption);
+    formData.append("kind", kind);
     images.forEach((uri, index) => {
       formData.append(`images`, {
         uri: uri,
         name: `image${index}.jpeg`,
-        type: 'image/jpeg',
+        type: "image/jpeg",
       });
     });
 
     // Gửi yêu cầu POST lên server
-    const response = await axios.post(`${BASE_URL}/post/`, formData, {
+    const response = await axios.post(ApiPaths.createPost, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${userToken}`,
       },
     });
     showMessage({
-      message: 'successfully',
-      type: 'success',
+      message: "successfully",
+      type: "success",
       floating: true,
       duration: 500,
       autoHide: true,
-      
     });
 
-   
     if (callback) {
       callback();
     }
 
-    console.log('Response from server:', response.data);
+    console.log("Response from server:", response.data);
   } catch (error) {
-    console.error('Error uploading images:', error);
+    console.error("Error uploading images:", error);
   }
 };
 
 const handleUpdatePost = async (postId, caption, images, callback, kind) => {
   try {
     const formData = new FormData();
-    formData.append('postId', postId);
-    formData.append('caption', caption);
+    formData.append("postId", postId);
+    formData.append("caption", caption);
     images.forEach((uri, index) => {
       formData.append(`images`, {
         uri: uri,
         name: `image${index}.jpeg`,
-        type: 'image/jpeg',
+        type: "image/jpeg",
       });
     });
-    formData.append('kind', kind);
-
-
+    formData.append("kind", kind);
 
     // Gửi yêu cầu cập nhật bài post lên server
-    const response = await axios.put(`${ApiPaths.updatePost}${postId}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        
-      },
-    });
+    const response = await axios.put(
+      `${ApiPaths.updatePost}${postId}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
     showMessage({
-      message: 'successfully',
-      type: 'success',
+      message: "successfully",
+      type: "success",
       floating: true,
       duration: 500,
       autoHide: true,
-      
     });
 
     if (callback) {
       callback();
     }
-
-
   } catch (error) {
-    console.error('Error updating post:', error);
-    Alert.alert('Error', 'An error occurred while updating post');
+    console.error("Error updating post:", error);
+    Alert.alert("Error", "An error occurred while updating post");
   }
-
-  
 };
 
 const getPostKindFromDataBase = async () => {
@@ -176,10 +167,10 @@ const getPostKindFromDataBase = async () => {
     const response = await axios.get(ApiPaths.getAllPostKind);
     return response.data;
   } catch (error) {
-    console.error('Error fetching posts:', error);
+    console.error("Error fetching posts:", error);
     throw error;
   }
-}
+};
 
 const addLike = async (postId, token) => {
   try {
@@ -189,14 +180,13 @@ const addLike = async (postId, token) => {
 
     const response = await axios.post(`${ApiPaths.addPostLike}${postId}/like`, {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
-    
 
-    console.log('Like added:', response.data);
+    console.log("Like added:", response.data);
   } catch (error) {
-    console.error('Error adding like:', error);
+    console.error("Error adding like:", error);
   }
 };
 
@@ -204,14 +194,17 @@ const removeLike = async (postId, token) => {
   try {
     // const userInfo = await getUserIdFromAsyncStorage();
     // const { token } = userInfo;
-    const response = await axios.delete(`${ApiPaths.addPostLike}${postId}/like`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    console.log('Like added:', response.data);
+    const response = await axios.delete(
+      `${ApiPaths.addPostLike}${postId}/like`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log("Like added:", response.data);
   } catch (error) {
-    console.error('Error adding like:', error);
+    console.error("Error adding like:", error);
   }
 };
 
@@ -220,56 +213,58 @@ const handleAddCommentToPost = async (postId, content, userId, token) => {
     // const userInfo = await getUserIdFromAsyncStorage();
     // const { token, userId } = userInfo;
 
-    
     const formData = new FormData();
-    formData.append('userId', userId);
-    formData.append('content', content);
-    
-    const response = await axios.post(`${ApiPaths.addComment}/${postId}/create`, formData, {
-      
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    
+    formData.append("userId", userId);
+    formData.append("content", content);
+
+    const response = await axios.post(
+      `${ApiPaths.addComment}/${postId}/create`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
     showMessage({
-      message: 'successfully',
-      type: 'success',
+      message: "successfully",
+      type: "success",
       floating: true,
       duration: 500,
       autoHide: true,
-      
     });
   } catch (error) {
-    console.error('Error: ', error);
+    console.error("Error: ", error);
   }
-
-}
+};
 
 const handleDeleteComment = async (commentId, token) => {
   try {
     // const userInfo = await getUserIdFromAsyncStorage();
     // const { token } = userInfo;
     console.log("commentId in handleDeleteComment: ", commentId);
-    const response = await axios.delete(`${ApiPaths.deleteComment}/${commentId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
+    const response = await axios.delete(
+      `${ApiPaths.deleteComment}/${commentId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     showMessage({
-      message: 'successfully',
-      type: 'success',
+      message: "successfully",
+      type: "success",
       floating: true,
       duration: 500,
       autoHide: true,
-      
     });
   } catch (error) {
-    console.log('Error: ', error);
+    console.log("Error: ", error);
   }
-}
+};
 
 const handleEditComment = async (commentId, content, token) => {
   try {
@@ -277,54 +272,110 @@ const handleEditComment = async (commentId, content, token) => {
     // const { token } = userInfo;
 
     const formData = new FormData();
-    formData.append('content', content);
-    
-    const response = await axios.put(`${ApiPaths.editComment}/${commentId}`, formData, {
-      
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    
+    formData.append("content", content);
+
+    const response = await axios.put(
+      `${ApiPaths.editComment}/${commentId}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
     showMessage({
-      message: 'successfully',
-      type: 'success',
+      message: "successfully",
+      type: "success",
       floating: true,
       duration: 500,
       autoHide: true,
-      
     });
   } catch (error) {
-    console.error('Error: ', error);
+    console.error("Error: ", error);
   }
-
-}
+};
 
 const getUserByIdFromDatabase = async (userId, token) => {
   try {
-    
     // const userInfo = await getUserIdFromAsyncStorage();
     // const { userId, token } = userInfo;
     const response = await axios.get(`${ApiPaths.getUserById}/${userId}`, {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching user:', error);
+    console.error("Error fetching user:", error);
     throw error;
   }
 };
 
+const getQRcode = async (userId, token) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8080/api/auth/qr/${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: "arraybuffer",
+      }
+    );
+    
+    return response;
+  } catch (error) {
+    console.error("Error fetching QR code:", error);
+    throw error;
+  }
+};
 
+const handleSubmitEditProfile = async (userId, userToken, username, email, birthdayYear, birthdayMonth, birthdayDay, selectedImage) => {
+  const paddedMonth = String(birthdayMonth).padStart(2, '0');
+  const paddedDay = String(birthdayDay).padStart(2, '0');
+  const birthday = `${birthdayYear}-${paddedMonth}-${paddedDay}`;
+  console.log(birthday);
+  try {
+    const formData = new FormData();
+    formData.append("username", username);
+    formData.append("email", email);
+    formData.append("birthday", birthday);
 
+    if (selectedImage) {
+      formData.append(`image`, {
+        uri: selectedImage,
+        name: "profile.jpg",
+        type: "image/jpeg",
+      });
+    }
 
-export { getPostsFromDatabase, 
-  uploadImages, 
-  getUserNameAndAvatarFromAsyncStorage, 
-  handleUpdatePost, 
+    const response = await fetch(`http://localhost:8080/api/auth/${userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "multipart/form-data",
+        "Authorization": `Bearer ${userToken}` // Assuming you have userToken
+      },
+      body: formData,
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Profile updated successfully", data);
+    } else {
+      console.error("Failed to update profile");
+    }
+  } catch (error) {
+    console.error("Error updating profile", error);
+  }
+};
+
+export {
+  getPostsFromDatabase,
+  uploadImages,
+  getUserNameAndAvatarFromAsyncStorage,
+  handleUpdatePost,
   getPostKindFromDataBase,
   addLike,
   removeLike,
@@ -333,4 +384,10 @@ export { getPostsFromDatabase,
   handleDeleteComment,
   handleEditComment,
   getUserIdFromAsyncStorage,
-  getUserByIdFromDatabase };
+  getUserByIdFromDatabase,
+  getQRcode,
+  handleSubmitEditProfile,
+};
+
+
+
