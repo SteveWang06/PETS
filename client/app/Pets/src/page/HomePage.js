@@ -169,7 +169,7 @@ const HomePage = () => {
           ),
         }));
         setPosts(formattedPosts);
-
+        //console.log(JSON.stringify(formattedPosts, null, 2));
       } catch (error) {
         console.error("Error fetching posts:", error);
       }
