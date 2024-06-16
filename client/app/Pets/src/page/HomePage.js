@@ -242,7 +242,7 @@ const HomePage = () => {
         onScroll={handleScroll}
         bounces={false}
         renderItem={({ item }) => (
-          <View style={{ flex: 1, width, height }}>
+          <View style={{ flex: 1}}>
             <ScrollView
               refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

@@ -38,7 +38,6 @@ const PostCard = ({
   const [userInfo, setUserInfo] = useState({});
   const [postId, setPostId] = useState(id);
   const [liked, setLiked] = useState(false);
- 
   const handleModalVisibility = (visibility) => {
     setModalVisible(visibility);
   };
@@ -48,11 +47,15 @@ const PostCard = ({
   };
 
   const handlePressEditPost = async () => {
-    const userInfo = await getUserNameAndAvatarFromAsyncStorage();
-    if (userInfo) {
-      setUserInfo(userInfo);
-      setModalVisible(true);
-    }
+    
+    // const userInfo = await getUserNameAndAvatarFromAsyncStorage();
+    // const userInfo = {userName, userAvatar}
+    // if (userInfo) {
+    //   setUserInfo(userInfo);
+      
+    // }
+    setModalVisible(true);
+
     console.log("postId:", postId);
   };
 
@@ -131,6 +134,8 @@ const PostCard = ({
   const userId = userData.userId;
   const userToken = userData.token;
   const dispatch = useDispatch();
+
+    const userName = userData.userName;
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -156,8 +161,8 @@ const PostCard = ({
                   <EditPostModal
                     postId={postId}
                     setModalVisible={handleModalVisibility}
-                    authorName={userInfo.userName}
-                    avatar={userInfo.imageUrl}
+                    authorName={userName}
+                    avatar={authorAvatar}
                     caption={caption}
                     postImages={postImages}
                     postKind={kind}

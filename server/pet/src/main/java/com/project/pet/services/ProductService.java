@@ -40,9 +40,11 @@ public class ProductService {
     return productRepository.findById(id);
   }
 
-  public Product createProduct(String name, String description, MultipartFile[] imageUrl, Long userId) throws IOException {
+  public Product createProduct(String name, String type, Integer price, String description, MultipartFile[] imageUrl, Long userId) throws IOException {
     Product product = new Product();
     product.setName(name);
+    product.setType(type);
+    product.setPrice(price);
     product.setDescription(description);
 
     List<Image> savedImages = new ArrayList<>();
@@ -66,10 +68,12 @@ public class ProductService {
     return productRepository.save(product);
   }
 
-  public Product updateProduct(Long id, String name, String description, MultipartFile[] imageUrl) throws IOException {
+  public Product updateProduct(Long id, String name, String type, Integer price, String description, MultipartFile[] imageUrl) throws IOException {
     Product product = productRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Product not found"));
     List<Image> oldImages = product.getImageUrl();
     product.setName(name);
+    product.setType(type);
+    product.setPrice(price);
     product.setDescription(description);
 
 

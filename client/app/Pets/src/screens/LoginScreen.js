@@ -5,11 +5,11 @@ import TextInput from "../components/TextInput";
 import { theme } from "../core/theme";
 import { Button } from "react-native-paper";
 import { useDispatch } from "react-redux";
-import { loginRequest } from "../redux/actions/authAction";
+import { loginRequest, registerRequest } from "../redux/actions/authAction";
 import Facebook from "../components/loginWithSocialMedia/Facebook";
 import Google from "../components/loginWithSocialMedia/Google";
-import { registerRequest } from "../redux/actions/authAction";
-
+import { showMessage } from "react-native-flash-message";
+import FlashMessage from "react-native-flash-message"; // Correctly import FlashMessage
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState("");
@@ -31,6 +31,17 @@ const LoginScreen = ({ navigation }) => {
   const handleRegister = async () => {
     try {
       await dispatch(registerRequest({ username, email, password }));
+      showMessage({
+        message: "Registration successful!",
+        type: "success",
+        floating: true,
+        duration: 2000,
+        autoHide: true,
+      });
+
+      setTimeout(() => {
+        setActiveTab("login");
+      }, 2000);
     } catch (error) {
       setError(error.message);
     }
@@ -49,13 +60,15 @@ const LoginScreen = ({ navigation }) => {
       <View style={styles.tabsContainer}>
         <TouchableOpacity
           style={[styles.tabButton, activeTab === "login" && styles.activeTab]}
-          onPress={() => setActiveTab("login")}>
+          onPress={() => setActiveTab("login")}
+        >
           <Text
             style={
               activeTab === "login"
                 ? styles.tabButtonText
                 : styles.noActiveTabButtonText
-            }>
+            }
+          >
             Login
           </Text>
         </TouchableOpacity>
@@ -64,13 +77,15 @@ const LoginScreen = ({ navigation }) => {
             styles.tabButton,
             activeTab === "register" && styles.activeTab,
           ]}
-          onPress={() => setActiveTab("register")}>
+          onPress={() => setActiveTab("register")}
+        >
           <Text
             style={
               activeTab === "register"
                 ? styles.tabButtonText
                 : styles.noActiveTabButtonText
-            }>
+            }
+          >
             Register
           </Text>
         </TouchableOpacity>
@@ -79,25 +94,25 @@ const LoginScreen = ({ navigation }) => {
         {activeTab === "register" && (
           <TextInput
             style={styles.input}
-            label='User name'
+            label="User name"
             value={username}
             onChangeText={(text) => setUsername(text)}
-            autoCapitalize='none'
+            autoCapitalize="none"
           />
         )}
         <TextInput
           style={styles.input}
-          label='Email'
+          label="Email"
           value={email}
           onChangeText={(text) => setEmail(text)}
-          autoCapitalize='none'
-          autoCompleteType='email'
-          textContentType='emailAddress'
-          keyboardType='email-address'
+          autoCapitalize="none"
+          autoCompleteType="email"
+          textContentType="emailAddress"
+          keyboardType="email-address"
         />
         <TextInput
           style={styles.input}
-          label='Password'
+          label="Password"
           value={password}
           onChangeText={(text) => setPassword(text)}
           secureTextEntry={!showPassword}
@@ -112,7 +127,7 @@ const LoginScreen = ({ navigation }) => {
 
         <Button
           disabled={email.length === 0 || password.length === 0}
-          mode='contained'
+          mode="contained"
           onPress={activeTab === "login" ? handleLogin : handleRegister}
           style={[
             styles.button,
@@ -122,7 +137,8 @@ const LoginScreen = ({ navigation }) => {
                   ? theme.colors.red
                   : theme.colors.grey,
             },
-          ]}>
+          ]}
+        >
           {activeTab === "login" ? "Login" : "Register"}
         </Button>
 
@@ -130,7 +146,8 @@ const LoginScreen = ({ navigation }) => {
           style={{
             flexDirection: "row",
             justifyContent: "center",
-          }}>
+          }}
+        >
           <TouchableOpacity>
             <Facebook />
           </TouchableOpacity>
@@ -141,9 +158,11 @@ const LoginScreen = ({ navigation }) => {
         </View>
       </View>
       <TouchableOpacity
-        onPress={() => navigation.replace("ForgotPasswordScreen")}>
+        onPress={() => navigation.replace("ForgotPasswordScreen")}
+      >
         <Text style={styles.forgot}>Forgot your password?</Text>
       </TouchableOpacity>
+      <FlashMessage position="top" style={{ marginBottom: 50 }}/>
     </Background>
   );
 };

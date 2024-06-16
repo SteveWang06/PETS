@@ -2,6 +2,7 @@ package com.project.pet.controller;
 
 import com.project.pet.dto.UserProfileDTO;
 import com.project.pet.models.User;
+import com.project.pet.security.GetAllUserPermission;
 import com.project.pet.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -35,7 +36,8 @@ public class UserController {
 
   @Operation(summary = "Get All Users", description = "Retrieve information of all users")
   @GetMapping("/user")
-  @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+  //@PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+  @GetAllUserPermission
   public ResponseEntity<List<User>> allUsers() {
     List<User> users = userService.allUser();
     return ResponseEntity.ok(users);
