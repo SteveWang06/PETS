@@ -196,7 +196,7 @@ const EditPostModal = ({
       <View style={styles.header}>
         <Image
           source={{
-            uri: `${BASE_URL}/${avatar}`,
+            uri: `${avatar}`,
           }}
           style={styles.avatar}
         />

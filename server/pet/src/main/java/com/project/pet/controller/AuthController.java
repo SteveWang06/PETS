@@ -3,6 +3,8 @@ package com.project.pet.controller;
 import com.project.pet.dto.LoginDto;
 import com.project.pet.dto.SignupDTO;
 import com.project.pet.dto.UserDTO;
+import com.project.pet.models.Image;
+import com.project.pet.models.Role;
 import com.project.pet.models.User;
 import com.project.pet.payload.response.LoginResponse;
 import com.project.pet.services.AuthService;
@@ -54,10 +56,15 @@ public class AuthController {
     String jwtToken = jwtService.generateToken(authenticatedUser);
     String username = authenticatedUser.getUserName();
     Long userId = authenticatedUser.getId();
+    Role role = authenticatedUser.getRole();
+    Image avatar = authenticatedUser.getAvatar();
+
     LoginResponse loginResponse = new LoginResponse()
         .setToken(jwtToken)
         .setExpiresIn(jwtService.getExpirationTime())
         .setUserName(username)
+        .setAvatar(avatar)
+        .setRole(role)
         .setUserId(userId);
     return ResponseEntity.ok(loginResponse);
   }

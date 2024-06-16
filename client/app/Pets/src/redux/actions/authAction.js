@@ -54,6 +54,7 @@ export const registerRequest = ({ username, email, password }) => {
 
       const data = await response.json();
       dispatch({ type: REGISTER_SUCCESS, payload: data });
+      
       //console.log("user data in loginRequest: ", data);
     } catch (error) {
       dispatch({ type: REGISTER_FAILURE, payload: error.message });

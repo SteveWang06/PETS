@@ -4,25 +4,20 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TouchableNativeFeedback,
-  LayoutAnimation,
   Image,
   ScrollView,
   Dimensions,
   Modal,
   ActivityIndicator,
-  TextInput,
 } from "react-native";
 import { AuthContext } from "../context/AuthContext";
 import { Button } from "react-native-paper";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Feather, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-import { Container } from "../components/Wrappers";
 import i18next from "i18next";
 import {
   getQRcode,
   getUserByIdFromDatabase,
-  handleSubmitEditProfile,
 } from "../services/requester/UserRequester";
 import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -34,32 +29,30 @@ import { updatePostLike, setPosts } from "../redux/actions/postActions";
 import { logout } from "../redux/actions/authAction";
 import { theme } from "../core/theme";
 import { Buffer } from "buffer";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import RNPickerSelect from "react-native-picker-select";
 import EditProfileModal from "../components/EditProfileModal";
+import RoleChangeModal from "../components/RoleChangeModal";
 
 const languages = [
   { code: "en", label: "English" },
   { code: "zh_tw", label: "中文" },
 ];
 
-
-const { width, height } = Dimensions.get("screen");
+const { width } = Dimensions.get("screen");
 const ProfilePage = () => {
   const [showLanguagesList, setShowLanguagesList] = useState(false);
   const { t } = useTranslation();
-  const [refreshing, setRefreshing] = useState(false);
-  const [userName, setUserName] = useState();
-  const [userEmail, setUserEmail] = useState();
+  const [userName, setUserName] = useState("");
+  const [role, setRole] = useState("");
+  const [userEmail, setUserEmail] = useState("");
   const [userBirthDay, setUserBirthDay] = useState([]);
-  const [userAvatar, setUserAvatar] = useState();
+  const [userAvatar, setUserAvatar] = useState("");
   const [posts, setPosts] = useState([]);
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [imageBase64, setImageBase64] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showModalEditProfile, setShowModalEditProfile] = useState(false);
-  
-
+  const [showRoleModal, setShowRoleModal] = useState(false);
+  const [currentRole, setCurrentRole] = useState("");
   const changeLanguage = (code) => {
     i18next.changeLanguage(code);
     setSelectedLanguage(code);
@@ -79,7 +72,6 @@ const ProfilePage = () => {
   const userData = useSelector((state) => state.auth.userData);
   const userId = userData.userId;
   const userToken = userData.token;
-
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -87,7 +79,8 @@ const ProfilePage = () => {
         const formattedUserProfile = {
           userName: data.user.userName,
           email: data.user.email,
-          userBirthDay: data.user.birthday,
+          role: data.user.role.name,
+          userBirthDay: data.user.birthday || [],
           userAvatar: `${BASE_URL}/${data.user.avatar.imageUrl}`,
           posts: data.posts.map((post) => ({
             id: post.id,
@@ -103,20 +96,19 @@ const ProfilePage = () => {
         setUserBirthDay(formattedUserProfile.userBirthDay);
         setUserAvatar(formattedUserProfile.userAvatar);
         setPosts(formattedUserProfile.posts);
+        setCurrentRole(formattedUserProfile.role);
       } catch (error) {
         console.error("Error fetching profile:", error);
       }
     };
 
     fetchUserProfile();
-  }, [posts]);
+  }, []);
 
   const birthdayString =
-    userBirthDay.length === 3
+    Array.isArray(userBirthDay) && userBirthDay.length === 3
       ? `${userBirthDay[0]}-${userBirthDay[1]}-${userBirthDay[2]}`
       : "";
-
-  //console.log("birthdayString: ", birthdayString);
 
   const dispatch = useDispatch();
   const handleLikeToggle = (postId, liked) => {
@@ -163,14 +155,44 @@ const ProfilePage = () => {
     };
 
     fetchQRCode();
-  }, []);
+  }, [userId, userToken]);
+
+  const handleUpdateProfile = (updatedUserData) => {
+    dispatch(updateProfile(userData.userId, userData.token, updatedUserData));
+    closeModalEditProfile();
+  };
+
+  const renderRoleIcon = (currentRole) => {
+    switch (currentRole) {
+      case "USER":
+        return (
+          <Feather
+            name='user'
+            size={20}
+            color='white'
+            style={styles.userIcon}
+          />
+        );
+      case "BUSINESS":
+        return <Entypo name='shop' size={20} color='white' />;
+      case "HOSPITAL":
+        return (
+          <MaterialCommunityIcons name="hospital-box-outline" size={20} color="white" />
+        );
+      case "ADMIN":
+      case "SUPER_ADMIN":
+        return <Feather name='award' size={24} color='white' />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <View>
-      <GestureHandlerRootView style={{}}>
-        <View style={{}}>
+      <GestureHandlerRootView>
+        <View>
           <StatusBar style='light' />
-          <BottomSheet ref={ref} style={{}}>
+          <BottomSheet ref={ref}>
             <View style={styles.containerInBottomSheet}>
               <TouchableOpacity
                 style={styles.buttonLogout}
@@ -178,7 +200,7 @@ const ProfilePage = () => {
                 <Text style={styles.buttonText}>{t("logout")}</Text>
               </TouchableOpacity>
 
-              <View style={{}}>
+              <View>
                 <Modal
                   visible={showLanguagesList}
                   animationType='slide'
@@ -218,7 +240,7 @@ const ProfilePage = () => {
                 </TouchableOpacity>
               </View>
 
-              <View style={{}}>
+              <View>
                 <EditProfileModal
                   showModalEditProfile={showModalEditProfile}
                   closeModalEditProfile={closeModalEditProfile}
@@ -226,6 +248,7 @@ const ProfilePage = () => {
                   userName={userName}
                   userEmail={userEmail}
                   userBirthday={userBirthDay}
+                  onSubmit={handleUpdateProfile}
                 />
                 <TouchableOpacity
                   style={styles.buttonChangeLanguage}
@@ -249,8 +272,13 @@ const ProfilePage = () => {
               }}
               style={styles.avatar}
             />
-            <Text style={styles.userName}>{userName}</Text>
-            <Text style={styles.birthdayText}>{birthdayString}</Text>
+            <View style={styles.userInfoContainer}>
+              <Text style={styles.userName}>{userName}</Text>
+              <TouchableOpacity onPress={() => setShowRoleModal(true)}>
+                {renderRoleIcon(currentRole)}
+              </TouchableOpacity>
+              <Text style={styles.birthdayText}>{birthdayString}</Text>
+            </View>
 
             <TouchableOpacity style={styles.buttonEdit} onPress={onPress}>
               <AntDesign name='setting' size={24} color='white' />
@@ -301,11 +329,39 @@ const ProfilePage = () => {
           </View>
         </View>
       </ScrollView>
+
+      <RoleChangeModal
+        showRoleModal={showRoleModal}
+        setShowRoleModal={setShowRoleModal}
+        currentRole={currentRole}
+        userId={userId}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  closeButton: {
+    backgroundColor: '#d9534f', // Màu đỏ
+  },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+  },
+  roleButton: {
+    backgroundColor: '#0275d8',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
   buttonEdit: {
     position: "absolute",
     bottom: 10,
@@ -325,7 +381,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: "90%",
     height: 200,
-    flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#8B0000",
     marginTop: 120,
@@ -345,14 +400,21 @@ const styles = StyleSheet.create({
     bottom: 130,
     left: 40,
   },
-  userName: {
-    width: 200,
+  userInfoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     position: "absolute",
     top: 20,
-    right: 20,
-    fontSize: 18,
+    left: 165,
+  },
+  userName: {
+    fontSize: 20,
     color: "#FFFFFF",
     fontWeight: "bold",
+    marginRight: 5,
+  },
+  userIcon: {
+    marginLeft: 5,
   },
   containerInBottomSheet: {
     padding: 16,
@@ -428,8 +490,7 @@ const styles = StyleSheet.create({
   birthdayText: {
     width: 200,
     position: "absolute",
-    top: 45,
-    right: 20,
+    top: 30,
     fontSize: 15,
     color: "#FFFFFF",
   },
@@ -461,71 +522,9 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "bold",
   },
-
-  modalEditContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalEditContent: {
-    width: "80%",
-    padding: 20,
-    backgroundColor: "white",
-    borderRadius: 10,
-  },
-  headerEdit: {
-    alignItems: "center",
-  },
-  circleEdit: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: "#eee",
-    marginBottom: 20,
-  },
-  avatarEdit: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 20,
-  },
-  userNameEdit: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  birthdayTextEdit: {
+  modalText: {
     fontSize: 16,
-    color: "#888",
-    marginBottom: 20,
-  },
-  inputEdit: {
-    width: "100%",
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    marginBottom: 20,
-  },
-  buttonSelectEditImage: {
-    padding: 10,
-    backgroundColor: "#007BFF",
-    borderRadius: 5,
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  buttonSaveEdit: {
-    padding: 10,
-    backgroundColor: "#28A745",
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  selectedImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 20,
+    marginBottom: 10,
   },
 });
 

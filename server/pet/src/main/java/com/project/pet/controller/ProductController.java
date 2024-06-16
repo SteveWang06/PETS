@@ -1,8 +1,8 @@
 package com.project.pet.controller;
 
 import com.project.pet.models.Product;
+import com.project.pet.security.ShopRole;
 import com.project.pet.services.ProductService;
-import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,7 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -63,15 +62,18 @@ public class ProductController {
       @ApiResponse(responseCode = "400", description = "Invalid input",
           content = @Content) })
   @PostMapping
-  @PreAuthorize("hasRole('ADMIN','SUPER_ADMIN', 'BUSINESS')")
+//  @PreAuthorize("hasRole('ADMIN') OR hasRole('SUPER_ADMIN') OR hasRole('BUSINESS')")
+  @ShopRole
   @SecurityRequirement(name = "bearerAuth")
   public ResponseEntity<Product> createProduct(
       @Parameter(description = "Name of the product") @RequestParam("name") String name,
+      @Parameter(description = "Type of the product") @RequestParam("type") String type,
+      @Parameter(description = "Price of the product") @RequestParam("price") Integer price,
       @Parameter(description = "Description of the product") @RequestParam("description") String description,
       @Parameter(description = "Images of the product") @RequestParam("images") MultipartFile[] imageUrl,
       @Parameter(description = "User ID who is creating the product") @RequestParam("userId") Long userId) throws IOException {
 
-    Product createdProduct = productService.createProduct(name, description, imageUrl, userId);
+    Product createdProduct = productService.createProduct(name, type, price, description, imageUrl, userId);
     return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
   }
 
@@ -84,15 +86,17 @@ public class ProductController {
       @ApiResponse(responseCode = "404", description = "Product not found",
           content = @Content) })
   @PutMapping("/{id}")
-  @PreAuthorize("hasRole('ADMIN','SUPER_ADMIN', 'BUSINESS')")
+  @ShopRole
   @SecurityRequirement(name = "bearerAuth")
   public ResponseEntity<Product> updateProduct(
       @Parameter(description = "ID of the product to be updated") @PathVariable Long id,
       @Parameter(description = "Updated name of the product") @RequestParam("name") String name,
+      @Parameter(description = "Type of the product") @RequestParam("type") String type,
+      @Parameter(description = "Price of the product") @RequestParam("price") Integer price,
       @Parameter(description = "Updated description of the product") @RequestParam("description") String description,
       @Parameter(description = "Updated images of the product") @RequestParam("images") MultipartFile[] imageUrl) throws IOException {
 
-    Product product = productService.updateProduct(id, name, description, imageUrl);
+    Product product = productService.updateProduct(id, name,type, price, description, imageUrl);
     if (product != null) {
       return new ResponseEntity<>(product, HttpStatus.OK);
     } else {
@@ -108,12 +112,12 @@ public class ProductController {
       @ApiResponse(responseCode = "404", description = "Product not found",
           content = @Content) })
   @DeleteMapping("/{id}")
-  @PreAuthorize("hasRole('ADMIN','SUPER_ADMIN', 'BUSINESS')")
+  @ShopRole
   @SecurityRequirement(name = "bearerAuth")
   public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
     boolean deleted = productService.deleteProduct(id);
     if (deleted) {
-      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+      return new ResponseEntity<>(HttpStatus.OK);
     } else {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }

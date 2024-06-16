@@ -15,6 +15,8 @@ public class Product {
   private Long id;
 
   private String name;
+  private String type;
+  private Integer price;
 
   @Column(length = 1000)
   private String description;
@@ -47,6 +49,22 @@ public class Product {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public Integer getPrice() {
+    return price;
+  }
+
+  public void setPrice(Integer price) {
+    this.price = price;
   }
 
   public String getDescription() {

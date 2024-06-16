@@ -52,11 +52,11 @@ const getUserNameAndAvatarFromAsyncStorage = async () => {
   try {
     //const userInfo = await AsyncStorage.getItem('userInfo');
 
-    const userData = useSelector((state) => state.auth.userData);
-    const userId = userData.userId;
-    const userToken = userData.token;
-    const userName = userData.userName;
-    const userAvatar = userData.userAvatar;
+    // const userData = useSelector((state) => state.auth.userData);
+    // const userId = userData.userId;
+    // const userToken = userData.token;
+    // const userName = userData.userName;
+    // const userAvatar = userData.userAvatar;
     if (userData === null) {
       console.log("No userId found in AsyncStorage");
       return null;
@@ -73,15 +73,19 @@ const getUserNameAndAvatarFromAsyncStorage = async () => {
   }
 };
 
-const uploadImages = async (userId, userToken, caption, images, callback, kind) => {
+const uploadImages = async (
+  userId,
+  userToken,
+  caption,
+  images,
+  callback,
+  kind
+) => {
   try {
-
     if (!userId) {
       console.log("No user found in Storage");
       return;
     }
-
-    
 
     // Tạo formData và thêm userId vào đó
     const formData = new FormData();
@@ -324,7 +328,7 @@ const getQRcode = async (userId, token) => {
         responseType: "arraybuffer",
       }
     );
-    
+
     return response;
   } catch (error) {
     console.error("Error fetching QR code:", error);
@@ -332,9 +336,18 @@ const getQRcode = async (userId, token) => {
   }
 };
 
-const handleSubmitEditProfile = async (userId, userToken, username, email, birthdayYear, birthdayMonth, birthdayDay, selectedImage) => {
-  const paddedMonth = String(birthdayMonth).padStart(2, '0');
-  const paddedDay = String(birthdayDay).padStart(2, '0');
+const handleSubmitEditProfile = async (
+  userId,
+  userToken,
+  username,
+  email,
+  birthdayYear,
+  birthdayMonth,
+  birthdayDay,
+  selectedImage
+) => {
+  const paddedMonth = String(birthdayMonth).padStart(2, "0");
+  const paddedDay = String(birthdayDay).padStart(2, "0");
   const birthday = `${birthdayYear}-${paddedMonth}-${paddedDay}`;
   console.log(birthday);
   try {
@@ -355,7 +368,7 @@ const handleSubmitEditProfile = async (userId, userToken, username, email, birth
       method: "PUT",
       headers: {
         "Content-Type": "multipart/form-data",
-        "Authorization": `Bearer ${userToken}` // Assuming you have userToken
+        Authorization: `Bearer ${userToken}`, // Assuming you have userToken
       },
       body: formData,
     });
@@ -369,6 +382,29 @@ const handleSubmitEditProfile = async (userId, userToken, username, email, birth
   } catch (error) {
     console.error("Error updating profile", error);
   }
+};
+
+const handleRequestChangeRole = async (userId, userToken, requestedRole) => {
+  // Gởi yêu cầu lên server với userId và requestedRole
+  const formData = new FormData();
+  formData.append("userId", userId);
+  formData.append("requestedRole", requestedRole);
+  try {
+    const response = await fetch(ApiPaths.changeRole, {
+      method: "POST",
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${userToken}`, // Assuming you have userToken
+      },
+      body: formData,
+    });
+    const data = await response.json();
+    console.log("Response:", data);
+    // Xử lý kết quả trả về từ server nếu cần
+  } catch (error) {
+    console.error("Error:", error);
+  }
+  setShowRoleModal(false);
 };
 
 export {
@@ -387,7 +423,5 @@ export {
   getUserByIdFromDatabase,
   getQRcode,
   handleSubmitEditProfile,
+  handleRequestChangeRole,
 };
-
-
-

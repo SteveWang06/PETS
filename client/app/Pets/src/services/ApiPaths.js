@@ -16,7 +16,9 @@ export const ApiPaths = {
     editComment: 'http://localhost:8080/api/post/comment',
     getUserById: 'http://localhost:8080/api/auth/user',
     userRegister: 'http://localhost:8080/api/auth/register',
-    getQRcode: 'http://localhost:8080/api/auth/qr/'
+    getQRcode: 'http://localhost:8080/api/auth/qr/',
+    updateUser: 'http://localhost:8080/api/auth/',
+    changeRole: "http://localhost:8080/api/role-requests"
 }
 
 // export const ApiPaths = {
