@@ -5,7 +5,7 @@ import logo from '../image/petlogo.png';
 import axios from "axios";
 import { BASE_URL } from "../context/config";
 import { Navigate } from 'react-router-dom';
-
+ 
 const Login = () => {
   const [userToken, setUserToken] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
@@ -51,22 +51,23 @@ const Login = () => {
   if (success) {
     return <Navigate to="home"/>;
   }
-
+ 
     return (
         <body class="hold-transition login-page">
             <div className="login-box">
                 {/* /.login-logo */}
                 <div className="card card-outline card-primary">
                     <div className="card-header text-center">
-                        <a href="../../index2.html" className="h1"><b>Admin</b>LTE</a>
+                        <center><img src={logo} width="100px" height="100px"/></center>
+                        <a href="../../index2.html" className="h1"><b>PETS </b>ADMIN</a>
                     </div>
                     <div className="card-body">
-                        <p className="login-box-msg">Sign in to start your session</p>
+                        <p className="login-box-msg">Please enter your email and password to continue</p>
                         {error && <p style={{color: 'red'}}>{error}</p>}
                         <form onSubmit={handleSubmit}>
-                            <div className="input-group mb-3">                           
-                                <input type="email" className="form-control" placeholder="Email" 
-                                  value={inputEmail} onChange={(e)=>setInputEmail(e.target.value)} required/>                               
+                            <div className="input-group mb-3">                          
+                                <input type="email" className="form-control" placeholder="Email"
+                                  value={inputEmail} onChange={(e)=>setInputEmail(e.target.value)} required/>                              
                                 <div className="input-group-append">
                                     <div className="input-group-text">
                                         <span className="fas fa-envelope" />
@@ -74,7 +75,7 @@ const Login = () => {
                                 </div>
                             </div>
                             <div className="input-group mb-3">
-                                <input type="password" className="form-control" placeholder="Password" 
+                                <input type="password" className="form-control" placeholder="Password"
                                   value={inputPassword} onChange={(e)=>setInputPassword(e.target.value)} required/>
                                 <div className="input-group-append">
                                     <div className="input-group-text">
@@ -95,8 +96,8 @@ const Login = () => {
                                 {/* /.col */}
                                 {/* /.col */}
                             </div>
-                            <div className="btn btn-block ">
-                                <button type="submit" className="btn btn-primary btn-block">Sign In</button>
+                            <div className="social-auth-links text-center mt-2 mb-3">
+                                <button type="submit" className="btn btn-success btn-block">Sign In</button>
                             </div>
                         </form>
                         <div className="social-auth-links text-center mt-2 mb-3">
@@ -112,7 +113,7 @@ const Login = () => {
                             <a href="forgot-password.html">I forgot my password</a>
                         </p>
                         <p className="mb-0">
-                            <a href="register.html" className="text-center">Register a new membership</a>
+                            <a href="register.html" className="text-center">Create Account</a>
                         </p>
                     </div>
                     {/* /.card-body */}

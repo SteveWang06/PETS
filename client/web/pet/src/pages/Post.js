@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Header from "../components/Header"; // 介面的上面
-import SideNav from "../components/SideNav"; // 介面左邊的 menu
-import Footer from "../components/Footer"; // 介面的底部
+import Header from "../components/Header"; 
+import SideNav from "../components/SideNav"; 
+import Footer from "../components/Footer"; 
 import { BASE_URL } from "../context/config";
 
 const Post = () => {
@@ -14,10 +14,21 @@ const Post = () => {
   const [Kind, setKind] = useState('');
   const [Image, setImage] = useState(null);
   const [create, setCreate] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [filter, setFilter]=useState('');
+  const [original, setOriginal]=useState([]);
+  const [success, setSuccess]=useState('');
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(()=>{
+    if(success){
+      const timer=setTimeout(()=>setSuccess(''),3000);
+      return ()=>clearTimeout(timer);
+    }
+  },[success]);
 
   const fetchData = async () => {
     try {
@@ -33,6 +44,7 @@ const Post = () => {
       });
 
       setData(res.data);
+      setOriginal(res.data);
       console.log(res.data);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -69,6 +81,7 @@ const Post = () => {
       setKind('');
       setImage(null);
       setCreate(false);
+      setSuccess('Create Success');
     } catch (error) {
       console.error('Error creating data: ', error);
       setError('Error creating data');
@@ -88,6 +101,8 @@ const Post = () => {
       });
 
       setData(prevData => prevData.filter(item => item.id !== id));
+      setOriginal(prevData=>prevData.filter(item=>item.id!==id));
+      setSuccess('Delete Success');
     } catch (error) {
       console.error('Error deleting data: ', error);
       setError('Error deleting data');
@@ -101,7 +116,7 @@ const Post = () => {
     setKind(item.postKind);
   };
 
-  const handleSave = async () => {
+const handleSave = async () => {
     try {
       const token = sessionStorage.getItem('userToken');
       if (!token || !editId) {
@@ -139,16 +154,37 @@ const Post = () => {
         postKind: Kind,
         postImages: Image ? [{ ...item.postImages[0], imageUrl: URL.createObjectURL(Image) }] : item.postImages
       } : item);
+
       setData(updatedData);
+      setOriginal(updatedData);
       setEditId(null);
       setCaption('');
       setKind('');
       setUserId('');
       setImage(null);
+      setSuccess('Edit Success')
     } catch (error) {
       console.error('Error updating data: ', error);
       setError('Error updating data');
     }
+  };
+  
+  const handleSearch = () => {
+    const filteredData = original.filter(item => {
+      return (
+        item.authorName.toLowerCase().includes(searchText.toLowerCase()) ||
+        item.postKind.toLowerCase().includes(searchText.toLowerCase()) ||
+        item.caption.toLowerCase().includes(searchText.toLowerCase())
+      );
+    });
+    setData(filteredData);
+  };
+
+  const handleFilter=(e)=>{
+    const selectFilter=e.target.value;
+    setFilter(selectFilter);
+    const filteredData=selectFilter ? original.filter(item=>item.postKind===selectFilter) : original;
+    setData(filteredData);
   };
 
   return (
@@ -161,19 +197,42 @@ const Post = () => {
             <div className="col-12">
               <div className="card">
                 <div className="card-header">
-                  <h3 className="card-title" style={{ fontWeight: 'bold', fontSize: '28px' }}>Post</h3>
-                  <button className="btn btn-primary float-right" onClick={() => setCreate(true)}>Create</button>
+                  <div className="d-flex justify-content-between align-items-center">
+                    <h3 className="card-title" style={{ fontWeight: 'bold', fontSize: '28px' }}>Post</h3>
+                    <div className="d-flex">
+                      <div className="form-inline mr-2">
+                        <div className="input-group" data-widget="sidebar-search-1">
+                          <input className="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search" value={searchText} onChange={(e) => setSearchText(e.target.value)} />
+                          <div className="input-group-append">
+                            <button className="btn btn-sidebar" onClick={handleSearch}>
+                              <i className="fas fa-search fa-fw"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <button className="btn btn-primary" onClick={() => setCreate(true)}>Create</button>
+                    </div>
+                  </div>
                 </div>
                 <div className="card-body">
                   {error && <p style={{ color: 'red' }}>{error}</p>}
+                  {success && <p style={{color: 'green'}}>{success}</p>}
                   <table id="example2" className="table table-bordered table-hover">
                     <thead>
                       <tr>
                         <th>User Name</th>
                         <th>Images</th>
                         <th>Caption</th>
-                        <th>Kind</th>
-                        <th>Actions</th>
+                        <th>Kind
+                          <div style={{float: 'right'}}>
+                          <select value={filter} onChange={handleFilter} className="form-comtrol">
+                            <option value="">All</option>
+                            <option value="cat">Cat</option>
+                            <option value="dog">Dog</option>
+                            <option value="other">Other</option>
+                          </select>
+                          </div>
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -182,7 +241,7 @@ const Post = () => {
                           {editId === item.id ? (
                             <>
                               <td>{item.authorName}</td>
-                              <td>
+                              <td>                            
                                 <input 
                                   type="file" 
                                   onChange={(e) => setImage(e.target.files[0])}
@@ -195,6 +254,7 @@ const Post = () => {
                                   value={Caption} 
                                   onChange={(e) => setCaption(e.target.value)} 
                                   placeholder="Edit caption"
+                                  style={{width:'50%', margin:'0 auto', display:'block'}}
                                 />
                               </td>
                               <td>
@@ -203,6 +263,7 @@ const Post = () => {
                                   value={Kind} 
                                   onChange={(e) => setKind(e.target.value)} 
                                   placeholder="Edit Kind"
+                                  style={{width:'50%', margin:'0 auto', display:'block'}}
                                 />
                               </td>
                               <td>
@@ -212,12 +273,12 @@ const Post = () => {
                           ) : (
                             <>
                               <td>{item.authorName}</td>
-                              <td>{item.postImages[0].imageUrl.split('/').pop()}</td>
+                              <td><img src={item.postImages[0].imageUrl} alt="Post" style={{ width:'100px',height: 'auto'}}/></td>
                               <td>{item.caption}</td>
                               <td>{item.postKind}</td>
                               <td>
                                 <button className="btn btn-block btn-primary" onClick={() => handleEdit(item)}>Edit</button>
-                                <button className="btn btn-block btn-primary" onClick={() => handleDelete(item.id)}>Delete</button>
+                                <button className="btn btn-block btn-danger" onClick={() => handleDelete(item.id)}>Delete</button>
                               </td>
                             </>
                           )}
@@ -232,23 +293,27 @@ const Post = () => {
                         value={Caption} 
                         onChange={(e) => setCaption(e.target.value)} 
                         placeholder="Enter caption"
+                        // style={{width:'50%', margin:'0 auto', display:'block'}}
                       />
                       <input 
                         type="text" 
                         value={UserId} 
                         onChange={(e) => setUserId(e.target.value)} 
                         placeholder="Enter UserId"
+                        // style={{width:'50%', margin:'0 auto', display:'block'}}
                       />
                       <input 
                         type="text" 
                         value={Kind} 
                         onChange={(e) => setKind(e.target.value)} 
                         placeholder="Enter Kind"
+                        // style={{width:'50%', margin:'0 auto', display:'block'}}
                       />
                       <input 
                         type="file" 
                         onChange={(e) => setImage(e.target.files[0])}
                         placeholder="Choose Image"
+                        // style={{width:'50%', margin:'0 auto', display:'block'}}
                       />
                       <button onClick={handleCreate} className="btn btn-primary">Save</button>
                     </div>
@@ -262,9 +327,6 @@ const Post = () => {
       <Footer />
     </div>
   );
-};
+}
 
 export default Post;
-
-
-
