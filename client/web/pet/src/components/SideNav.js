@@ -7,10 +7,10 @@ function SideNav() {
             {/* Main Sidebar Container */}
             <aside className="main-sidebar sidebar-dark-primary elevation-4">
                 {/* Brand Logo */}
-                <a href="#" className="brand-link">
+                <Link to="/home" className="brand-link">
                     <img src="dist/img/petlogo.png" alt="PET Logo" className="brand-image img-circle elevation-3" style={{ opacity: '.8' }} />
                     <span className="brand-text font-weight-light">PET ADMIN</span>
-                </a>
+                </Link>
                 {/* Sidebar */}
                 <div className="sidebar">
                     {/* Sidebar user panel (optional) */}

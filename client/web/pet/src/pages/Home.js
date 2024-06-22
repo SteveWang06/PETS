@@ -2,10 +2,12 @@ import React from 'react';
 import Header from "../components/Header"; //介面的上面
 import SideNav from "../components/SideNav"; //介面左邊的menu
 import Footer from "../components/Footer"; //介面的底部
-
+import axios from "axios";
+import {Link} from "react-router-dom";
+ 
 function Home() {
     return (
-        
+       
         <div>
             <Header/>
             {/* Content Wrapper. Contains page content */}
@@ -32,40 +34,13 @@ function Home() {
                     <div className="container-fluid">
                         {/* Small boxes (Stat box) */}
                         <div className="row">
-                            <div className="col-lg-3 col-6">
-                                {/* small box */}
-                                <div className="small-box bg-info">
-                                    <div className="inner">
-                                        <h3>150</h3>
-                                        <p>New Orders</p>
-                                    </div>
-                                    <div className="icon">
-                                        <i className="ion ion-bag" />
-                                    </div>
-                                    <a href="#" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></a>
-                                </div>
-                            </div>
-                            {/* ./col */}
-                            <div className="col-lg-3 col-6">
-                                {/* small box */}
-                                <div className="small-box bg-success">
-                                    <div className="inner">
-                                        <h3>53<sup style={{ fontSize: 20 }}>%</sup></h3>
-                                        <p>Bounce Rate</p>
-                                    </div>
-                                    <div className="icon">
-                                        <i className="ion ion-stats-bars" />
-                                    </div>
-                                    <a href="#" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></a>
-                                </div>
-                            </div>
-                            {/* ./col */}
+                            {/* Total User */}
                             <div className="col-lg-3 col-6">
                                 {/* small box */}
                                 <div className="small-box bg-warning">
                                     <div className="inner">
-                                        <h3>44</h3>
-                                        <p>User Registrations</p>
+                                        <p>Total User</p>
+                                        <h3>12</h3>
                                     </div>
                                     <div className="icon">
                                         <i className="ion ion-person-add" />
@@ -73,13 +48,83 @@ function Home() {
                                     <a href="#" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></a>
                                 </div>
                             </div>
-                            {/* ./col */}
+                            {/* Total My Pet Post */}
+                            <div className="col-lg-3 col-6">
+                                {/* small box */}
+                                <div className="small-box bg-success">
+                                    <div className="inner">
+                                        <p>Total My Pet Post</p>
+                                        <h3>--</h3>
+                                    </div>
+                                    <div className="icon">
+                                        <i className="ion ion-stats-bars" />
+                                    </div>
+                                    <Link to="/post" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
+                                </div>
+                            </div>
+                            {/* Total Homeless Pet Post */}
+                            <div className="col-lg-3 col-6">
+                                {/* small box */}
+                                <div className="small-box bg-success">
+                                    <div className="inner">
+                                        <p>Total Homeless Pet Post</p>
+                                        <h3>--</h3>
+                                    </div>
+                                    <div className="icon">
+                                        <i className="ion ion-stats-bars" />
+                                    </div>
+                                    <Link to="/post" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
+                                </div>
+                            </div>
+                            {/* Total Give Pet Post */}
+                            <div className="col-lg-3 col-6">
+                                {/* small box */}
+                                <div className="small-box bg-success">
+                                    <div className="inner">
+                                        <p>Total Give Pet Post</p>
+                                        <h3>--</h3>
+                                    </div>
+                                    <div className="icon">
+                                        <i className="ion ion-stats-bars" />
+                                    </div>
+                                    <Link to="/post" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
+                                </div>
+                            </div>                              
+                            {/* Total Shop */}
+                            <div className="col-lg-3 col-6">
+                                {/* small box */}
+                                <div className="small-box bg-info">
+                                    <div className="inner">
+                                        <p>Total Shop</p>
+                                        <h3>150</h3>
+                                    </div>
+                                    <div className="icon">
+                                        <i className="ion ion-bag" />
+                                    </div>
+                                    <a href="#" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></a>
+                                </div>
+                            </div>
+                            {/* Total Products */}
+                            <div className="col-lg-3 col-6">
+                                {/* small box */}
+                                <div className="small-box bg-info">
+                                    <div className="inner">
+                                        <p>Total Products</p>
+                                        <h3>150</h3>
+                                    </div>
+                                    <div className="icon">
+                                        <i className="ion ion-bag" />
+                                    </div>
+                                    <a href="#" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></a>
+                                </div>
+                            </div>
+                            {/* Total Hospital */}
                             <div className="col-lg-3 col-6">
                                 {/* small box */}
                                 <div className="small-box bg-danger">
                                     <div className="inner">
-                                        <h3>65</h3>
-                                        <p>Unique Visitors</p>
+                                        <p>Total Hospital</p>
+                                        <h3>--</h3>
                                     </div>
                                     <div className="icon">
                                         <i className="ion ion-pie-graph" />
@@ -87,11 +132,24 @@ function Home() {
                                     <a href="#" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></a>
                                 </div>
                             </div>
-                            {/* ./col */}
+                            {/* Total Doctor */}
+                            <div className="col-lg-3 col-6">
+                                {/* small box */}
+                                <div className="small-box bg-danger">
+                                    <div className="inner">
+                                        <p>Total Doctor</p>
+                                        <h3>--</h3>
+                                    </div>
+                                    <div className="icon">
+                                        <i className="ion ion-pie-graph" />
+                                    </div>
+                                    <a href="#" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></a>
+                                </div>
+                            </div>
                         </div>
                         {/* /.row */}
                         {/* Main row */}
-                        
+                       
                     </div>{/* /.container-fluid */}
                 </section>
                 {/* /.content */}
@@ -101,5 +159,5 @@ function Home() {
         </div>
     );
 }
-
+ 
 export default Home;
