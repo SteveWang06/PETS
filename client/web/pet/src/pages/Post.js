@@ -13,11 +13,11 @@ const Post = () => {
   const [UserId, setUserId] = useState('');
   const [Kind, setKind] = useState('');
   const [Image, setImage] = useState(null);
-  const [create, setCreate] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [filter, setFilter]=useState('');
   const [original, setOriginal]=useState([]);
   const [success, setSuccess]=useState('');
+  const [showCreate, setShowCreate]=useState(false);
 
   useEffect(() => {
     fetchData();
@@ -80,8 +80,8 @@ const Post = () => {
       setUserId('');
       setKind('');
       setImage(null);
-      setCreate(false);
       setSuccess('Create Success');
+      setShowCreate(false);
     } catch (error) {
       console.error('Error creating data: ', error);
       setError('Error creating data');
@@ -210,7 +210,7 @@ const handleSave = async () => {
                           </div>
                         </div>
                       </div>
-                      <button className="btn btn-primary" onClick={() => setCreate(true)}>Create</button>
+                      <button className="btn btn-primary" onClick={() => setShowCreate(true)}>Create</button>
                     </div>
                   </div>
                 </div>
@@ -286,44 +286,58 @@ const handleSave = async () => {
                       ))}
                     </tbody>
                   </table>
-                  {create && (
-                    <div>
-                      <input 
-                        type="text" 
-                        value={Caption} 
-                        onChange={(e) => setCaption(e.target.value)} 
-                        placeholder="Enter caption"
-                        // style={{width:'50%', margin:'0 auto', display:'block'}}
-                      />
-                      <input 
-                        type="text" 
-                        value={UserId} 
-                        onChange={(e) => setUserId(e.target.value)} 
-                        placeholder="Enter UserId"
-                        // style={{width:'50%', margin:'0 auto', display:'block'}}
-                      />
-                      <input 
-                        type="text" 
-                        value={Kind} 
-                        onChange={(e) => setKind(e.target.value)} 
-                        placeholder="Enter Kind"
-                        // style={{width:'50%', margin:'0 auto', display:'block'}}
-                      />
-                      <input 
-                        type="file" 
-                        onChange={(e) => setImage(e.target.files[0])}
-                        placeholder="Choose Image"
-                        // style={{width:'50%', margin:'0 auto', display:'block'}}
-                      />
-                      <button onClick={handleCreate} className="btn btn-primary">Save</button>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
+      {showCreate && (
+        <div className="modal" style={{display:'block',backgroundColor:'rgba(0,0,0,0.5',position:'fixed',top:0,left:0,right:0,bottom:0,zIndex:999}}>
+          <div className="modal-dialog" style={{maxWidth:'500px',margin:'10% auto',backgroundColor:'white',padding:'20px',borderRadius:'5px'}}>
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Create Post</h5>
+                <button type="button" className="close" onClick={()=>setShowCreate(false)}>
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                <input
+                  type="text"
+                  value={Caption}
+                  onChange={(e)=>setCaption(e.target.value)}
+                  placeholder="Enter caption"
+                  className="form-control mb-2"
+                />
+                <input
+                  type="text"
+                  value={UserId}
+                  onChange={(e)=>setUserId(e.target.value)}
+                  placeholder="Enter UserId"
+                  className="form-control mb-2"
+                />
+                <input
+                  type="text"
+                  value={Kind}
+                  onChange={(e)=>setKind(e.target.value)}
+                  placeholder="Enter Kind"
+                  className="form-control mb-2"
+                />
+                <input
+                  type="file"
+                  onChange={(e)=>setImage(e.target.files[0])}
+                  className="form-control mb-2"
+                />
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={()=>setShowCreate(false)}>Cancel</button>
+                  <button type="button" className="btn btn-primary" onClick={handleCreate}>Save</button>
+                </div>
+              </div>
+          </div>
+        </div>   
+      )}
       <Footer />
     </div>
   );
