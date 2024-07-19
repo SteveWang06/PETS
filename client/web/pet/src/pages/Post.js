@@ -13,11 +13,13 @@ const Post = () => {
   const [UserId, setUserId] = useState('');
   const [Kind, setKind] = useState('');
   const [Image, setImage] = useState(null);
-  const [searchText, setSearchText] = useState('');
   const [filter, setFilter]=useState('');
   const [original, setOriginal]=useState([]);
   const [success, setSuccess]=useState('');
   const [showCreate, setShowCreate]=useState(false);
+  const [search, setSearch]=useState('');
+  const [currentPage,setCurrentPage]=useState(1);
+  const [postsPerPage]=useState(10);
 
   useEffect(() => {
     fetchData();
@@ -152,7 +154,7 @@ const handleSave = async () => {
         ...item,
         caption: Caption,
         postKind: Kind,
-        postImages: Image ? [{ ...item.postImages[0], imageUrl: URL.createObjectURL(Image) }] : item.postImages
+        postImages: Image ? [{ ...item.postImages[0], imageUrl: `{BASE_URL}/api/auth/${Image.name}` }] : item.postImages
       } : item);
 
       setData(updatedData);
@@ -168,23 +170,41 @@ const handleSave = async () => {
       setError('Error updating data');
     }
   };
-  
-  const handleSearch = () => {
-    const filteredData = original.filter(item => {
-      return (
-        item.authorName.toLowerCase().includes(searchText.toLowerCase()) ||
-        item.postKind.toLowerCase().includes(searchText.toLowerCase()) ||
-        item.caption.toLowerCase().includes(searchText.toLowerCase())
-      );
-    });
-    setData(filteredData);
-  };
 
   const handleFilter=(e)=>{
     const selectFilter=e.target.value;
     setFilter(selectFilter);
     const filteredData=selectFilter ? original.filter(item=>item.postKind===selectFilter) : original;
     setData(filteredData);
+  };
+
+  const handleSearch=(e)=>{
+    const value=e.target.value;
+    setSearch(value);
+    const searchedData=value?original.filter(item=>
+      item.caption.toLowerCase().includes(value.toLowerCase())||
+      item.authorName.toLowerCase().includes(value.toLowerCase())||
+      item.postKind.toLowerCase().includes(value.toLowerCase())
+    ):original;
+    setData(searchedData);
+  };
+
+  const indexOfLastPost=currentPage*postsPerPage;
+  const indexOfFirstPost=indexOfLastPost-postsPerPage;
+  const currentPosts=data.slice(indexOfFirstPost,indexOfLastPost);
+
+  const pageinate=(pageNumber)=>setCurrentPage(pageNumber);
+
+  const nextPage=()=>{
+    if(currentPage<Math.ceil(data.length/postsPerPage)){
+      setCurrentPage(currentPage+1);
+    }
+  };
+
+  const prevPage=()=>{
+    if(currentPage>1){
+      setCurrentPage(currentPage-1);
+    }
   };
 
   return (
@@ -200,16 +220,14 @@ const handleSave = async () => {
                   <div className="d-flex justify-content-between align-items-center">
                     <h3 className="card-title" style={{ fontWeight: 'bold', fontSize: '28px' }}>Post</h3>
                     <div className="d-flex">
-                      <div className="form-inline mr-2">
-                        <div className="input-group" data-widget="sidebar-search-1">
-                          <input className="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search" value={searchText} onChange={(e) => setSearchText(e.target.value)} />
-                          <div className="input-group-append">
-                            <button className="btn btn-sidebar" onClick={handleSearch}>
-                              <i className="fas fa-search fa-fw"></i>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
+                      <input
+                        className="form-control form-control-sidebar"
+                        type="search"
+                        placeholder="Search"
+                        aria-label="Search"
+                        value={search}
+                        onChange={handleSearch}
+                      />
                       <button className="btn btn-primary" onClick={() => setShowCreate(true)}>Create</button>
                     </div>
                   </div>
@@ -221,7 +239,7 @@ const handleSave = async () => {
                     <thead>
                       <tr>
                         <th>User Name</th>
-                        <th>Images</th>
+                        <th style={{width:'350px'}}>Images</th>
                         <th>Caption</th>
                         <th>Kind
                           <div style={{float: 'right'}}>
@@ -236,7 +254,7 @@ const handleSave = async () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {data.map(item => (
+                      {currentPosts.map(item => (
                         <tr key={item.id}>
                           {editId === item.id ? (
                             <>
@@ -273,12 +291,21 @@ const handleSave = async () => {
                           ) : (
                             <>
                               <td>{item.authorName}</td>
-                              <td><img src={item.postImages[0].imageUrl} alt="Post" style={{ width:'100px',height: 'auto'}}/></td>
+                              <td>
+                                {item.postImages && item.postImages.length>0 && (
+                                  <img src={`${BASE_URL}/${item.postImages[0].imageUrl}`}
+                                       alt="Post"
+                                       style={{width:'100px',height:'100px'}}
+                                  />
+                                )}
+                              </td>
                               <td>{item.caption}</td>
                               <td>{item.postKind}</td>
                               <td>
-                                <button className="btn btn-block btn-primary" onClick={() => handleEdit(item)}>Edit</button>
-                                <button className="btn btn-block btn-danger" onClick={() => handleDelete(item.id)}>Delete</button>
+                                <div style={{display:'flex',alignItems:'center'}}>
+                                <button className="btn btn-block btn-primary" style={{width:'80px',height:'40px',marginRight:'10px'}} onClick={() => handleEdit(item)}>Edit</button>
+                                <button className="btn btn-block btn-danger" style={{width:'80px',height:'40px'}} onClick={() => handleDelete(item.id)}>Delete</button>
+                                </div>
                               </td>
                             </>
                           )}
@@ -286,6 +313,13 @@ const handleSave = async () => {
                       ))}
                     </tbody>
                   </table>
+                  <div className="pagination">
+                    <button onClick={prevPage} className="btn btn-light" disabled={currentPage===1}>&laquo;</button>
+                    {Array.from({length:Math.ceil(data.length/postsPerPage)},(_,index)=>(
+                      <button key={index+1} onClick={()=>pageinate(index+1)} className={`btn ${currentPage===index+1 ? `btn-primary`:'btn-light'}`}>{index+1}</button>
+                    ))}
+                    <button onClick={nextPage} className="btn btn-light" disabled={currentPage===Math.ceil(data.length/postsPerPage)}>&raquo;</button>
+                  </div>
                 </div>
               </div>
             </div>
