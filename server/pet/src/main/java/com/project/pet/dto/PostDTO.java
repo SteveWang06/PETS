@@ -1,4 +1,4 @@
-package com.project.pet.dto;
+package com.project.pet.models.dto;
 
 import com.project.pet.models.Image;
 import com.project.pet.models.PostComment;

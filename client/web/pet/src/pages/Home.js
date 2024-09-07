@@ -1,11 +1,13 @@
-import React from 'react';
+import React ,{useEffect, useState }from 'react';
 import Header from "../components/Header"; //介面的上面
 import SideNav from "../components/SideNav"; //介面左邊的menu
 import Footer from "../components/Footer"; //介面的底部
 import axios from "axios";
 import {Link} from "react-router-dom";
- 
-function Home() {
+import {BASE_URL} from '../context/config';
+
+const Home=()=>{
+
     return (
        
         <div>
@@ -45,7 +47,7 @@ function Home() {
                                     <div className="icon">
                                         <i className="ion ion-person-add" />
                                     </div>
-                                    <a href="#" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></a>
+                                    <Link to="/user" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
                                 </div>
                             </div>
                             {/* Total My Pet Post */}
@@ -101,7 +103,7 @@ function Home() {
                                     <div className="icon">
                                         <i className="ion ion-bag" />
                                     </div>
-                                    <a href="#" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></a>
+                                    <Link to="/shop" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
                                 </div>
                             </div>
                             {/* Total Products */}
@@ -158,6 +160,6 @@ function Home() {
             <Footer/>
         </div>
     );
-}
+};
  
 export default Home;

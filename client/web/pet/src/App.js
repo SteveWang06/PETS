@@ -5,6 +5,13 @@ import Login from "./pages/login";
 import { AuthProvider } from './context/AuthProvider';
 import PrivateRoute from './PrivateRoute';
 import Post from './pages/Post';
+import User from './pages/User';
+import Register from './pages/register';
+import Shop from './pages/Shop';
+import Product from './pages/Product';
+import Hospital from './pages/Hospital';
+import Doctor from './pages/Doctor';
+import Forms from './pages/Forms';
 
 function App() {
   return (
@@ -27,6 +34,60 @@ function App() {
                 <PrivateRoute>
                   <Post/>
                 </PrivateRoute>
+              }
+            />
+            <Route
+              path="user"
+              element={
+                <PrivateRoute>
+                  <User/>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="shop"
+              element={
+                <PrivateRoute>
+                  <Shop/>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="product"
+              element={
+                <PrivateRoute>
+                  <Product/>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="hospital"
+              element={
+                <PrivateRoute>
+                  <Hospital/>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="doctors"
+              element={
+                <PrivateRoute>
+                  <Doctor/>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="forms"
+              element={
+                <PrivateRoute>
+                  <Forms/>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="register"
+              element={
+                  <Register/>
               }
             />
           </Routes>
