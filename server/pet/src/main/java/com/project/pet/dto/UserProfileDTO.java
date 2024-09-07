@@ -1,4 +1,4 @@
-package com.project.pet.dto;
+package com.project.pet.models.dto;
 
 import com.project.pet.models.Post;
 import com.project.pet.models.User;

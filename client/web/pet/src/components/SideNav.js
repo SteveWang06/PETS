@@ -1,7 +1,9 @@
 import React from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 
 function SideNav() {
+    const location=useLocation();
+    const getNavLinkClass=(path)=>location.pathname===path ? 'nav-link active' : 'nav-link';
     return (
         <div>
             {/* Main Sidebar Container */}
@@ -37,64 +39,63 @@ function SideNav() {
                     <nav className="mt-2">
                         <ul className="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                             {/* Add icons to the links using the .nav-icon class with font-awesome or any other icon font library */}
-                            <li className="nav-item menu-open">
-                                <Link to="/home" className="nav-link active">
+                            <li className="nav-item">
+                                <Link to="/home" className={getNavLinkClass('/home')}>
                                     <i className="nav-icon fas fa-tachometer-alt" />
                                     <p>Dashboard</p>
                                 </Link>                                
                             </li>
                             <li className="nav-item">
-                                <a href="pages/widgets.html" className="nav-link">
-                                    <i className="nav-icon fas fa-th" />
+                                <Link to="/user" className={getNavLinkClass('/user')}>
+                                    <i className="nav-icon fas fa-user" />
                                     <p>
                                         User
-                                        <span className="right badge badge-danger">New</span>
                                     </p>
-                                </a>
+                                </Link>
                             </li>
                             <li className="nav-item">
-                                <a href="#" className="nav-link">
-                                    <i className="nav-icon fas fa-copy" />
+                                <Link to="/shop" className={getNavLinkClass('/shop')}>
+                                    <i className="nav-icon fas fa-store" />
                                     <p>
                                         Shop
                                     </p>
-                                </a>                            
+                                </Link>                            
                             </li>
                             <li className="nav-item">
-                                <a href="#" className="nav-link">
-                                    <i className="nav-icon fas fa-chart-pie" />
+                                <Link to="/product" className={getNavLinkClass('/product')}>
+                                    <i className="nav-icon fas fa-box-open" />
                                     <p>
                                         Products
                                     </p>
-                                </a>
+                                </Link>
                             </li>
                             <li className="nav-item">
-                                <a href="#" className="nav-link">
-                                    <i className="nav-icon fas fa-tree" />
+                                <Link to="/hospital" className={getNavLinkClass('/hospital')}>
+                                    <i className="nav-icon fas fa-clinic-medical" />
                                     <p>
                                         Hospital
                                     </p>
-                                </a>                            
+                                </Link>                            
                             </li>
                             <li className="nav-item">
-                                <a href="#" className="nav-link">
+                                <Link to="/forms" className={getNavLinkClass('/forms')}>
                                     <i className="nav-icon fas fa-edit" />
                                     <p>
                                         Forms
                                     </p>
-                                </a>
+                                </Link>
                             </li>
                             <li className="nav-item">
-                                <a href="#" className="nav-link">
-                                    <i className="nav-icon fas fa-table" />
+                                <Link to="/doctors" className={getNavLinkClass('/doctors')}>
+                                    <i className="nav-icon fas fa-user-md" />
                                     <p>
                                         Doctors
                                     </p>
-                                </a>                            
+                                </Link>                            
                             </li>
                             <li className="nav-item">
-                                <Link to="/post" className="nav-link">
-                                    <i className="nav-icon far fa-calendar-alt" />
+                                <Link to="/post" className={getNavLinkClass('/post')}>
+                                    <i className="nav-icon far fa-newspaper" />
                                     <p>
                                         Post
                                     </p>
@@ -105,19 +106,19 @@ function SideNav() {
                             </p>
                             <li className="nav-item">
                                 <a href="#" className="nav-link">
-                                    <i className="nav-icon far fa-calendar-alt" />
+                                    <i className="nav-icon fas fa-cogs" />
                                     <p>
                                         Setting
                                     </p>
                                 </a>
                             </li>
                             <li className="nav-item">
-                                <a href="#" className="nav-link">
-                                    <i className="nav-icon far fa-calendar-alt" />
+                                <Link to="/" className="nav-link">
+                                    <i className="nav-icon fas fa-sign-out-alt" />
                                     <p>
                                         Logout
                                     </p>
-                                </a>
+                                </Link>
                             </li>
                         </ul>
                     </nav>

@@ -5,6 +5,7 @@ import logo from '../image/petlogo.png';
 import axios from "axios";
 import { BASE_URL } from "../context/config";
 import { Navigate } from 'react-router-dom';
+import {Link} from 'react-router-dom';
  
 const Login = () => {
   const [userToken, setUserToken] = useState(null);
@@ -113,7 +114,7 @@ const Login = () => {
                             <a href="forgot-password.html">I forgot my password</a>
                         </p>
                         <p className="mb-0">
-                            <a href="register.html" className="text-center">Create Account</a>
+                            <Link to="/register" className="text-center">Create Account</Link>
                         </p>
                     </div>
                     {/* /.card-body */}
