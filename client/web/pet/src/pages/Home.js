@@ -45,7 +45,7 @@ const Home=()=>{
                                         <h3>12</h3>
                                     </div>
                                     <div className="icon">
-                                        <i className="ion ion-person-add" />
+                                        <i className="nav-icon fas fa-user" />
                                     </div>
                                     <Link to="/user" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
                                 </div>
@@ -59,7 +59,7 @@ const Home=()=>{
                                         <h3>--</h3>
                                     </div>
                                     <div className="icon">
-                                        <i className="ion ion-stats-bars" />
+                                        <i className="nav-icon far fa-newspaper" />
                                     </div>
                                     <Link to="/post" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
                                 </div>
@@ -73,7 +73,7 @@ const Home=()=>{
                                         <h3>--</h3>
                                     </div>
                                     <div className="icon">
-                                        <i className="ion ion-stats-bars" />
+                                        <i className="nav-icon far fa-newspaper" />
                                     </div>
                                     <Link to="/post" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
                                 </div>
@@ -87,7 +87,7 @@ const Home=()=>{
                                         <h3>--</h3>
                                     </div>
                                     <div className="icon">
-                                        <i className="ion ion-stats-bars" />
+                                        <i className="nav-icon far fa-newspaper" />
                                     </div>
                                     <Link to="/post" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
                                 </div>
@@ -101,7 +101,7 @@ const Home=()=>{
                                         <h3>150</h3>
                                     </div>
                                     <div className="icon">
-                                        <i className="ion ion-bag" />
+                                        <i className="nav-icon fas fa-store" />
                                     </div>
                                     <Link to="/shop" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
                                 </div>
@@ -115,9 +115,9 @@ const Home=()=>{
                                         <h3>150</h3>
                                     </div>
                                     <div className="icon">
-                                        <i className="ion ion-bag" />
+                                        <i className="nav-icon fas fa-box-open" />
                                     </div>
-                                    <a href="#" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></a>
+                                    <Link to="/product" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
                                 </div>
                             </div>
                             {/* Total Hospital */}
@@ -129,9 +129,9 @@ const Home=()=>{
                                         <h3>--</h3>
                                     </div>
                                     <div className="icon">
-                                        <i className="ion ion-pie-graph" />
+                                        <i className="nav-icon fas fa-clinic-medical" />
                                     </div>
-                                    <a href="#" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></a>
+                                    <Link to="/hospital" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
                                 </div>
                             </div>
                             {/* Total Doctor */}
@@ -143,9 +143,9 @@ const Home=()=>{
                                         <h3>--</h3>
                                     </div>
                                     <div className="icon">
-                                        <i className="ion ion-pie-graph" />
+                                        <i className="nav-icon fas fa-user-md" />
                                     </div>
-                                    <a href="#" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></a>
+                                    <Link to="/doctors" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
                                 </div>
                             </div>
                         </div>
