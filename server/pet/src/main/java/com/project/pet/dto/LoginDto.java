@@ -1,4 +1,4 @@
-package com.project.pet.models.dto;
+package com.project.pet.dto;
 
 
 import lombok.Data;
@@ -30,8 +30,8 @@ public class LoginDto {
   @Override
   public String toString() {
     return "LoginUserDto{" +
-        "email='" + email + '\'' +
-        ", password='" + password + '\'' +
-        '}';
+            "email='" + email + '\'' +
+            ", password='" + password + '\'' +
+            '}';
   }
 }
