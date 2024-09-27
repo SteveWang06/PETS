@@ -1,4 +1,11 @@
-import React, { useContext, useState, useRef, useEffect } from "react";
+import React, {
+  useContext,
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  memo,
+} from "react";
 import {
   View,
   Text,
@@ -9,10 +16,17 @@ import {
   Dimensions,
   Modal,
   ActivityIndicator,
+  TextInput,
 } from "react-native";
 import { AuthContext } from "../context/AuthContext";
 import { Button } from "react-native-paper";
-import { AntDesign, Feather, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Feather,
+  Entypo,
+  MaterialCommunityIcons,
+  FontAwesome,
+} from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import {
@@ -26,11 +40,14 @@ import { BASE_URL } from "../config";
 import PostCard from "../components/PostCard";
 import { useDispatch, useSelector } from "react-redux";
 import { updatePostLike, setPosts } from "../redux/actions/postActions";
-import { logout } from "../redux/actions/authAction";
+import { getUserById, logout } from "../redux/actions/authAction";
 import { theme } from "../core/theme";
 import { Buffer } from "buffer";
 import EditProfileModal from "../components/EditProfileModal";
 import RoleChangeModal from "../components/RoleChangeModal";
+import ProductCardInUserProfile from "../components/ProductCardInUserProfile";
+import { fetchUserById } from "../services/requester/fetcher/User";
+import { useQuery } from '@tanstack/react-query';
 
 const languages = [
   { code: "en", label: "English" },
@@ -38,6 +55,7 @@ const languages = [
 ];
 
 const { width } = Dimensions.get("screen");
+
 const ProfilePage = () => {
   const [showLanguagesList, setShowLanguagesList] = useState(false);
   const { t } = useTranslation();
@@ -47,17 +65,30 @@ const ProfilePage = () => {
   const [userBirthDay, setUserBirthDay] = useState([]);
   const [userAvatar, setUserAvatar] = useState("");
   const [posts, setPosts] = useState([]);
+  const [profileData, setProfileData] = useState(null);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [activeTab, setActiveTab] = useState("posts");
+  const [showSearchButton, setShowSearchButton] = useState(true);
+  const [showSearchInputs, setShowSearchInputs] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [imageBase64, setImageBase64] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showModalEditProfile, setShowModalEditProfile] = useState(false);
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [currentRole, setCurrentRole] = useState("");
-  const changeLanguage = (code) => {
+  const [searchText, setSearchText] = useState("");
+  const [searchType, setSearchType] = useState("");
+  const [searchPrice, setSearchPrice] = useState("");
+  const [products, setProducts] = useState([]);
+
+  const changeLanguage = useCallback((code) => {
     i18next.changeLanguage(code);
     setSelectedLanguage(code);
-  };
+  }, []);
 
+  const handleLogout = useCallback(() => {
+    dispatch(logout());
+  }, [dispatch]);
   const ref = useRef(null);
 
   const onPress = () => {
@@ -70,55 +101,17 @@ const ProfilePage = () => {
   };
 
   const userData = useSelector((state) => state.auth.userData);
+  const profile = useSelector((state) => state.auth.profileData);
   const userId = userData.userId;
   const userToken = userData.token;
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const data = await getUserByIdFromDatabase(userId, userToken);
-        const formattedUserProfile = {
-          userName: data.user.userName,
-          email: data.user.email,
-          role: data.user.role.name,
-          userBirthDay: data.user.birthday || [],
-          userAvatar: `${BASE_URL}/${data.user.avatar.imageUrl}`,
-          posts: data.posts.map((post) => ({
-            id: post.id,
-            caption: post.caption,
-            images: post.postImages.map(
-              (image) => `${BASE_URL}/${image.imageUrl}`
-            ),
-            like: post.postLike,
-          })),
-        };
-        setUserName(formattedUserProfile.userName);
-        setUserEmail(formattedUserProfile.email);
-        setUserBirthDay(formattedUserProfile.userBirthDay);
-        setUserAvatar(formattedUserProfile.userAvatar);
-        setPosts(formattedUserProfile.posts);
-        setCurrentRole(formattedUserProfile.role);
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      }
-    };
 
-    fetchUserProfile();
-  }, []);
-
-  const birthdayString =
-    Array.isArray(userBirthDay) && userBirthDay.length === 3
-      ? `${userBirthDay[0]}-${userBirthDay[1]}-${userBirthDay[2]}`
-      : "";
-
+  
   const dispatch = useDispatch();
   const handleLikeToggle = (postId, liked) => {
     dispatch(updatePostLike(postId, !liked));
   };
 
-  const handleLogout = () => {
-    dispatch(logout());
-  };
-
+  
   const openLanguagesList = () => {
     setShowLanguagesList(true);
   };
@@ -155,12 +148,25 @@ const ProfilePage = () => {
     };
 
     fetchQRCode();
+    setUserAvatar(`${BASE_URL}/${profile.user.avatar.imageUrl}`);
+    setUserName(profile.user.userName);
+    setUserBirthDay(profile.user.birthday);
+    setUserEmail(profile.user.email);
+    setCurrentRole(profile.user.role.name);
   }, [userId, userToken]);
 
   const handleUpdateProfile = (updatedUserData) => {
     dispatch(updateProfile(userData.userId, userData.token, updatedUserData));
     closeModalEditProfile();
   };
+
+
+
+  useEffect(() => {
+    if (profile) {
+      handleSearch();
+    }
+  }, [searchText, searchType, searchPrice]);
 
   const renderRoleIcon = (currentRole) => {
     switch (currentRole) {
@@ -177,7 +183,11 @@ const ProfilePage = () => {
         return <Entypo name='shop' size={20} color='white' />;
       case "HOSPITAL":
         return (
-          <MaterialCommunityIcons name="hospital-box-outline" size={20} color="white" />
+          <MaterialCommunityIcons
+            name='hospital-box-outline'
+            size={20}
+            color='white'
+          />
         );
       case "ADMIN":
       case "SUPER_ADMIN":
@@ -187,6 +197,90 @@ const ProfilePage = () => {
     }
   };
 
+  const handleSearch = () => {
+    if (!userData) return;
+
+    if (searchText === "" && searchType === "" && searchPrice === "") {
+      // If all search fields are empty, reset the filtered products to the initial list
+      setFilteredProducts(profile.products.reverse());
+    } else {
+      const filteredProducts = profile.products.filter(
+        (product) =>
+          (searchText === "" ||
+            product.name.toLowerCase().includes(searchText.toLowerCase())) &&
+          (searchType === "" ||
+            product.type.toLowerCase().includes(searchType.toLowerCase())) &&
+          (searchPrice === "" ||
+            parseFloat(product.price) <= parseFloat(searchPrice))
+      );
+
+      // Update the filtered products state and reverse the list
+      setFilteredProducts(filteredProducts.reverse());
+    }
+  };
+
+  const renderPosts = () => (
+    <ScrollView style={{ width }}>
+      {profile.posts
+        .slice()
+        .reverse()
+        .map((post) => (
+          <PostCard
+            key={post.id}
+            id={post.id}
+            authorId={post.author.id}
+            authorName={post.author.userName}
+            authorAvatar={`${BASE_URL}/${post.author.avatar.imageUrl}`}
+            caption={post.caption}
+            postImages={post.postImages.map(
+              (image) => `${BASE_URL}/${image.imageUrl}`
+            )}
+            like={post.postLike}
+          />
+        ))}
+    </ScrollView>
+  );
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    if (tab === "posts") {
+      setShowSearchInputs(false); // Hide search inputs when switching to "posts" tab
+      setShowSearchButton(false); // Hide search button when switching to "posts" tab
+    } else {
+      setShowSearchButton(true); // Show search button when switching to "products" tab
+    }
+  };
+
+  const renderProducts = () => (
+    <ScrollView style={{ width }}>
+      <View style={styles.rowContainer}>
+        {filteredProducts.map(
+          (product, index) =>
+            index % 2 === 0 && (
+              <View key={product.id} style={styles.productRow}>
+                <ProductCardInUserProfile product={product} />
+                {index + 1 < filteredProducts.length && (
+                  <ProductCardInUserProfile
+                    key={filteredProducts[index + 1].id}
+                    product={filteredProducts[index + 1]}
+                  />
+                )}
+              </View>
+            )
+        )}
+      </View>
+    </ScrollView>
+  );
+
+  const toggleSearchInputs = () => {
+    setShowSearchInputs(!showSearchInputs);
+  };
+
+  const birthdayString = Array.isArray(profile.user.birthday)
+    ? `${profile.user.birthday[0]}-${profile.user.birthday[1]}-${profile.user.birthday[2]}`
+    : "";
+
+  
   return (
     <View>
       <GestureHandlerRootView>
@@ -268,12 +362,12 @@ const ProfilePage = () => {
 
             <Image
               source={{
-                uri: userAvatar,
+                uri: `${BASE_URL}/${profile.user.avatar.imageUrl}`,
               }}
               style={styles.avatar}
             />
             <View style={styles.userInfoContainer}>
-              <Text style={styles.userName}>{userName}</Text>
+              <Text style={styles.userName}>{profile.user.userName}</Text>
               <TouchableOpacity onPress={() => setShowRoleModal(true)}>
                 {renderRoleIcon(currentRole)}
               </TouchableOpacity>
@@ -283,6 +377,13 @@ const ProfilePage = () => {
             <TouchableOpacity style={styles.buttonEdit} onPress={onPress}>
               <AntDesign name='setting' size={24} color='white' />
             </TouchableOpacity>
+            {showSearchButton && activeTab === "products" && (
+              <TouchableOpacity
+                style={styles.searchButton}
+                onPress={toggleSearchInputs}>
+                <FontAwesome name='search' size={24} color='white' />
+              </TouchableOpacity>
+            )}
             <View style={styles.qrCodeContainer}>
               {loading ? (
                 <ActivityIndicator size='large' color='#0000ff' />
@@ -308,25 +409,70 @@ const ProfilePage = () => {
             </View>
           </View>
 
-          <View style={{ width }}>
-            {posts &&
-              posts
-                .slice()
-                .reverse()
-                .map((post) => (
-                  <PostCard
-                    key={post.id}
-                    id={post.id}
-                    authorName={userName}
-                    authorAvatar={userAvatar}
-                    caption={post.caption}
-                    postImages={post.images}
-                    kind={post.kind}
-                    like={post.like}
-                    onLikeToggle={handleLikeToggle}
-                  />
-                ))}
-          </View>
+          {showSearchInputs && (
+            <View style={styles.searchContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder='Name'
+                onChangeText={(text) => {
+                  setSearchText(text);
+                  handleSearch();
+                }}
+                value={searchText}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder='Type'
+                onChangeText={(text) => {
+                  setSearchType(text);
+                  handleSearch();
+                }}
+                value={searchType}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder='Price'
+                onChangeText={(text) => {
+                  setSearchPrice(text);
+                  handleSearch();
+                }}
+                value={searchPrice}
+                keyboardType='numeric'
+              />
+            </View>
+          )}
+
+          {currentRole != "USER" ? (
+          <View style={styles.tabContainer}>
+            <TouchableOpacity
+              style={[
+                styles.tabButton,
+                activeTab === "posts" && styles.activeTab,
+              ]}
+              onPress={() => handleTabChange("posts")}>
+              <AntDesign
+                name='picture'
+                size={24}
+                color={activeTab === "posts" ? "#fff" : "#000"}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.tabButton,
+                activeTab === "products" && styles.activeTab,
+              ]}
+              onPress={() => {
+                handleTabChange("products");
+                setShowSearchInputs(false); // Hide search inputs when switching tabs
+              }}>
+              <Entypo
+                name='shop'
+                size={24}
+                color={activeTab === "products" ? "#fff" : "#000"}
+              />
+            </TouchableOpacity>
+          </View>) : null}
+          {activeTab === "posts" ? renderPosts() : renderProducts()}
         </View>
       </ScrollView>
 
@@ -341,8 +487,45 @@ const ProfilePage = () => {
 };
 
 const styles = StyleSheet.create({
+  searchButton: {
+    position: "absolute",
+    bottom: 10,
+    right: 60,
+  },
+  activeTab: {
+    backgroundColor: "#007bff",
+  },
+  tabContainer: {
+    flexDirection: "row",
+    margin: 10,
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  tabButton: {
+    flex: 1,
+    paddingVertical: 5,
+    alignItems: "center",
+    backgroundColor: "#ffffff",
+  },
+  productRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginBottom: 10,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 15,
+  },
+  rowContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
   closeButton: {
-    backgroundColor: '#d9534f', // Màu đỏ
+    backgroundColor: "#d9534f", // Màu đỏ
   },
   buttonRow: {
     flexDirection: "row",
@@ -350,22 +533,23 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   roleButton: {
-    backgroundColor: '#0275d8',
+    backgroundColor: "#0275d8",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   buttonEdit: {
     position: "absolute",
     bottom: 10,
     right: 20,
+    zIndex: 1,
   },
   avatar: {
     width: 100,
@@ -377,7 +561,7 @@ const styles = StyleSheet.create({
     left: 45,
   },
   header: {
-    marginBottom: 10,
+    marginBottom: 30,
     flexDirection: "row",
     width: "90%",
     height: 200,
@@ -526,6 +710,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 10,
   },
+  input: {
+    height: 40,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    flex: 1,
+    marginRight: 10,
+    backgroundColor: "#fff",
+  },
 });
 
-export default ProfilePage;
+// export default ProfilePage;
+export default memo(ProfilePage);

@@ -1,5 +1,6 @@
 package com.project.pet.controller;
 
+import com.project.pet.dto.ProductDTO;
 import com.project.pet.models.Product;
 import com.project.pet.security.ShopRole;
 import com.project.pet.services.ProductService;
@@ -32,7 +33,7 @@ public class ProductController {
 
   @GetMapping
   @Operation(summary = "Get all products", description = "Retrieve a list of all products")
-  public List<Product> getAllProducts() {
+  public List<ProductDTO> getAllProducts() {
     return productService.getAllProducts();
   }
 
@@ -45,11 +46,19 @@ public class ProductController {
       @ApiResponse(responseCode = "404", description = "Product not found",
           content = @Content) })
   @GetMapping("/{id}")
-  public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-    Optional<Product> optionalProduct = productService.getProductById(id);
-    return optionalProduct.map(product -> new ResponseEntity<>(product, HttpStatus.OK))
-        .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+  public ResponseEntity<?> getProductById(@PathVariable Long id) {
+    try {
+      ProductDTO productDTO = productService.getProductById(id);
+      return ResponseEntity.ok(productDTO);
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.notFound().build();
+    }
   }
+//  public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+//    Optional<Product> optionalProduct = productService.getProductById(id);
+//    return optionalProduct.map(product -> new ResponseEntity<>(product, HttpStatus.OK))
+//        .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+//  }
 
 
 
@@ -88,19 +97,20 @@ public class ProductController {
   @PutMapping("/{id}")
   @ShopRole
   @SecurityRequirement(name = "bearerAuth")
-  public ResponseEntity<Product> updateProduct(
-      @Parameter(description = "ID of the product to be updated") @PathVariable Long id,
-      @Parameter(description = "Updated name of the product") @RequestParam("name") String name,
-      @Parameter(description = "Type of the product") @RequestParam("type") String type,
-      @Parameter(description = "Price of the product") @RequestParam("price") Integer price,
-      @Parameter(description = "Updated description of the product") @RequestParam("description") String description,
-      @Parameter(description = "Updated images of the product") @RequestParam("images") MultipartFile[] imageUrl) throws IOException {
+  public ResponseEntity<ProductDTO> updateProduct(
+      @PathVariable Long id,
+      @RequestParam("name") String name,
+      @RequestParam("type") String type,
+      @RequestParam("price") Integer price,
+      @RequestParam("description") String description,
+      @RequestParam("images") MultipartFile[] images) throws IOException {
 
-    Product product = productService.updateProduct(id, name,type, price, description, imageUrl);
-    if (product != null) {
-      return new ResponseEntity<>(product, HttpStatus.OK);
+    ProductDTO updatedProduct = productService.updateProduct(id, name, type, price, description, images);
+
+    if (updatedProduct != null) {
+      return ResponseEntity.ok(updatedProduct);
     } else {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      return ResponseEntity.notFound().build();
     }
   }
 

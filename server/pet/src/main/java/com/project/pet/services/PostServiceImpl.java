@@ -143,6 +143,7 @@ public class PostServiceImpl implements PostService{
     dto.setPostImages(post.getPostImages());
     //dto.setPostKinds(post.getPostKinds());
     dto.setPostKind(post.getPostKind());
+    dto.setUserId(post.getAuthor().getId());
     dto.setAuthorName(post.getAuthor().getUserName());
     dto.setAuthorAvatar(post.getAuthor().getAvatar());
     dto.setPostLike(post.getPostLike());

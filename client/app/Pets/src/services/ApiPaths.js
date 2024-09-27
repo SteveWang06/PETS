@@ -14,11 +14,14 @@ export const ApiPaths = {
     addComment: 'http://localhost:8080/api/post/comment',
     deleteComment: 'http://localhost:8080/api/post/comment',
     editComment: 'http://localhost:8080/api/post/comment',
-    getUserById: 'http://localhost:8080/api/auth/user',
+    getUserById: 'http://localhost:8080/api/auth/user/',
     userRegister: 'http://localhost:8080/api/auth/register',
     getQRcode: 'http://localhost:8080/api/auth/qr/',
     updateUser: 'http://localhost:8080/api/auth/',
-    changeRole: "http://localhost:8080/api/role-requests"
+    changeRole: "http://localhost:8080/api/role-requests",
+    deletePost: 'http://localhost:8080/api/auth/post/',
+    updateProduct: 'http://localhost:8080/api/products/',
+    deleteProduct: 'http://localhost:8080/api/products/'
 }
 
 // export const ApiPaths = {

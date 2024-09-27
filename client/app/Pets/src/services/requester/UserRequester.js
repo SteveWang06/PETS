@@ -22,7 +22,7 @@ const getPostsByIdFromDatabase = async (postId) => {
     const response = await axios.get(`${ApiPaths.getPostById}${postId}`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching posts:", error);
+    console.error("Error fetching posts by id:", error);
     throw error;
   }
 };
@@ -127,6 +127,7 @@ const uploadImages = async (
 
 const handleUpdatePost = async (postId, caption, images, callback, kind) => {
   try {
+
     const formData = new FormData();
     formData.append("postId", postId);
     formData.append("caption", caption);
@@ -138,6 +139,7 @@ const handleUpdatePost = async (postId, caption, images, callback, kind) => {
       });
     });
     formData.append("kind", kind);
+
 
     // Gửi yêu cầu cập nhật bài post lên server
     const response = await axios.put(
@@ -166,12 +168,36 @@ const handleUpdatePost = async (postId, caption, images, callback, kind) => {
   }
 };
 
+const handleDeletePost = async (token, postId) => {
+  try {
+    
+    const response = await axios.delete(
+      `${ApiPaths.deletePost}${postId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    showMessage({
+      message: "successfully",
+      type: "success",
+      floating: true,
+      duration: 500,
+      autoHide: true,
+    });
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+}
+
 const getPostKindFromDataBase = async () => {
   try {
     const response = await axios.get(ApiPaths.getAllPostKind);
     return response.data;
   } catch (error) {
-    console.error("Error fetching posts:", error);
+    console.error("Error fetching kind:", error);
     throw error;
   }
 };
@@ -305,15 +331,25 @@ const getUserByIdFromDatabase = async (userId, token) => {
   try {
     // const userInfo = await getUserIdFromAsyncStorage();
     // const { userId, token } = userInfo;
-    const response = await axios.get(`${ApiPaths.getUserById}/${userId}`, {
+    const response = await axios.get(`${ApiPaths.getUserById}${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
     return response.data;
+    
   } catch (error) {
-    console.error("Error fetching user:", error);
-    throw error;
+    console.error('Error get product:', error);
+    if (error.response) {
+      // Server đã trả về phản hồi với mã lỗi khác 2xx
+      console.error('Server response:', error.response.data);
+    } else if (error.request) {
+      // Yêu cầu đã được gửi nhưng không nhận được phản hồi
+      console.error('Request made but no response received:', error.request);
+    } else {
+      // Đã xảy ra lỗi trong quá trình thiết lập yêu cầu
+      console.error('Error setting up request:', error.message);
+    }
   }
 };
 
@@ -341,6 +377,7 @@ const handleSubmitEditProfile = async (
   userToken,
   username,
   email,
+  address,
   birthdayYear,
   birthdayMonth,
   birthdayDay,
@@ -354,6 +391,7 @@ const handleSubmitEditProfile = async (
     const formData = new FormData();
     formData.append("username", username);
     formData.append("email", email);
+    formData.append("address", address);
     formData.append("birthday", birthday);
 
     if (selectedImage) {
@@ -407,6 +445,97 @@ const handleRequestChangeRole = async (userId, userToken, requestedRole) => {
   setShowRoleModal(false);
 };
 
+const handleUpdateProduct = async (token, id, name, type, description, price, images, callback) => {
+  try {
+  console.log("images handleUpdateProduct: ", images);
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("type", type);
+    formData.append("description", description);
+    formData.append("price", price);
+    images.forEach((uri, index) => {
+      formData.append(`images`, {
+        uri: uri,
+        name: `image${index}.jpeg`,
+        type: "image/jpeg",
+      });
+    });
+
+
+    // Gửi yêu cầu cập nhật bài post lên server
+    const response = await axios.put(
+      `${ApiPaths.updateProduct}${id}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    showMessage({
+      message: "successfully",
+      type: "success",
+      floating: true,
+      duration: 500,
+      autoHide: true,
+    });
+
+    if (callback) {
+      callback();
+    }
+  } catch (error) {
+    console.error("Error updating product:", error);
+  }
+};
+
+const handleDeleteProduct = async (productId, token) => {
+  try {
+    // const userInfo = await getUserIdFromAsyncStorage();
+    // const { token } = userInfo;
+    const response = await axios.delete(
+      `${ApiPaths.deleteProduct}${productId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    showMessage({
+      message: "successfully",
+      type: "success",
+      floating: true,
+      duration: 500,
+      autoHide: true,
+    });
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+};
+
+const getPostById = async (postId, token) => {
+  try {
+    // const userInfo = await getUserIdFromAsyncStorage();
+    // const { token } = userInfo;
+    const response = await axios.get(
+      `${ApiPaths.getPostById}${postId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data; 
+
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+};
+
 export {
   getPostsFromDatabase,
   uploadImages,
@@ -424,4 +553,8 @@ export {
   getQRcode,
   handleSubmitEditProfile,
   handleRequestChangeRole,
+  handleDeletePost,
+  handleUpdateProduct,
+  handleDeleteProduct,
+  getPostById
 };

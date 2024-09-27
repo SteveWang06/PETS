@@ -1,5 +1,4 @@
-// reducers.js
-import { LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT } from "../types";
+import { LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT, GET_USER_SUCCESS, UPDATE_PROFILE } from "../types";
 
 const initialState = {
   isLoading: false,
@@ -7,6 +6,7 @@ const initialState = {
   error: null,
   isAuthenticated: false,
   userData: null,
+  profileData: null,
 };
 
 const authReducer = (state = initialState, action) => {
@@ -24,6 +24,18 @@ const authReducer = (state = initialState, action) => {
         error: null,
         isAuthenticated: true,
         userData: action.payload,
+      };
+    case GET_USER_SUCCESS:
+      return {
+        ...state,
+        isLoading: false,
+        profileData: action.payload, // Assuming payload from GET_USER_SUCCESS contains user data
+        error: null,
+      };
+    case UPDATE_PROFILE:
+      return {
+        ...state,
+        profileData: action.payload,
       };
     case LOGIN_FAILURE:
       return {

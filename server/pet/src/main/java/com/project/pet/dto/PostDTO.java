@@ -17,6 +17,7 @@ public class PostDTO {
   private List<Image> postImages;
   private String postKind;
   private List<PostComment> postComment;
+  private Long userId;
   private String authorName;
   private Image authorAvatar;
   private Integer postLike;
@@ -60,6 +61,14 @@ public class PostDTO {
 
   public void setPostKind(String postKind) {
     this.postKind = postKind;
+  }
+
+  public Long getUserId() {
+    return userId;
+  }
+
+  public void setUserId(Long userId) {
+    this.userId = userId;
   }
 
   public String getAuthorName() {

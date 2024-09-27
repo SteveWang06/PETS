@@ -7,7 +7,8 @@ import authMiddleware from "../middleware/authMiddleware";
 
 const persistConfig = {
     key: "root",
-    storage
+    storage,
+    
 }
 const store = createStore(rootReducer, applyMiddleware(thunk));
 

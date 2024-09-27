@@ -33,7 +33,7 @@ const EditPostModal = ({
   setModalVisible,
   authorName,
   avatar,
-  
+  visible,
   caption,
   postImages,
   postKind,
@@ -48,6 +48,8 @@ const EditPostModal = ({
   const [imageSelected, setImageSelected] = useState([]);
   const [dataDropdown, setDataDropdown] = useState([]);
   const { t } = useTranslation();
+
+
 
   useEffect(() => {
     const fetchPostKind = async () => {
