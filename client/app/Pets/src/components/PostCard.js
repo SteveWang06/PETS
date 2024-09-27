@@ -1,151 +1,197 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
   Image,
   StyleSheet,
   FlatList,
-  TouchableOpacity,
   Pressable,
   Modal,
+  Alert,
+  TouchableOpacity,
 } from "react-native";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { AntDesign } from "@expo/vector-icons";
-import EditPostModal from "./EditPostModal";
 import {
-  addLike,
-  removeLike,
-  getUserNameAndAvatarFromAsyncStorage,
-} from "../services/requester/UserRequester";
-import CommentModal from "./CommentModal";
-import { updatePostLike } from "../redux/actions/postActions";
+  AntDesign,
+  Feather,
+  Entypo,
+  MaterialCommunityIcons,
+  FontAwesome,
+} from "@expo/vector-icons";
+import EditPostModal from "./EditPostModal"; // Assuming you have implemented EditPostModal
 import { useDispatch, useSelector } from "react-redux";
+import { updatePostLike } from "../redux/actions/postActions";
+import CommentModal from "./CommentModal";
+import ActionSheet from "react-native-actionsheet";
+import {
+  handleDeletePost,
+  getPostById,
+  getUserByIdFromDatabase,
+} from "../services/requester/UserRequester";
+import PostModal from "./PostModal";
 
 const PostCard = ({
   id,
+  authorId,
   authorName,
   authorAvatar,
   caption,
   postImages,
   kind,
   like,
-  onLikeToggle
+  onLikeToggle,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalCommentVisible, setModalCommentVisible] = useState(false);
-  const [modalInCommentVisible, setModalInCommentVisible] = useState(true);
+  const actionSheet = useRef();
+  const [isAuthor, setIsAuthor] = useState(false);
+  const [userRole, setUserRole] = useState();
+  const [fullPostModalVisible, setFullPostModalVisible] = useState(false);
 
-  const [userInfo, setUserInfo] = useState({});
-  const [postId, setPostId] = useState(id);
-  const [liked, setLiked] = useState(false);
   const handleModalVisibility = (visibility) => {
     setModalVisible(visibility);
   };
 
-  const handleModalCommentVisibility = (visibility) => {
-    setModalCommentVisible(visibility);
-  };
-
-  const handlePressEditPost = async () => {
-    
-    // const userInfo = await getUserNameAndAvatarFromAsyncStorage();
-    // const userInfo = {userName, userAvatar}
-    // if (userInfo) {
-    //   setUserInfo(userInfo);
-      
-    // }
-    setModalVisible(true);
-
-    console.log("postId:", postId);
-  };
-
-  const handleShowComment = async () => {
-    setModalCommentVisible(true);
-    setModalInCommentVisible(false);
-    //modalInCommentVisible=false;
-    console.log("setModalInCommentVisible: ", modalInCommentVisible);
-    console.log("postId:", postId);
+  const handleModalCommentVisibility = () => {
+    setModalCommentVisible(!modalCommentVisible);
   };
 
   const handlePressLiked = () => {
     onLikeToggle(id, like);
-    setLiked(!liked);
   };
 
-  const renderItem = ({ item }) => (
-    <Image
-      source={{ uri: item }}
-      style={{ width: 200, height: 200, marginRight: 3, marginBottom: 3 }}
-    />
-  );
-
-  // const renderOneItem = ({ item }) => (
-  //   <Image
-  //     source={{ uri: item }}
-  //     style={{ width: "100%", height: 200, marginRight: 3, marginBottom: 3 }}
-  //   />
-  // );
-
-  // const renderLessThan4Items = ({ item }) => (
-  //   <Image
-  //     source={{ uri: item }}
-  //     style={{ width: 200, height: 200, marginRight: 3, marginBottom: 3 }}
-  //   />
-  // );
-
-  // const renderMoreThan4Items = () => (
-  //   <View style={{ flexDirection: "row" }}>
-  //     {postImages.slice(0, 3).map((item, index) => (
-  //       <Image
-  //         key={index}
-  //         source={{ uri: item }}
-  //         style={{ width: 200, height: 200, marginRight: 3, marginBottom: 3 }}
-  //       />
-  //     ))}
-  //     <TouchableOpacity onPress={handleShowMore}>
-  //       <Text style={{ textAlign: "center" }}>More</Text>
-  //     </TouchableOpacity>
-  //   </View>
-  // );
-
-  // const renderItems = ({ item }) => {
-  //   if (item.key === "postImages") {
-  //     if (postImages.length === 1) {
-  //       return renderOneItem({ item: postImages[0] });
-  //     } else if (postImages.length > 1 && postImages.length < 4) {
-  //       return postImages.map((image, index) => (
-  //         <View style={styles.item} key={index}>
-  //           {renderLessThan4Items({ item: image })}
-  //         </View>
-  //       ));
-  //     } else if (postImages.length > 4) {
-  //       return <View >{renderMoreThan4Items()}</View>;
-  //     }
-  //   }
-  //};
-
-  const handleShowMore = () => {
-    // Xử lý khi người dùng bấm vào nút "more"
+  const renderItem = ({ item, index }) => {
+    if (index === 3 && postImages.length > 4) {
+      return (
+        <TouchableOpacity onPress={fetchFullPostData}>
+          <View style={styles.remainingImagesContainer}>
+            <Image source={{ uri: item }} style={styles.image} />
+            <View style={styles.overlay}>
+              <Text style={styles.remainingText}>+{postImages.length - 4}</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      );
+    }
+    return <Image source={{ uri: item }} style={styles.image} />;
   };
 
-  
-  const isLiked = useSelector(state => state.post?.posts[postId] || false);
-  const userData = useSelector(state => state.auth.userData);
-  const userId = userData.userId;
+  const isLiked = useSelector((state) => state.post?.posts[id] || false);
+  const userData = useSelector((state) => state.auth.userData);
   const userToken = userData.token;
   const dispatch = useDispatch();
+  const userName = userData.userName;
+  const userId = useSelector((state) => state.auth.userData.userId);
+  const buttons = ["edit", "delete", "cancel"];
 
-    const userName = userData.userName;
+  const checkAuthorPost = () => {
+    if (userId === authorId) {
+      setIsAuthor(true);
+    } else {
+      setIsAuthor(false);
+    }
+  };
+
+  useEffect(() => {
+    checkAuthorPost();
+    fetchUserById();
+  }, []);
+
+  const showActionSheet = () => {
+    actionSheet.current.show();
+  };
+
+  const handleEdit = () => {
+    setModalVisible(true);
+  };
+
+  const handleDelete = () => {
+    handleDeletePost(userToken, id);
+    // Implement delete logic here
+  };
+
+  const numColumns = postImages.length === 1 ? 1 : 2;
+
+  const fetchFullPostData = async () => {
+    try {
+      const response = await getPostById(id, userToken);
+      setFullPostModalVisible(true);
+    } catch (error) {
+      console.error("Failed to fetch full post data:", error);
+    }
+  };
+
+  const fetchUserById = async () => {
+    try {
+      const response = await getUserByIdFromDatabase(authorId, userToken);
+      setUserRole(response.user.role.name);
+    } catch (error) {
+      console.error("Failed to fetch user data:", error);
+    }
+  };
+
+  const renderRoleIcon = (userRole) => {
+    switch (userRole) {
+      case "USER":
+        return (
+          <Feather
+            name='user'
+            size={20}
+            color='black'
+            style={styles.userIcon}
+          />
+        );
+      case "BUSINESS":
+        return <Entypo name='shop' size={20} color='black' />;
+      case "HOSPITAL":
+        return (
+          <MaterialCommunityIcons
+            name='hospital-box-outline'
+            size={20}
+            color='black'
+          />
+        );
+      case "ADMIN":
+      case "SUPER_ADMIN":
+        return <Feather name='award' size={24} color='black' />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <View style={styles.card}>
       <View style={styles.header}>
         <Image source={{ uri: authorAvatar }} style={styles.avatar} />
-
         <View style={styles.cardHeader}>
-          <Text style={styles.author}>{authorName}</Text>
-          <Pressable style={styles.iconEdit} onPress={handlePressEditPost}>
-            <AntDesign name='ellipsis1' size={24} color='black' />
-          </Pressable>
+          <View style={styles.authorAndRole}>
+            <Text style={styles.author}>{authorName}</Text>
+            {renderRoleIcon(userRole)}
+          </View>
+
+          {isAuthor && (
+            <Pressable style={styles.iconEdit} onPress={showActionSheet}>
+              <AntDesign name='ellipsis1' size={24} color='black' />
+            </Pressable>
+          )}
+
+          <ActionSheet
+            ref={actionSheet}
+            title={"action"}
+            options={buttons}
+            cancelButtonIndex={2}
+            onPress={(index) => {
+              switch (index) {
+                case 0:
+                  handleEdit();
+                  break;
+                case 1:
+                  handleDelete();
+                  break;
+                default:
+                  break;
+              }
+            }}
+          />
 
           <View style={styles.EditPostModal}>
             <Modal
@@ -154,12 +200,12 @@ const PostCard = ({
               visible={modalVisible}
               onRequestClose={() => {
                 Alert.alert("Modal has been closed.");
-                setModalVisible(!modalVisible);
+                setModalVisible(false);
               }}>
               <View style={styles.centeredView}>
                 <View style={styles.modalView}>
                   <EditPostModal
-                    postId={postId}
+                    postId={id}
                     setModalVisible={handleModalVisibility}
                     authorName={userName}
                     avatar={authorAvatar}
@@ -171,29 +217,33 @@ const PostCard = ({
               </View>
             </Modal>
           </View>
-
-          {/* <Text style={styles.time}>{time}</Text> */}
         </View>
       </View>
       <Text style={styles.content}>{caption}</Text>
-
       <View style={styles.listImage}>
-        <FlatList
-          data={postImages}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-          numColumns={2}
-        />
+        {postImages.length === 1 ? (
+          <Image source={{ uri: postImages[0] }} style={styles.singleImage} />
+        ) : (
+          <View>
+            <FlatList
+              data={postImages.slice(0, 4)} // Only pass the first 4 images to FlatList
+              renderItem={renderItem}
+              keyExtractor={(item, index) => index.toString()}
+              numColumns={numColumns}
+              key={numColumns}
+            />
+          </View>
+        )}
       </View>
       <View style={styles.likeIconAndLikeQuantity}>
         <MaterialCommunityIcons name='thumb-up' size={15} color={"#099BFA"} />
         <Text style={styles.likeQuantity}>{like}</Text>
       </View>
-
       <View style={styles.line}></View>
-
       <View style={styles.action}>
-        <Pressable style={styles.like} onPress={() => dispatch(updatePostLike(id, !isLiked, userToken))}>
+        <Pressable
+          style={styles.like}
+          onPress={() => dispatch(updatePostLike(id, !isLiked, userToken))}>
           <MaterialCommunityIcons
             name={isLiked ? "thumb-up" : "thumb-up-outline"}
             size={20}
@@ -203,36 +253,27 @@ const PostCard = ({
             {isLiked ? "Liked" : "Like"}
           </Text>
         </Pressable>
-        
-        
         <Pressable
           style={styles.comment}
-          onPress={ handleShowComment }>
+          onPress={handleModalCommentVisibility}>
           <MaterialCommunityIcons name='comment-outline' size={20} />
           <Text style={styles.textActionButton}>Comment</Text>
-          <View style={styles.EditPostModal}>
-            <Modal
-              animationType='slide'
-              transparent={true}
-              visible={modalCommentVisible}
-              onRequestClose={() => {
-                Alert.alert("Modal has been closed.");
-                setModalCommentVisible(!modalCommentVisible);
-              }}>
-              
-              <View style={styles.centeredView}>
-                <View style={styles.modalView}>
-                  <CommentModal
-                    setModalCommentVisible={handleModalCommentVisibility}
-                    setModalInCommentVisible={setModalInCommentVisible}
-                    postId={postId}
-                  />
-                </View>
-              </View>
-            </Modal>
-          </View>
         </Pressable>
       </View>
+
+      <CommentModal
+        postId={id}
+        visible={modalCommentVisible}
+        onClose={handleModalCommentVisibility}
+        userRole={userRole}
+      />
+
+      <PostModal
+        visible={fullPostModalVisible}
+        onClose={() => setFullPostModalVisible(false)}
+        postId={id}
+        userRole={userRole}
+      />
     </View>
   );
 };
@@ -260,13 +301,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 10,
   },
-  author: {
-    fontWeight: "bold",
+  authorAndRole: {
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
-    justifyContent: "flex-end",
   },
-  time: {
-    color: "#666",
+  author: {
+    marginRight: 10,
+    fontWeight: "bold",
   },
   content: {
     marginBottom: 10,
@@ -290,12 +332,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-
   line: {
     borderWidth: 0.5,
     marginBottom: 10,
   },
-
   likeIconAndLikeQuantity: {
     flexDirection: "row",
     alignItems: "center",
@@ -312,6 +352,26 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  image: {
+    width: 200,
+    height: 200,
+    marginRight: 3,
+    marginBottom: 3,
+  },
+  remainingImagesContainer: {
+    position: "relative",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  remainingText: {
+    color: "white",
+    fontSize: 24,
+    fontWeight: "bold",
+  },
   item: {
     flexBasis: "50%",
     padding: 3,
@@ -322,10 +382,9 @@ const styles = StyleSheet.create({
   cardHeader: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     paddingHorizontal: 3,
+    justifyContent: "space-between",
   },
-
   centeredView: {
     flex: 1,
     justifyContent: "center",
@@ -338,7 +397,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 35,
     marginTop: 10,
-
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -351,9 +409,15 @@ const styles = StyleSheet.create({
   textActionButton: {
     marginLeft: 10,
   },
-  commentModal: {
-    height: '100%'
-  }
+  iconRole: {
+    marginLeft: 10,
+    alignItems: "center",
+  },
+  singleImage: {
+    width: "100%",
+    aspectRatio: 1,
+    marginBottom: 10,
+  },
 });
 
 export default PostCard;

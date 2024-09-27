@@ -13,6 +13,6 @@ import java.util.Date;
 public interface AuthService {
   User createUser(String username, String email, String password) throws IOException;
   User authenticate(LoginDto input);
-  User updateUser(Long id, String username, String email, MultipartFile images, LocalDate birthday) throws IOException;
+  User updateUser(Long id, String username, String email, MultipartFile images, LocalDate birthday, String address) throws IOException;
   String deleteUser(Long userId);
 }

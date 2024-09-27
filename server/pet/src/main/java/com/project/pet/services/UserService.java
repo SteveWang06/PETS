@@ -4,6 +4,7 @@ package com.project.pet.services;
 import com.project.pet.dto.SignupDTO;
 import com.project.pet.dto.UserProfileDTO;
 import com.project.pet.models.Post;
+import com.project.pet.models.Product;
 import com.project.pet.models.Role;
 import com.project.pet.models.RoleEnum;
 import com.project.pet.models.User;
@@ -67,6 +68,7 @@ public class UserService implements UserDetailsService {
   public UserProfileDTO getUserProfile(Long userId) {
     User user = userRepository.findById(userId).orElse(null);
     List<Post> posts = user != null ? user.getPosts() : new ArrayList<>();
-    return new UserProfileDTO(user, posts);
+    List<Product> products = user != null ? user.getProducts() : new ArrayList<>();
+    return new UserProfileDTO(user, posts, products);
   }
 }

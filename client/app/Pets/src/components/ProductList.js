@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  RefreshControl,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchProducts } from "../redux/actions/productActions";
@@ -16,6 +17,7 @@ const ProductList = ({ addToCart }) => {
   const [searchText, setSearchText] = useState("");
   const [searchType, setSearchType] = useState("");
   const [searchPrice, setSearchPrice] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
   const userToken = useSelector((state) => state.auth.userData.token);
 
@@ -44,6 +46,13 @@ const ProductList = ({ addToCart }) => {
     return filteredProducts.reverse();
   };
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    dispatch(fetchProducts(userToken))
+      .then(() => setRefreshing(false))
+      .catch(() => setRefreshing(false));
+  };
+
   if (loading) return <Text>Loading...</Text>;
   if (error) return <Text>Error: {error}</Text>;
 
@@ -57,22 +66,22 @@ const ProductList = ({ addToCart }) => {
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.input}
-          placeholder='Name'
+          placeholder="Name"
           onChangeText={(text) => setSearchText(text)}
           value={searchText}
         />
         <TextInput
           style={styles.input}
-          placeholder='Type'
+          placeholder="Type"
           onChangeText={(text) => setSearchType(text)}
           value={searchType}
         />
         <TextInput
           style={styles.input}
-          placeholder='Price'
+          placeholder="Price"
           onChangeText={(text) => setSearchPrice(text)}
           value={searchPrice}
-          keyboardType='numeric'
+          keyboardType="numeric"
         />
         <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
           <Text style={styles.searchButtonText}>Search</Text>
@@ -86,6 +95,9 @@ const ProductList = ({ addToCart }) => {
         keyExtractor={(item) => item.id.toString()}
         numColumns={2}
         contentContainerStyle={styles.list}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
     </View>
   );
