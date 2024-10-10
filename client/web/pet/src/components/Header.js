@@ -1,7 +1,14 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-
+import { useTranslation } from 'react-i18next';
+ 
+ 
 function Header() {
+    const { t, i18n } = useTranslation();
+ 
+    const changeLanguage = (lng) => {
+        i18n.changeLanguage(lng); // Change language function
+    };
     return (
         <div>
             {/* Navbar */}
@@ -12,10 +19,10 @@ function Header() {
                         <a className="nav-link" data-widget="pushmenu" href="#" role="button"><i className="fas fa-bars" /></a>
                     </li>
                     <li className="nav-item d-none d-sm-inline-block">
-                        <Link to="/home" className="nav-link">Home</Link>
+                        <Link to="/home" className="nav-link">{t('home')}</Link>
                     </li>
                     <li className="nav-item d-none d-sm-inline-block">
-                        <a href="#" className="nav-link">Contact</a>
+                        <a href="#" className="nav-link">{t('contact')}</a>
                     </li>
                 </ul>
                 {/* Right navbar links */}
@@ -41,7 +48,16 @@ function Header() {
                             </form>
                         </div>
                     </li>
-                  
+                    {/* Language Dropdown */}
+                    <li className="nav-item dropdown">
+                        <a className="nav-link" data-toggle="dropdown" href="#">
+                        <i className="fas fa-globe" /> {t('language')}
+                        </a>
+                        <div className="dropdown-menu dropdown-menu-right">
+                            <a className="dropdown-item" onClick={() => changeLanguage('en')}>English</a>
+                            <a className="dropdown-item" onClick={() => changeLanguage('zh_TW')}>中文</a>
+                        </div>
+                    </li>
                     {/* Messages Dropdown Menu */}
                     <li className="nav-item dropdown">
                         <a className="nav-link" data-toggle="dropdown" href="#">
@@ -140,9 +156,9 @@ function Header() {
                 </ul>
             </nav>
             {/* /.navbar */}
-
+ 
         </div>
     );
 }
-
+ 
 export default Header;
