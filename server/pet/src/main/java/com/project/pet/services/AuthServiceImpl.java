@@ -112,7 +112,7 @@ public class AuthServiceImpl implements AuthService{
   }
 
 
-  public User updateUser(Long id, String username, String email, MultipartFile images, LocalDate birthday) throws IOException {
+  public User updateUser(Long id, String username, String email, MultipartFile images, LocalDate birthday, String address) throws IOException {
     User user = userRepository.findById(id)
         .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -128,6 +128,7 @@ public class AuthServiceImpl implements AuthService{
     user.setEmail(email);
     user.setAvatar(savedImage);
     user.setBirthday(birthday);
+    user.setAddress(address);
 
 
     return userRepository.save(user);

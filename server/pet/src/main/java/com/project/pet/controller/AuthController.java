@@ -13,12 +13,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Map;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -75,9 +78,10 @@ public class AuthController {
   public ResponseEntity<User> updateUser(@PathVariable Long id,
                                          @RequestParam("username") String username,
                                          @RequestParam("email") String email,
+                                         @RequestParam("address") String address,
                                          @RequestParam("image") MultipartFile images,
                                          @RequestParam("birthday") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthday) throws IOException {
-    User updatedUser = authService.updateUser(id, username, email, images, birthday);
+    User updatedUser = authService.updateUser(id, username, email, images, birthday, address);
     return ResponseEntity.ok(updatedUser);
   }
 

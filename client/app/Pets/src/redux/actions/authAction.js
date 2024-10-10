@@ -1,7 +1,7 @@
-import { LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT } from "../types";
+import { LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT, GET_USER_SUCCESS, UPDATE_PROFILE } from "../types";
 import { REGISTER_REQUEST, REGISTER_SUCCESS, REGISTER_FAILURE } from "../types";
 import { ApiPaths } from "../../services/ApiPaths";
-
+import { getUserByIdFromDatabase } from "../../services/requester/UserRequester";
 
 export const loginRequest = ({ email, password }) => {
   
@@ -24,6 +24,9 @@ export const loginRequest = ({ email, password }) => {
       const data = await response.json();
       dispatch({ type: LOGIN_SUCCESS, payload: data });
       //console.log("user data in loginRequest: ", data);
+
+      const profileData = await getUserByIdFromDatabase(data.userId, data.token);
+      dispatch({ type: GET_USER_SUCCESS, payload: profileData });
     } catch (error) {
       dispatch({ type: LOGIN_FAILURE, payload: error.message });
       throw error;
@@ -63,6 +66,22 @@ export const registerRequest = ({ username, email, password }) => {
   };
 };
 
+export const getUserById = ({userId, userToken}) => {
+  
+  return async (dispatch) => {
+    try {
+     
+      const profileData = await getUserByIdFromDatabase(userId, userToken);
+      dispatch({ type: GET_USER_SUCCESS, payload: profileData });
+      return profileData;
+      //console.log("profileData: ", profileData);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+};
+
+
 export const loginSuccess = (userData) => {
   return {
     type: LOGIN_SUCCESS,
@@ -94,3 +113,8 @@ export const registerFailure = (error) => {
     payload: error,
   };
 };
+
+export const updateProfile = (updatedProfileData) => ({
+  type: UPDATE_PROFILE,
+  payload: updatedProfileData,
+});

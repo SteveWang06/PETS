@@ -31,7 +31,7 @@ public class Post {
   @Column()
   private Integer postLike;
 
-  @JsonIgnore
+  //@JsonIgnore
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User author;

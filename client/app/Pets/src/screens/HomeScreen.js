@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import AddNewPostPage from "../page/AddNewPostPage";
 import HomePage from "../page/HomePage";
 import ShopPage from "../page/ShopPage";
@@ -12,6 +12,7 @@ const Tab = createMaterialBottomTabNavigator();
 
 const HomeScreen = () => {
   const { t } = useTranslation();
+  
   return (
     <Tab.Navigator 
       activeColor="#f0edf6"

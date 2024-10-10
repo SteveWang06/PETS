@@ -12,6 +12,7 @@ const ShopPage = () => {
   const [showCart, setShowCart] = useState(false);
   const [showAddProductModal, setShowAddProductModal] = useState(false);
   
+  
 
   const role = useSelector((state) => state.auth.userData.role.name);
   const token = useSelector((state) => state.auth.userData.token)
@@ -26,6 +27,7 @@ const ShopPage = () => {
     } else {
       setCart([...cart, { ...product, quantity: 1 }]);
     }
+    Alert.alert('Success', 'Product added to cart!');
   };
 
   const incrementQuantity = (product) => {
@@ -197,6 +199,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+    marginTop: 40
   },
   cartItem: {
     flexDirection: 'row',
@@ -265,6 +268,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     width: '100%',
     marginTop: 20,
+    marginBottom: 40,
   },
 });
 
