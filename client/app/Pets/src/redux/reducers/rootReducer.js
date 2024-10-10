@@ -11,6 +11,7 @@ import productReducer from "./productReducer";
 const persistConfig = {
     key: "root",
     storage
+    
 }
 
 

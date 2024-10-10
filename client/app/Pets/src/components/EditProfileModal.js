@@ -12,11 +12,12 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import RNPickerSelect from "react-native-picker-select";
 import { handleSubmitEditProfile } from "../services/requester/UserRequester";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { FontAwesome } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
 import ActionSheet from "react-native-actionsheet";
 import { useTranslation } from "react-i18next";
+import { getUserById } from "../redux/actions/authAction";
 
 const currentYear = new Date().getFullYear();
 const years = Array.from(new Array(100), (val, index) => currentYear - index);
@@ -39,10 +40,12 @@ const EditProfileModal = ({
   userName,
   userEmail,
   userBirthday,
+  reload
 }) => {
 
   const [username, setUsername] = useState();
   const [email, setEmail] = useState();
+  const [address, setAddress] = useState();
   const [birthdayYear, setBirthdayYear] = useState("");
   const [birthdayMonth, setBirthdayMonth] = useState("");
   const [birthdayDay, setBirthdayDay] = useState("");
@@ -53,7 +56,7 @@ const EditProfileModal = ({
   const userId = userData.userId;
   const userToken = userData.token;
   //const dispatch = useDispatch();
-  
+  const dispatch = useDispatch();
   useEffect(() => {
     // Kiểm tra xem userName và userEmail có giá trị không trước khi cập nhật state
     if (userName && userEmail) {
@@ -68,13 +71,23 @@ const EditProfileModal = ({
       userToken,
       username,
       email,
+      address,
       birthdayYear,
       birthdayMonth,
       birthdayDay,
       selectedImage
     );
+    dispatch(getUserById({ userId, userToken }));
   };
 
+  useEffect(() => {
+    if (userId && userToken) {
+      dispatch(getUserById({ userId, userToken }));
+    }
+  }, [closeModalEditProfile]);
+
+
+  
   useEffect(() => {
     loadImages();
 
@@ -165,6 +178,12 @@ const EditProfileModal = ({
             onChangeText={(text) => setEmail(text)}
             style={styles.inputEdit}
             keyboardType='email-address'
+          />
+          <TextInput
+            placeholder='Address'
+            value={address}
+            onChangeText={(text) => setAddress(text)}
+            style={styles.inputEdit}
           />
 
           <Text>Your birthday :</Text>

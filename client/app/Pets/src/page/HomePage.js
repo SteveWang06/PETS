@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import {
   ScrollView,
   View,
@@ -7,17 +7,20 @@ import {
   Text,
   Animated,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import PostCard from "../components/PostCard";
 import { getPostsFromDatabase } from "../services/requester/UserRequester"; // Import hàm từ module UserRequester
 import HomepageHeader from "../components/HomepageHeader";
 import { BASE_URL } from "../config";
-
 import { getPostKindFromDataBase } from "../services/requester/UserRequester";
 import FlashMessage, { showMessage } from 'react-native-flash-message';
 import { useTranslation } from 'react-i18next';
-const { width, height } = Dimensions.get("screen");
+import { useSelector, useDispatch } from "react-redux";
+import { getUserById } from "../redux/actions/authAction";
+import { logout } from "../redux/actions/authAction";
 
+const { width, height } = Dimensions.get("screen");
 const capitalizeFirstLetter = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 };
@@ -33,7 +36,6 @@ const Tab = React.forwardRef(({ data, item, onItemPress, isSelected }, ref) => {
             color: isSelected ? "#8B0000" : "#ABB2B9",
             fontSize: 50 / data.length,
             fontWeight: "800",
-            //textTransform: "uppercase",
           }}>
           {title}
         </Text>
@@ -60,7 +62,6 @@ const Indicator = ({ measures, scrollX, data }) => {
         position: "absolute",
         height: 2,
         width: indicatorWidth,
-
         left: 1,
         zIndex: 1,
         backgroundColor: "black",
@@ -71,18 +72,14 @@ const Indicator = ({ measures, scrollX, data }) => {
   );
 };
 
-
-
 const Tabs = ({ data, scrollX, onItemPress, currentTabIndex }) => {
   const [measures, setMeasures] = useState([]);
   const containerRef = useRef();
   const [selectedTab, setSelectedTab] = useState(0);
 
-  
   useEffect(() => {
     let m = [];
     data.forEach((item) => {
-
       item.ref.current.measureLayout(
         containerRef.current,
         (x, y, width, height) => {
@@ -94,11 +91,9 @@ const Tabs = ({ data, scrollX, onItemPress, currentTabIndex }) => {
           });
           if (m.length === data.length) {
             setMeasures(m);
-            
           }
         }
       );
-
     });
   }, [data]);
 
@@ -142,7 +137,6 @@ const Tabs = ({ data, scrollX, onItemPress, currentTabIndex }) => {
   );
 };
 
-
 const HomePage = () => {
   const [posts, setPosts] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -150,13 +144,22 @@ const HomePage = () => {
   const scrollX = useRef(new Animated.Value(0)).current;
   const ref = useRef();
   const [titles, setTitles] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+
+  const userData = useSelector((state) => state.auth.userData);
+  const userId = userData.userId;
+  const userToken = userData.token;
+
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
+        setIsLoading(true);
         const data = await getPostsFromDatabase();
         const formattedPosts = data.map((post) => ({
           id: post.id,
+          authorId: post.userId,
           authorName: post.authorName,
           authorAvatar: post.authorAvatar
             ? `${BASE_URL}/${post.authorAvatar.imageUrl}`
@@ -169,14 +172,18 @@ const HomePage = () => {
           ),
         }));
         setPosts(formattedPosts);
-        //console.log(JSON.stringify(formattedPosts, null, 2));
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching posts:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchPosts();
-  }, [posts]);
+    dispatch(getUserById({userId, userToken}))
+  }, [refreshing]);
 
+  
   const onRefresh = () => {
     setRefreshing(true);
     setTimeout(() => {
@@ -218,8 +225,10 @@ const HomePage = () => {
     scrollX.setValue(offsetX);
   };
 
+
+  
   return (
-    <View style={{ flex: 1}}>
+    <View style={{ flex: 1 }}>
       <HomepageHeader />
       <Tabs
         data={dataWithRefs}
@@ -227,48 +236,51 @@ const HomePage = () => {
         onItemPress={onItemPress}
         currentTabIndex={currentTabIndex}
       />
-
-      <Animated.FlatList
-        ref={ref}
-        data={dataWithRefs}
-        keyExtractor={(item) => item.key}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        pagingEnabled
-        // onScroll={Animated.event(
-        //   [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-        //   { useNativeDriver: false }
-        // )}
-        onScroll={handleScroll}
-        bounces={false}
-        renderItem={({ item }) => (
-          <View style={{ flex: 1}}>
-            <ScrollView
-              refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-              }>
-              {posts
-                .slice()
-                .reverse()
-                .filter((post) => post.kind === item.content)
-                .map((formattedPosts) => (
-                  <PostCard
-                    key={formattedPosts.id}
-                    id={formattedPosts.id}
-                    authorName={formattedPosts.authorName}
-                    authorAvatar={formattedPosts.authorAvatar}
-                    caption={formattedPosts.caption}
-                    postImages={formattedPosts.images}
-                    kind={formattedPosts.kind}
-                    like={formattedPosts.like}
-                  />
-                ))}
-            </ScrollView>
-            
-          </View>
-        )}
-      />
-      <FlashMessage position="top"/>
+     
+      {isLoading ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      ) : (
+        <Animated.FlatList
+          ref={ref}
+          data={dataWithRefs}
+          keyExtractor={(item) => item.key}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          pagingEnabled
+          onScroll={handleScroll}
+          bounces={false}
+          renderItem={({ item }) => (
+            <View style={{ flex: 1 }}>
+              <ScrollView
+                style={{ width }}
+                refreshControl={
+                  <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }>
+                {posts
+                  .slice()
+                  .reverse()
+                  .filter((post) => post.kind === item.content)
+                  .map((formattedPosts) => (
+                    <PostCard
+                      key={formattedPosts.id}
+                      id={formattedPosts.id}
+                      authorId={formattedPosts.authorId}
+                      authorName={formattedPosts.authorName}
+                      authorAvatar={formattedPosts.authorAvatar}
+                      caption={formattedPosts.caption}
+                      postImages={formattedPosts.images}
+                      kind={formattedPosts.kind}
+                      like={formattedPosts.like}
+                    />
+                  ))}
+              </ScrollView>
+            </View>
+          )}
+        />
+      )}
+      <FlashMessage position="top" />
     </View>
   );
 };

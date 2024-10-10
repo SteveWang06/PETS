@@ -18,7 +18,12 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSCameraUsageDescription": "This app uses the camera to take photos.",
-        "NSPhotoLibraryUsageDescription": "This app uses the photo library to select photos."
+        "NSPhotoLibraryUsageDescription": "This app uses the photo library to select photos.",
+        "NSLocationAlwaysUsageDescription": "This app uses your location in the background to show you relevant information.",
+        "NSLocationWhenInUseUsageDescription": "This app uses your location to show you relevant information."
+      },
+      "config": {
+        "googleMapsApiKey": "AIzaSyATRRAPLIHg3A627J59b2KPK9rjXRDMMtM"
       }
     },
     "android": {
@@ -29,8 +34,16 @@
       "permissions": [
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
-      ]
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyATRRAPLIHg3A627J59b2KPK9rjXRDMMtM"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -39,8 +52,14 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Selecct and upload images.",
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera."
+          "photosPermission": "Select and upload images.",
+          "cameraPermission": "Allow Pets to access your camera."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Pets to use your location."
         }
       ]
     ]

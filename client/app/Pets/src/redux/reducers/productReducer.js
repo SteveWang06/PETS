@@ -1,5 +1,5 @@
 import { FETCH_PRODUCTS_ERROR, FETCH_PRODUCTS_SUCCESS } from "../types";
-import { ADD_PRODUCT_SUCCESS, ADD_PRODUCT_ERROR } from '../types';
+import { ADD_PRODUCT_SUCCESS, ADD_PRODUCT_ERROR, UPDATE_PROFILE } from '../types';
 
 
 const initialState = {

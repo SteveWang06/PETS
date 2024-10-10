@@ -60,9 +60,15 @@ public class User implements UserDetails {
   @OneToMany(mappedBy = "author")
   private List<Post> posts;
 
+  @JsonIgnore
+  @OneToMany(mappedBy = "user")
+  private List<Product> products;
+
   @OneToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
   private Role role;
+
+  private  String address;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -73,6 +79,10 @@ public class User implements UserDetails {
 
   public List<Post> getPosts() {
     return posts;
+  }
+
+  public List<Product> getProducts() {
+    return products;
   }
 
   public String getPassword() {
@@ -174,6 +184,15 @@ public class User implements UserDetails {
     return this;
   }
 
+  public String getAddress() {
+    return address;
+  }
+
+  public User setAddress(String address) {
+    this.address = address;
+    return this;
+  }
+
   @Override
   public String toString() {
     return "User{" +
@@ -183,6 +202,7 @@ public class User implements UserDetails {
         ", email='" + email + '\'' +
         ", createdAt=" + createdAt +
         ", updatedAt=" + birthday +
+        ", address=" + address +
         '}';
   }
 }
