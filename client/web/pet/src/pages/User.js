@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import SideNav from "../components/SideNav";
 import Footer from "../components/Footer";
 import { BASE_URL } from "../context/config";
+import { auth } from '../pathApi';
 
 const User = () => {
   const [users, setUsers] = useState([]);
@@ -11,7 +12,9 @@ const User = () => {
   const [editId, setEditId] = useState(null);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [password,setPassword]=useState('')
+  const [birthday, setBirthday] = useState('');
+  const [image, setImage] = useState(null);
   const [success, setSuccess] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [search, setSearch] = useState('');
@@ -81,6 +84,64 @@ const User = () => {
     }
   };
 
+
+  const handleEdit = (user) => {
+    setEditId(user.id);
+    setUsername(user.userName);
+    setEmail(user.email);
+    setImage(null);
+    setBirthday(user.birthday ? new Date(user.birthday).toISOString().split('T')[0] : '');
+  };
+
+  const handleSave = async () => {
+    try {
+      const token = sessionStorage.getItem('userToken');
+      if (!token || !editId) {
+        throw new Error('No token or data found');
+      }
+      const formData = new FormData();
+      formData.append('username', username);
+      formData.append('email', email);
+      const formattedBirthday = birthday;
+      formData.append('birthday', formattedBirthday);
+      if (image) {
+        formData.append('image', image);  
+      }
+      else {
+        formData.append('images', new File([], users.find(item => item.id === editId).avatar.imageUrl.split('/').pop()));
+      }      
+
+      const res = await axios.put(`${auth.updateUser}/${editId}`, formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      console.log(res);
+
+      const updatedData = users.map(user => user.id === editId ? {
+        ...user,
+        userName:username,
+        email:email,
+        birthday:formattedBirthday,
+        image: image ? URL.createObjectURL(image) : user.avatar.imageUrl, 
+      } : user);
+
+      setUsers(updatedData);
+      setOriginal(updatedData);
+      setEditId(null);
+      setUsername('');
+      setEmail('');
+      setBirthday('');
+      setImage(null);
+      setSuccess('Edit Success');
+    } catch (error) {
+      console.error('Error updating data: ', error.response ? error.response.data : error.message);
+      setError('Error updating data');
+    }
+  };
+
   const handleDelete = async (id) => {
     try {
       const token = sessionStorage.getItem('userToken');
@@ -101,54 +162,12 @@ const User = () => {
     }
   };
 
-  const handleEdit = (user) => {
-    setEditId(user.id);
-    setUsername(user.userName);
-    setEmail(user.email);
-    setPassword('');
-  };
-
-  const handleSave = async () => {
-    try {
-      const token = sessionStorage.getItem('userToken');
-      if (!token || !editId) {
-        throw new Error('No token or data found');
-      }
-
-      const updatedUser = { username,email };
-
-      const res=await axios.put(`${BASE_URL}/${editId}`, updatedUser, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-
-      console.log(res);
-
-      const updatedData = users.map(user => user.id === editId ? {
-        ...user,
-        username:username,
-        email
-      } : user);
-
-      setUsers(updatedData);
-      setOriginal(updatedData);
-      setEditId(null);
-      setUsername('');
-      setEmail('');
-      setSuccess('Edit Success');
-    } catch (error) {
-      console.error('Error updating data: ', error.response?error.response.data:error.message);
-      setError('Error updating data');
-    }
-  };
 
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearch(value);
     const searchedUsers = value ? original.filter(user =>
-      user.userName.toLowerCase().includes(value.toLowerCase()) ||
+      user.username.toLowerCase().includes(value.toLowerCase()) ||
       user.email.toLowerCase().includes(value.toLowerCase())
     ) : original;
     setUsers(searchedUsers);
@@ -203,6 +222,8 @@ const User = () => {
                       <tr>
                         <th>Username</th>
                         <th>Email</th>
+                        <th>Birthday</th>
+                        <th>Image</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
@@ -230,6 +251,21 @@ const User = () => {
                                 />
                               </td>
                               <td>
+                                <input
+                                  type="date"
+                                  value={birthday}
+                                  onChange={(e) => setBirthday(e.target.value)}
+                                  style={{ width: '100%' }}
+                                />
+                              </td>
+                              <td>
+                                <input
+                                  type="file"
+                                  onChange={(e)=>setImage(e.target.files[0])}
+                                  style={{ width: '100%' }}
+                                />
+                              </td>
+                              <td>
                                 <button onClick={handleSave} className="btn btn-primary">Save</button>
                               </td>
                             </>
@@ -237,10 +273,14 @@ const User = () => {
                             <>
                               <td>{user.userName}</td>
                               <td>{user.email}</td>
+                              <td>{user.birthday}</td>
+                              <td>
+                                <img src={`${BASE_URL}/${user.avatar?.imageUrl}`} alt="User" style={{ width: '50px', height: '50px' }} />
+                              </td>
                               <td>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                                  <button className="btn btn-block btn-primary" style={{ width: '80px', height: '40px', marginRight: '10px' }} onClick={() => handleEdit(user)}>Edit</button>
-                                  <button className="btn btn-block btn-danger" style={{ width: '80px', height: '40px' }} onClick={() => handleDelete(user.id)}>Delete</button>
+                                  <button className="btn btn-primary" style={{ width: '80px', height: '40px', marginRight: '10px' }} onClick={() => handleEdit(user)}>Edit</button>
+                                  <button className="btn btn-danger" style={{ width: '80px', height: '40px' }} onClick={() => handleDelete(user.id)}>Delete</button>
                                 </div>
                               </td>
                             </>
@@ -312,6 +352,6 @@ const User = () => {
       <Footer />
     </div>
   );
-}
+};
 
 export default User;

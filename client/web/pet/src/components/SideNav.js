@@ -1,8 +1,10 @@
 import React from 'react';
 import {Link, useLocation} from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 function SideNav() {
     const location=useLocation();
+    const { t, i18n } = useTranslation();
     const getNavLinkClass=(path)=>location.pathname===path ? 'nav-link active' : 'nav-link';
     return (
         <div>
@@ -42,14 +44,14 @@ function SideNav() {
                             <li className="nav-item">
                                 <Link to="/home" className={getNavLinkClass('/home')}>
                                     <i className="nav-icon fas fa-tachometer-alt" />
-                                    <p>Dashboard</p>
+                                    <p>{t('dashboard')}</p>
                                 </Link>                                
                             </li>
                             <li className="nav-item">
                                 <Link to="/user" className={getNavLinkClass('/user')}>
                                     <i className="nav-icon fas fa-user" />
                                     <p>
-                                        User
+                                    {t('user')}
                                     </p>
                                 </Link>
                             </li>

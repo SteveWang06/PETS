@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import SideNav from "../components/SideNav"; 
 import Footer from "../components/Footer"; 
 import { BASE } from "../context/config";
+import { auth, products } from '../pathApi';
 
 const Item = () => {
   const [data, setData] = useState([]);
@@ -35,14 +36,14 @@ const Item = () => {
         throw new Error('No token found');
       }
 
-      const res = await axios.get(`${BASE}/products`, {
+      const res = await axios.get(`${products.getAllProducts}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
       setData(res.data);
-      console.log(res.data);
+      console.log(res);
     } catch (error) {
       console.error('Error fetching data:', error);
       setError('Error fetching data');

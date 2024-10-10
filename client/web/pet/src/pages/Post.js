@@ -154,7 +154,7 @@ const handleSave = async () => {
         ...item,
         caption: Caption,
         postKind: Kind,
-        postImages: Image ? [{ ...item.postImages[0], imageUrl: `{BASE_URL}/api/auth/${Image.name}` }] : item.postImages
+        postImages: Image ? [{ ...item.postImages[0], imageUrl: `${BASE_URL}/api/auth/${Image.name}` }] : item.postImages
       } : item);
 
       setData(updatedData);
@@ -303,8 +303,8 @@ const handleSave = async () => {
                               <td>{item.postKind}</td>
                               <td>
                                 <div style={{display:'flex',alignItems:'center'}}>
-                                <button className="btn btn-block btn-primary" style={{width:'80px',height:'40px',marginRight:'10px'}} onClick={() => handleEdit(item)}>Edit</button>
-                                <button className="btn btn-block btn-danger" style={{width:'80px',height:'40px'}} onClick={() => handleDelete(item.id)}>Delete</button>
+                                <button className="btn btn-primary" style={{width:'80px',height:'40px',marginRight:'10px'}} onClick={() => handleEdit(item)}>Edit</button>
+                                <button className="btn btn-danger" style={{width:'80px',height:'40px'}} onClick={() => handleDelete(item.id)}>Delete</button>
                                 </div>
                               </td>
                             </>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import './i18n'
 import Home from "./pages/Home";
 import Login from "./pages/login";
 import { AuthProvider } from './context/AuthProvider';
@@ -12,6 +13,7 @@ import Product from './pages/Product';
 import Hospital from './pages/Hospital';
 import Doctor from './pages/Doctor';
 import Forms from './pages/Forms';
+
 
 function App() {
   return (
