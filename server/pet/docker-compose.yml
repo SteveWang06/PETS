@@ -7,8 +7,11 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: pet_database
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     ports:
       - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
     networks:
       - mynetwork
 
@@ -25,10 +28,20 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+    volumes:
+      - /home/ubuntu/pet_uploads/products:/springboot/public/products
+      - /home/ubuntu/pet_uploads/images:/springboot/public/images
+      - /home/ubuntu/pet_uploads/avatar:/springboot/public/avatar
     depends_on:
       - mysql
     networks:
       - mynetwork
+
+volumes:
+  db-data:
+    driver: local
+
 
 networks:
   mynetwork:

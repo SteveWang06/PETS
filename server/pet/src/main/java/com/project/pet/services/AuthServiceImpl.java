@@ -128,7 +128,20 @@ public class AuthServiceImpl implements AuthService{
     user.setEmail(email);
     user.setAvatar(savedImage);
     user.setBirthday(birthday);
-    user.setAddress(address);
+    // Cập nhật địa chỉ
+    Address userAddress = new Address();
+    userAddress.setAddress(address);
+    userAddress.setUser(user); // Đặt user cho địa chỉ
+
+    // Kiểm tra nếu người dùng đã có địa chỉ thì cập nhật
+    if (user.getAddresses() != null && !user.getAddresses().isEmpty()) {
+      // Nếu có địa chỉ tồn tại, cập nhật địa chỉ đầu tiên
+      Address existingAddress = user.getAddresses().get(0);
+      existingAddress.setAddress(address);
+    } else {
+      // Nếu không có địa chỉ, thêm mới
+      user.getAddresses().add(userAddress);
+    }
 
 
     return userRepository.save(user);
