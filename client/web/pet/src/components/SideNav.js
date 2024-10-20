@@ -1,11 +1,23 @@
-import React from 'react';
-import {Link, useLocation} from 'react-router-dom';
+import React, {useContext}from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import AuthContext from '../context/AuthProvider';
+import { useNavigate } from 'react-router-dom';
 
 function SideNav() {
-    const location=useLocation();
+    const location = useLocation();
     const { t, i18n } = useTranslation();
-    const getNavLinkClass=(path)=>location.pathname===path ? 'nav-link active' : 'nav-link';
+    const { setAuth } = useContext(AuthContext);
+    const navigate=useNavigate();
+    const getNavLinkClass = (path) => location.pathname === path ? 'nav-link active' : 'nav-link';
+
+    const handleLogout = () => {
+        localStorage.removeItem('userInfo')
+        localStorage.removeItem('userToken')
+        setAuth(null);
+        navigate('/')
+    }
+
     return (
         <div>
             {/* Main Sidebar Container */}
@@ -23,7 +35,7 @@ function SideNav() {
                             <img src="dist/img/user2-160x160.jpg" className="img-circle elevation-2" alt="User Image" />
                         </div>
                         <div className="info">
-                            <a href="#" className="d-block">FCU Admin</a>
+                            <Link to="/profile" className="d-block">FCU Admin</Link>
                         </div>
                     </div>
                     {/* SidebarSearch Form */}
@@ -45,13 +57,13 @@ function SideNav() {
                                 <Link to="/home" className={getNavLinkClass('/home')}>
                                     <i className="nav-icon fas fa-tachometer-alt" />
                                     <p>{t('dashboard')}</p>
-                                </Link>                                
+                                </Link>
                             </li>
                             <li className="nav-item">
                                 <Link to="/user" className={getNavLinkClass('/user')}>
                                     <i className="nav-icon fas fa-user" />
                                     <p>
-                                    {t('user')}
+                                        {t('user')}
                                     </p>
                                 </Link>
                             </li>
@@ -59,15 +71,15 @@ function SideNav() {
                                 <Link to="/shop" className={getNavLinkClass('/shop')}>
                                     <i className="nav-icon fas fa-store" />
                                     <p>
-                                        Shop
+                                        {t('shop')}
                                     </p>
-                                </Link>                            
+                                </Link>
                             </li>
                             <li className="nav-item">
                                 <Link to="/product" className={getNavLinkClass('/product')}>
                                     <i className="nav-icon fas fa-box-open" />
                                     <p>
-                                        Products
+                                        {t('products')}
                                     </p>
                                 </Link>
                             </li>
@@ -75,15 +87,15 @@ function SideNav() {
                                 <Link to="/hospital" className={getNavLinkClass('/hospital')}>
                                     <i className="nav-icon fas fa-clinic-medical" />
                                     <p>
-                                        Hospital
+                                        {t('hospital')}
                                     </p>
-                                </Link>                            
+                                </Link>
                             </li>
                             <li className="nav-item">
                                 <Link to="/forms" className={getNavLinkClass('/forms')}>
                                     <i className="nav-icon fas fa-edit" />
                                     <p>
-                                        Forms
+                                        {t('forms')}
                                     </p>
                                 </Link>
                             </li>
@@ -91,34 +103,34 @@ function SideNav() {
                                 <Link to="/doctors" className={getNavLinkClass('/doctors')}>
                                     <i className="nav-icon fas fa-user-md" />
                                     <p>
-                                        Doctors
+                                        {t('doctors')}
                                     </p>
-                                </Link>                            
+                                </Link>
                             </li>
                             <li className="nav-item">
                                 <Link to="/post" className={getNavLinkClass('/post')}>
                                     <i className="nav-icon far fa-newspaper" />
                                     <p>
-                                        Post
+                                        {t('post')}
                                     </p>
                                 </Link>
                             </li>
                             <p>
-                                <hr color="white"/>
+                                <hr color="white" />
                             </p>
                             <li className="nav-item">
                                 <a href="#" className="nav-link">
                                     <i className="nav-icon fas fa-cogs" />
                                     <p>
-                                        Setting
+                                        {t('setting')}
                                     </p>
                                 </a>
                             </li>
                             <li className="nav-item">
-                                <Link to="/" className="nav-link">
+                                <Link to='/' className={getNavLinkClass('/')} onClick={handleLogout} >
                                     <i className="nav-icon fas fa-sign-out-alt" />
                                     <p>
-                                        Logout
+                                        {t('logout')}
                                     </p>
                                 </Link>
                             </li>

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Header from "../components/Header"; 
-import SideNav from "../components/SideNav"; 
-import Footer from "../components/Footer"; 
+import Header from "../components/Header";
+import SideNav from "../components/SideNav";
+import Footer from "../components/Footer";
 import { BASE_URL } from "../context/config";
-
+import {IMAGE} from "../context/config";
+import { useTranslation } from 'react-i18next';
+ 
 const Post = () => {
+  const { t, i18n } = useTranslation();
   const [data, setData] = useState([]);
   const [error, setError] = useState('');
   const [editId, setEditId] = useState(null);
@@ -20,31 +23,31 @@ const Post = () => {
   const [search, setSearch]=useState('');
   const [currentPage,setCurrentPage]=useState(1);
   const [postsPerPage]=useState(10);
-
+ 
   useEffect(() => {
     fetchData();
   }, []);
-
+ 
   useEffect(()=>{
     if(success){
       const timer=setTimeout(()=>setSuccess(''),3000);
       return ()=>clearTimeout(timer);
     }
   },[success]);
-
+ 
   const fetchData = async () => {
     try {
-      const token = sessionStorage.getItem('userToken');
+      const token = localStorage.getItem('userToken');
       if (!token) {
         throw new Error('No token found');
       }
-
+ 
       const res = await axios.get(`${BASE_URL}/post/`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-
+ 
       setData(res.data);
       setOriginal(res.data);
       console.log(res.data);
@@ -53,30 +56,30 @@ const Post = () => {
       setError('Error fetching data');
     }
   };
-
+ 
   const handleCreate = async () => {
     try {
-      const token = sessionStorage.getItem('userToken');
+      const token = localStorage.getItem('userToken');
       if (!token) {
         throw new Error('Invalid data');
       }
-
+ 
       const formData = new FormData();
       formData.append('caption', Caption);
       formData.append('kind', Kind);
       formData.append('userId', UserId);
-
+ 
       if (Image) {
         formData.append('images', Image);
       }
-
+ 
       await axios.post(`${BASE_URL}/post/`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         }
       });
-
+ 
       fetchData();
       setCaption('');
       setUserId('');
@@ -89,10 +92,10 @@ const Post = () => {
       setError('Error creating data');
     }
   };
-
+ 
   const handleDelete = async (id) => {
     try {
-      const token = sessionStorage.getItem('userToken');
+      const token = localStorage.getItem('userToken');
       if (!token) {
         throw new Error('No token found');
       }
@@ -101,7 +104,7 @@ const Post = () => {
           'Authorization': `Bearer ${token}`
         }
       });
-
+ 
       setData(prevData => prevData.filter(item => item.id !== id));
       setOriginal(prevData=>prevData.filter(item=>item.id!==id));
       setSuccess('Delete Success');
@@ -110,53 +113,53 @@ const Post = () => {
       setError('Error deleting data');
     }
   };
-
+ 
   const handleEdit = (item) => {
     setEditId(item.id);
     setCaption(item.caption);
-    setUserId(item.userId); 
+    setUserId(item.userId);
     setKind(item.postKind);
   };
-
+ 
 const handleSave = async () => {
     try {
-      const token = sessionStorage.getItem('userToken');
+      const token = localStorage.getItem('userToken');
       if (!token || !editId) {
         throw new Error('No token or data found');
       }
-
+ 
       const formData = new FormData();
       formData.append('caption', Caption);
       formData.append('kind', Kind);
-
+ 
       if (Image) {
         formData.append('images', Image);
       } else {
         formData.append('images', new File([], data.find(item => item.id === editId).postImages[0].imageUrl.split('/').pop()));
       }
-
+ 
       console.log('Updating data with:', {
         caption: Caption,
         kind: Kind,
         image: Image ? Image.name : 'No new image'
       });
-
+ 
       const response = await axios.put(`${BASE_URL}/post/${editId}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         }
       });
-
+ 
       console.log('Server response:', response);
-
+ 
       const updatedData = data.map(item => item.id === editId ? {
         ...item,
         caption: Caption,
         postKind: Kind,
-        postImages: Image ? [{ ...item.postImages[0], imageUrl: `${BASE_URL}/api/auth/${Image.name}` }] : item.postImages
+        postImages: Image ? [{ ...item.postImages[0], imageUrl: `${Image.name}` }] : item.postImages
       } : item);
-
+ 
       setData(updatedData);
       setOriginal(updatedData);
       setEditId(null);
@@ -170,14 +173,14 @@ const handleSave = async () => {
       setError('Error updating data');
     }
   };
-
+ 
   const handleFilter=(e)=>{
     const selectFilter=e.target.value;
     setFilter(selectFilter);
     const filteredData=selectFilter ? original.filter(item=>item.postKind===selectFilter) : original;
     setData(filteredData);
   };
-
+ 
   const handleSearch=(e)=>{
     const value=e.target.value;
     setSearch(value);
@@ -188,25 +191,25 @@ const handleSave = async () => {
     ):original;
     setData(searchedData);
   };
-
+ 
   const indexOfLastPost=currentPage*postsPerPage;
   const indexOfFirstPost=indexOfLastPost-postsPerPage;
   const currentPosts=data.slice(indexOfFirstPost,indexOfLastPost);
-
+ 
   const pageinate=(pageNumber)=>setCurrentPage(pageNumber);
-
+ 
   const nextPage=()=>{
     if(currentPage<Math.ceil(data.length/postsPerPage)){
       setCurrentPage(currentPage+1);
     }
   };
-
+ 
   const prevPage=()=>{
     if(currentPage>1){
       setCurrentPage(currentPage-1);
     }
   };
-
+ 
   return (
     <div>
       <Header />
@@ -218,17 +221,17 @@ const handleSave = async () => {
               <div className="card">
                 <div className="card-header">
                   <div className="d-flex justify-content-between align-items-center">
-                    <h3 className="card-title" style={{ fontWeight: 'bold', fontSize: '28px' }}>Post</h3>
+                    <h3 className="card-title" style={{ fontWeight: 'bold', fontSize: '28px' }}>{t('post')}</h3>
                     <div className="d-flex">
                       <input
                         className="form-control form-control-sidebar"
                         type="search"
-                        placeholder="Search"
+                        placeholder={t('search')}
                         aria-label="Search"
                         value={search}
                         onChange={handleSearch}
                       />
-                      <button className="btn btn-primary" onClick={() => setShowCreate(true)}>Create</button>
+                      <button className="btn btn-primary" onClick={() => setShowCreate(true)}>{t('create')}</button>
                     </div>
                   </div>
                 </div>
@@ -238,19 +241,20 @@ const handleSave = async () => {
                   <table id="example2" className="table table-bordered table-hover">
                     <thead>
                       <tr>
-                        <th>User Name</th>
-                        <th style={{width:'350px'}}>Images</th>
-                        <th>Caption</th>
-                        <th>Kind
+                        <th>{t('user_name')}</th>
+                        <th style={{width:'350px'}}>{t('image')}</th>
+                        <th>{t('caption')}</th>
+                        <th>{t('kind')}
                           <div style={{float: 'right'}}>
                           <select value={filter} onChange={handleFilter} className="form-comtrol">
-                            <option value="">All</option>
-                            <option value="cat">Cat</option>
-                            <option value="dog">Dog</option>
-                            <option value="other">Other</option>
+                            <option value="">{t('all')}</option>
+                            <option value="cat">{t('cat')}</option>
+                            <option value="dog">{t('dog')}</option>
+                            <option value="other">{t('other')}</option>
                           </select>
                           </div>
                         </th>
+                        <th>{t('actions')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -260,26 +264,26 @@ const handleSave = async () => {
                             <>
                               <td>{item.authorName}</td>
                               <td>                            
-                                <input 
-                                  type="file" 
+                                <input
+                                  type="file"
                                   onChange={(e) => setImage(e.target.files[0])}
                                   placeholder="Edit Image"
                                 />
                               </td>
                               <td>
-                                <input 
-                                  type="text" 
-                                  value={Caption} 
-                                  onChange={(e) => setCaption(e.target.value)} 
-                                  placeholder="Edit caption"
+                                <input
+                                  type="text"
+                                  value={Caption}
+                                  onChange={(e) => setCaption(e.target.value)}
+                                  placeholder="Edit Caption"
                                   style={{width:'50%', margin:'0 auto', display:'block'}}
                                 />
                               </td>
                               <td>
-                                <input 
-                                  type="text" 
-                                  value={Kind} 
-                                  onChange={(e) => setKind(e.target.value)} 
+                                <input
+                                  type="text"
+                                  value={Kind}
+                                  onChange={(e) => setKind(e.target.value)}
                                   placeholder="Edit Kind"
                                   style={{width:'50%', margin:'0 auto', display:'block'}}
                                 />
@@ -303,8 +307,8 @@ const handleSave = async () => {
                               <td>{item.postKind}</td>
                               <td>
                                 <div style={{display:'flex',alignItems:'center'}}>
-                                <button className="btn btn-primary" style={{width:'80px',height:'40px',marginRight:'10px'}} onClick={() => handleEdit(item)}>Edit</button>
-                                <button className="btn btn-danger" style={{width:'80px',height:'40px'}} onClick={() => handleDelete(item.id)}>Delete</button>
+                                <button className="btn btn-primary" style={{width:'80px',height:'40px',marginRight:'10px'}} onClick={() => handleEdit(item)}>{t('edit')}</button>
+                                <button className="btn btn-danger" style={{width:'80px',height:'40px'}} onClick={() => handleDelete(item.id)}>{t('delete')}</button>
                                 </div>
                               </td>
                             </>
@@ -331,7 +335,7 @@ const handleSave = async () => {
           <div className="modal-dialog" style={{maxWidth:'500px',margin:'10% auto',backgroundColor:'white',padding:'20px',borderRadius:'5px'}}>
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Create Post</h5>
+                <h5 className="modal-title">{t('create_post')}</h5>
                 <button type="button" className="close" onClick={()=>setShowCreate(false)}>
                   <span aria-hidden="true">&times;</span>
                 </button>
@@ -341,7 +345,7 @@ const handleSave = async () => {
                   type="text"
                   value={Caption}
                   onChange={(e)=>setCaption(e.target.value)}
-                  placeholder="Enter caption"
+                  placeholder="Enter Caption"
                   className="form-control mb-2"
                 />
                 <input
@@ -365,16 +369,16 @@ const handleSave = async () => {
                 />
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={()=>setShowCreate(false)}>Cancel</button>
-                  <button type="button" className="btn btn-primary" onClick={handleCreate}>Save</button>
+                  <button type="button" className="btn btn-secondary" onClick={()=>setShowCreate(false)}>{t('cancel')}</button>
+                  <button type="button" className="btn btn-primary" onClick={handleCreate}>{t('save')}</button>
                 </div>
               </div>
           </div>
-        </div>   
+        </div>  
       )}
       <Footer />
     </div>
   );
 }
-
+ 
 export default Post;

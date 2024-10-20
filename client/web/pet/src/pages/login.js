@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import AuthContext from '../context/AuthProvider';
 import './css/login.css';
 import logo from '../image/petlogo.png';
@@ -19,6 +19,17 @@ const Login = () => {
   const { setAuth } = useContext(AuthContext);
   const { t, i18n } = useTranslation();
 
+  useEffect(() => {
+    const savedUserInfo = localStorage.getItem("userInfo");
+    const savedUserToken = localStorage.getItem("userToken");
+    if (savedUserInfo && savedUserToken) {
+      setUserInfo(JSON.parse(savedUserInfo));
+      setUserToken(savedUserToken);
+      setAuth({ token: savedUserToken, userInfo: JSON.parse(savedUserInfo) });
+      setSuccess(true);
+    }
+  }, [setAuth]);
+
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng); // Change language function
   };
@@ -36,12 +47,12 @@ const Login = () => {
       if (userInfo.token) {
         setUserToken(userInfo.token);
         setUserInfo(userInfo);
-        sessionStorage.setItem("userInfo", JSON.stringify(userInfo));
-        sessionStorage.setItem("userToken", userInfo.token);
+
+        localStorage.setItem("userInfo", JSON.stringify(userInfo));
+        localStorage.setItem("userToken", userInfo.token);
         setAuth({ token: userInfo.token, userInfo });
         setSuccess(true);
         setError('');
-
       } else {
         throw new Error("Invalid");
       }
@@ -60,9 +71,8 @@ const Login = () => {
   }
 
   return (
-    <body class="hold-transition login-page">
+    <body className="hold-transition login-page">
       <div className="login-box">
-        {/* /.login-logo */}
         <div className="card card-outline card-primary">
           <div className="card-header text-center">
             <center><img src={logo} width="100px" height="100px" /></center>
@@ -100,8 +110,6 @@ const Login = () => {
                     </label>
                   </div>
                 </div>
-                {/* /.col */}
-                {/* /.col */}
               </div>
               <div className="social-auth-links text-center mt-2 mb-3">
                 <button type="submit" className="btn btn-success btn-block">{t('sign_in')}</button>
@@ -115,8 +123,6 @@ const Login = () => {
                 <i className="fab fa-google-plus mr-2" />{t('login_google')}
               </a>
             </div>
-            {/* Language switch split button */}
-            {/* Language switch split button */}
             <div className="language-switcher" style={{ float: 'right' }}>
               <div className="btn-group">
                 <button type="button" className="btn btn-primary">
@@ -131,8 +137,6 @@ const Login = () => {
                 </div>
               </div>
             </div>
-
-            {/* /.social-auth-links */}
             <p className="mb-1">
               <Link to="/register">{t('forgot_password')} </Link>
             </p>
@@ -140,13 +144,9 @@ const Login = () => {
               <Link to="/register" className="text-center">{t('create_account')}</Link>
             </p>
           </div>
-          {/* /.card-body */}
         </div>
-        {/* /.card */}
       </div>
-
     </body>
-
   );
 };
 

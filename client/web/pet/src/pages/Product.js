@@ -6,7 +6,7 @@ import Footer from "../components/Footer";
 import { BASE } from "../context/config";
 import { auth, products } from '../pathApi';
 
-const Item = () => {
+const Products = () => {
   const [data, setData] = useState([]);
   const [error, setError] = useState('');
   const [editId, setEditId] = useState(null);
@@ -14,9 +14,12 @@ const Item = () => {
   const [type, setType] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
+  const [UserId, setUserId]=useState('');
   const [image, setImage] = useState(null);
   const [success, setSuccess] = useState('');
   const [showCreate, setShowCreate] = useState(false);
+  const [search, setSearch] = useState('');
+  const [original, setOriginal] = useState([]);
 
   useEffect(() => {
     fetchData();
@@ -31,7 +34,7 @@ const Item = () => {
 
   const fetchData = async () => {
     try {
-      const token = sessionStorage.getItem('userToken');
+      const token = localStorage.getItem('userToken');
       if (!token) {
         throw new Error('No token found');
       }
@@ -43,6 +46,7 @@ const Item = () => {
       });
 
       setData(res.data);
+      setOriginal(res.data);
       console.log(res);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -52,7 +56,7 @@ const Item = () => {
 
   const handleCreate = async () => {
     try {
-      const token = sessionStorage.getItem('userToken');
+      const token = localStorage.getItem('userToken');
       if (!token) {
         throw new Error('Invalid data');
       }
@@ -62,6 +66,7 @@ const Item = () => {
       formData.append('type', type);
       formData.append('price', price);
       formData.append('description', description);
+      formData.append('userId',UserId);
 
       if (image) {
         formData.append('images', image);
@@ -79,6 +84,7 @@ const Item = () => {
       setType('');
       setPrice('');
       setDescription('');
+      setUserId('');
       setImage(null);
       setSuccess('Create Success');
       setShowCreate(false);
@@ -90,7 +96,7 @@ const Item = () => {
 
   const handleDelete = async (id) => {
     try {
-      const token = sessionStorage.getItem('userToken');
+      const token = localStorage.getItem('userToken');
       if (!token) {
         throw new Error('No token found');
       }
@@ -118,7 +124,7 @@ const Item = () => {
 
   const handleSave = async () => {
     try {
-      const token = sessionStorage.getItem('userToken');
+      const token = localStorage.getItem('userToken');
       if (!token || !editId) {
         throw new Error('No token or data found');
       }
@@ -131,6 +137,8 @@ const Item = () => {
 
       if (image) {
         formData.append('images', image);
+      }else{
+        formData.append('images',new File([],data.find(item=>item.id===editId).images[0].imageUrl.split('/').pop()))
       }
 
       console.log('Updating data with:', {
@@ -141,7 +149,7 @@ const Item = () => {
         image: image ? image.name : 'No new image'
       });
 
-      const response = await axios.put(`${BASE}/products/${editId}`, formData, {
+      const response = await axios.put(`${auth.updateUser}/products/${editId}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -160,6 +168,7 @@ const Item = () => {
       } : item);
 
       setData(updatedData);
+      setOriginal(updatedData);
       setEditId(null);
       setName('');
       setType('');
@@ -171,6 +180,17 @@ const Item = () => {
       console.error('Error updating data: ', error);
       setError('Error updating data');
     }
+  };
+
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearch(value);
+    const searchedUsers = value ? original.filter(data =>
+      data.name.toLowerCase().includes(value.toLowerCase()) ||
+      data.description.toLowerCase().includes(value.toLowerCase()) ||
+      data.type.toLowerCase().includes(value.toLowerCase())
+    ) : original;
+    setData(searchedUsers);
   };
 
   return (
@@ -185,7 +205,17 @@ const Item = () => {
                 <div className="card-header">
                   <div className="d-flex justify-content-between align-items-center">
                     <h3 className="card-title" style={{ fontWeight: 'bold', fontSize: '28px' }}>Products</h3>
-                    <button className="btn btn-primary" onClick={() => setShowCreate(true)}>Create</button>
+                    <div className="d-flex">
+                      <input
+                        className="form-control form-control-sidebar"
+                        type="search"
+                        placeholder="Search"
+                        aria-label="Search"
+                        value={search}
+                        onChange={handleSearch}
+                      />
+                      <button className="btn btn-primary" onClick={() => setShowCreate(true)}>Create</button>
+                    </div>
                   </div>
                 </div>
                 <div className="card-body">
@@ -198,7 +228,7 @@ const Item = () => {
                         <th>Type</th>
                         <th>Price</th>
                         <th>Description</th>
-                        <th>Images</th>
+                        <th style={{width:'350px'}}>Images</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
@@ -212,7 +242,7 @@ const Item = () => {
                                   type="text" 
                                   value={name} 
                                   onChange={(e) => setName(e.target.value)} 
-                                  placeholder="Edit name"
+                                  placeholder="Edit name"                             
                                 />
                               </td>
                               <td>
@@ -265,8 +295,11 @@ const Item = () => {
                                 )}
                               </td>
                               <td>
-                                <button className="btn btn-block btn-primary" style={{marginRight:'10px'}} onClick={() => handleEdit(item)}>Edit</button>
-                                <button className="btn btn-block btn-danger" onClick={() => handleDelete(item.id)}>Delete</button>
+                                <div style={{display:'flex',alignItems:'center'}}>
+                                  <button className="btn btn-primary" style={{marginRight:'10px'}} onClick={() => handleEdit(item)}>Edit</button>
+                                  <button className="btn btn-danger" onClick={() => handleDelete(item.id)}>Delete</button>
+                                </div>
+                                
                               </td>
                             </>
                           )}
@@ -282,10 +315,10 @@ const Item = () => {
       </section>
       {showCreate && (
         <div className="modal" style={{display:'block',backgroundColor:'rgba(0,0,0,0.5',position:'fixed',top:0,left:0,right:0,bottom:0,zIndex:999}}>
-          <div className="modal-dialog" style={{maxWidth:'500px',margin:'10% auto',backgroundColor:'white',padding:'20px',borderRadius:'5px'}}>
+          <div className="modal-dialog" style={{maxWidth:'500px',margin:'5% auto',backgroundColor:'white',padding:'20px',borderRadius:'5px'}}>
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Create Item</h5>
+                <h5 className="modal-title">Create Product</h5>
                 <button type="button" className="close" onClick={()=>setShowCreate(false)}>&times;</button>
               </div>
               <div className="modal-body">
@@ -294,29 +327,41 @@ const Item = () => {
                   value={name} 
                   onChange={(e) => setName(e.target.value)} 
                   placeholder="Enter name"
+                  className="form-control mb-2"
                 />
                 <input 
                   type="text" 
                   value={type} 
                   onChange={(e) => setType(e.target.value)} 
                   placeholder="Enter type"
+                  className="form-control mb-2"
                 />
                 <input 
                   type="number" 
                   value={price} 
                   onChange={(e) => setPrice(e.target.value)} 
                   placeholder="Enter price"
+                  className="form-control mb-2"
                 />
                 <input 
                   type="text" 
                   value={description} 
                   onChange={(e) => setDescription(e.target.value)} 
                   placeholder="Enter description"
+                  className="form-control mb-2"
+                />
+                <input
+                  type="text"
+                  value={UserId}
+                  onChange={(e)=>setUserId(e.target.value)}
+                  placeholder="Enter UserId"
+                  className="form-control mb-2"
                 />
                 <input 
                   type="file" 
                   onChange={(e) => setImage(e.target.files[0])}
-                  placeholder="Upload Image"
+                  aria-label="Upload Image"
+                  className="form-control mb-2"
                 />
               </div>
               <div className="modal-footer">
@@ -332,4 +377,4 @@ const Item = () => {
   );
 };
 
-export default Item;
+export default Products;
