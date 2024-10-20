@@ -13,6 +13,7 @@ import Product from './pages/Product';
 import Hospital from './pages/Hospital';
 import Doctor from './pages/Doctor';
 import Forms from './pages/Forms';
+import Profile from './pages/Profile';
 
 
 function App() {
@@ -90,6 +91,12 @@ function App() {
               path="register"
               element={
                   <Register/>
+              }
+            />
+            <Route
+              path="profile"
+              element={
+                <Profile/>
               }
             />
           </Routes>

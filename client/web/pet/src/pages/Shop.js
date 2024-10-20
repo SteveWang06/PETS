@@ -1,28 +1,29 @@
-import React, {useState,useEffect} from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import Header from "../components/Header";
 import SideNav from "../components/SideNav";
 import Footer from '../components/Footer';
-import {BASE_URL} from "../context/config";
 
-const Shop=()=>{
-    const [search, setSearch]=useState('');
-    const [currentPage,setCurrentPage]=useState(1);
-    const [postsPerPage]=useState(10);
-    const [original,setOriginal]=useState([]);
+const Shop = () => {
+    const [selected, setSelected] = useState('Processing'); 
 
-    // const handleSearch=(e)=>{
-    //     const value=e.target.value;
-    //     setSearch(value);
-    //     const searchUsers=value?original.filter(user=>
-    //         user
-    //     )
-    // }
+    const categories = ['Processing', 'Accepted'];
 
-    return(
+    const acceptedData = [
+        { name: 'John Doe', address: '123 Main St' },
+        { name: 'Jane Smith', address: '456 Elm St' },
+        { name: 'Michael Johnson', address: '789 Oak St' },
+    ];
+
+    const processingData = [
+        { name: 'Alice Brown', address: '321 Maple St' },
+        { name: 'Bob White', address: '654 Pine St' },
+        { name: 'Cathy Green', address: '987 Cedar St' },
+    ];
+
+    return (
         <div>
-            <Header/>
-            <SideNav/>
+            <Header />
+            <SideNav />
             <section className="content-wrapper">
                 <div className="container-fluid">
                     <div className="row">
@@ -30,20 +31,74 @@ const Shop=()=>{
                             <div className="card">
                                 <div className="card-header">
                                     <div className="d-flex justify-content-between align-items-center">
-                                        <h3 className="card-title" style={{fontWeight:'bold',fontSize:'28px'}}>Shop</h3>
-                                        <div className="d-flex">
-
-                                        </div>
+                                        <h3 className="card-title" style={{ fontWeight: 'bold', fontSize: '28px' }}>Shop</h3>
                                     </div>
+                                </div>
+                                <div className="card-body">
+                                    {/* Selection Header */}
+                                    <ul style={{ display: 'flex', listStyle: 'none', padding: 0 }}>
+                                        {categories.map((category) => (
+                                            <li
+                                                key={category}
+                                                onClick={() => setSelected(category)}
+                                                style={{
+                                                    marginRight: '20px',
+                                                    cursor: 'pointer',
+                                                    color: selected === category ? 'blue' : 'black',
+                                                    fontWeight: selected === category ? 'bold' : 'normal'
+                                                }}
+                                            >
+                                                {category}
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    {selected === 'Accepted' && (
+                                        <table className="table table-bordered" style={{ marginTop: '20px' }}>
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Address</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {acceptedData.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td>{item.name}</td>
+                                                        <td>{item.address}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    )}
+
+                                    {selected === 'Processing' && (
+                                        <table className="table table-bordered" style={{ marginTop: '20px' }}>
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Address</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {processingData.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td>{item.name}</td>
+                                                        <td>{item.address}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    )}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
-            <Footer/>
+            <Footer />
         </div>
     );
-}
+};
 
 export default Shop;
