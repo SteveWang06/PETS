@@ -21,8 +21,8 @@ public class RoleUpdateRequestController {
 
   @Operation(summary = "Create Role Update Request", description = "Create a new role update request")
   @PostMapping
-  public RoleUpdateRequest createRoleUpdateRequest(@RequestParam("userId") Long userId, @RequestParam("requestedRole") RoleEnum requestedRole) {
-    return roleUpdateRequestService.createRoleUpdateRequest(userId, requestedRole);
+  public RoleUpdateRequest createRoleUpdateRequest(@RequestParam("userId") Long userId, @RequestParam("requestedRole") RoleEnum requestedRole, @RequestParam("address") String address) {
+    return roleUpdateRequestService.createRoleUpdateRequest(userId, requestedRole, address);
   }
 
   @Operation(summary = "Get Pending Role Update Requests", description = "Retrieve all pending role update requests")

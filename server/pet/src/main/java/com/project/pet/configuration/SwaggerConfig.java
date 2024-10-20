@@ -38,8 +38,8 @@ import java.util.List;
     ),
     servers = {
         @Server(
-            description = "Local EVN",
-            url = "http://localhost:8080"
+            description = "Production EVN",
+            url = "https://fcupet.com"
         )
     }
 )
