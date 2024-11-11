@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider, PostProvider } from './context/AuthProvider';
+import PrivateRoute from './PrivateRoute';
 import './i18n'
 import Home from "./pages/Home";
 import Login from "./pages/login";
-import { AuthProvider } from './context/AuthProvider';
-import PrivateRoute from './PrivateRoute';
 import Post from './pages/Post';
 import User from './pages/User';
 import Register from './pages/register';
@@ -21,6 +21,7 @@ function App() {
     <div className="wrapper">
       <BrowserRouter>
         <AuthProvider>
+          <PostProvider>
           <Routes>
             <Route path="/" element={<Login />} />
             <Route
@@ -100,6 +101,7 @@ function App() {
               }
             />
           </Routes>
+          </PostProvider>
         </AuthProvider>
       </BrowserRouter>
     </div>

@@ -3,11 +3,10 @@ import axios from 'axios';
 import Header from "../components/Header";
 import SideNav from "../components/SideNav";
 import Footer from "../components/Footer";
-import { BASE_URL } from "../context/config";
 import { auth } from '../pathApi';
 import { useTranslation } from 'react-i18next';
  
-function User() {
+const User=()=> {
   const { t, i18n } = useTranslation();
   const [users, setUsers] = useState([]);
   const [error, setError] = useState('');
@@ -43,7 +42,7 @@ function User() {
         throw new Error('No token found');
       }
  
-      const res = await axios.get(`${BASE_URL}/user`, {
+      const res = await axios.get(`${auth.updateUser}/user`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -69,7 +68,7 @@ function User() {
  
       console.log(newUser);
  
-      await axios.post(`${BASE_URL}/register`, newUser, {
+      await axios.post(`${auth.updateUser}/register`, newUser, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -114,7 +113,7 @@ function User() {
         formData.append('image', image);
       }
       else {
-        formData.append('images', new File([], users.find(item => item.id === editId).avatar.imageUrl.split('/').pop()));
+        formData.append('image', new File([], users.find(item => item.id === editId).avatar.imageUrl.split('/').pop()));
       }
  
       const res = await axios.put(`${auth.updateUser}/${editId}`, formData, {
@@ -135,6 +134,7 @@ function User() {
         image: image ? URL.createObjectURL(image) : user.avatar.imageUrl,
       } : user);
  
+      fetchUsers();
       setUsers(updatedData);
       setOriginal(updatedData);
       setEditId(null);
@@ -152,11 +152,11 @@ function User() {
  
   const handleDelete = async (id) => {
     try {
-      const token = sessionStorage.getItem('userToken');
+      const token = localStorage.getItem('userToken');
       if (!token) {
         throw new Error('No token found');
       }
-      await axios.delete(`${BASE_URL}/${id}`, {
+      await axios.delete(`${auth.updateUser}/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -175,11 +175,12 @@ function User() {
     const value = e.target.value;
     setSearch(value);
     const searchedUsers = value ? original.filter(user =>
-      user.userName.toLowerCase().includes(value.toLowerCase()) ||
-      user.email.toLowerCase().includes(value.toLowerCase())
+      (user.userName && user.userName.toLowerCase().includes(value.toLowerCase())) ||
+      (user.email && user.email.toLowerCase().includes(value.toLowerCase())) ||
+      (user.address && user.address.toLowerCase().includes(value.toLowerCase()))
     ) : original;
     setUsers(searchedUsers);
-  };
+  };  
  
   const indexOfLastUser = currentPage * postsPerPage;
   const indexOfFirstUser = indexOfLastUser - postsPerPage;
@@ -209,7 +210,7 @@ function User() {
                 <div className="card-header">
                   <div className="d-flex justify-content-between align-items-center">
                     <h3 className="card-title" style={{ fontWeight: 'bold', fontSize: '28px' }}>{t('user')}</h3>
-                    <div className="d-flex">
+                    <div className="d-flex justify-content-between" style={{ paddingRight: '0.5cm' }}>
                       <input
                         className="form-control form-control-sidebar"
                         type="search"
@@ -218,7 +219,13 @@ function User() {
                         value={search}
                         onChange={handleSearch}
                       />
-                      <button className="btn btn-primary" onClick={() => setShowCreate(true)}>{t('create')}</button>
+                      <button
+                        className="btn btn-primary "
+                        style={{ width:'100px'}}
+                        onClick={() => setShowCreate(true)}
+                      >
+                      {t('create')}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -293,7 +300,7 @@ function User() {
                               <td>{user.birthday}</td>
                               <td>{user.address}</td>
                               <td>
-                                <img src={`${BASE_URL}/${user.avatar?.imageUrl}`} alt="User" style={{ width: '50px', height: '50px' }} />
+                                <img src={`${auth.updateUser}/${user.avatar?.imageUrl}`} alt="User" style={{ width: '50px', height: '50px' }} />
                               </td>
                               <td>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -338,21 +345,21 @@ function User() {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Enter Username"
+                  placeholder={t('enter_username')}
                   className="form-control mb-2"
                 />
                 <input
                   type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter Email"
+                  placeholder={t('enter_email')}
                   className="form-control mb-2"
                 />
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter Password"
+                  placeholder={t('enter_password')}
                   className="form-control mb-2"
                 />
               </div>
