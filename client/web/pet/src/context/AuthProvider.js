@@ -12,4 +12,15 @@ export const AuthProvider=({ children })=>{
     )
 }
 
-export default AuthContext;
+const PostContext = createContext({});
+export const PostProvider=({ children })=>{
+    const [postLength, setPostLength] = useState(0);
+
+    return(
+        <PostContext.Provider value={{postLength, setPostLength}}>
+            {children}
+        </PostContext.Provider>
+    );
+};
+
+export {AuthContext, PostContext};

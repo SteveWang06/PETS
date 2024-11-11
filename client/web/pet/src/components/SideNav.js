@@ -1,7 +1,7 @@
 import React, {useContext}from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import AuthContext from '../context/AuthProvider';
+import {AuthContext} from '../context/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 
 function SideNav() {

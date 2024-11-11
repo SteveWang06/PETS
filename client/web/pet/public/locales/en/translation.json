@@ -49,5 +49,15 @@
   "other":"Other",
   "create_post":"Create Post",
   "search":"Search",
-  "address":"Address"
+  "address":"Address",
+  "enter_username":"Enter Username",
+  "enter_email":"Enter Email",
+  "enter_password":"Enter Password",
+  "enter_caption":"Enter Caption",
+  "enter_userid":"Enter UserId",
+  "enter_kind":"Enter Kind",
+  "hospital_name":"Name",
+  "hospital_address":"Address",
+  "processing":"Processing",
+  "accepted":"Accepted"
 }

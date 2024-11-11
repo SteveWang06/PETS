@@ -48,5 +48,15 @@
   "dog":"狗",
   "other":"其他",
   "create_post":"創建文章",
-  "search":"搜尋"
+  "search":"搜尋",
+  "enter_username":"輸入用戶名稱",
+  "enter_email":"輸入電子郵件",
+  "enter_password":"輸入密碼",
+  "enter_caption":"輸入標題",
+  "enter_userid":"輸入用戶名稱",
+  "enter_kind":"輸入種類",
+  "hospital_name":"名稱",
+  "hospital_address":"地址",
+  "processing":"審核中",
+  "accepted":"已通過審核"
 }

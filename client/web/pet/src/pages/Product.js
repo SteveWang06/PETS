@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Header from "../components/Header"; 
-import SideNav from "../components/SideNav"; 
-import Footer from "../components/Footer"; 
-import { BASE } from "../context/config";
-import { auth, products } from '../pathApi';
+import Header from "../components/Header";
+import SideNav from "../components/SideNav";
+import Footer from "../components/Footer";
+import { products } from '../pathApi';
 
 const Products = () => {
   const [data, setData] = useState([]);
@@ -14,7 +13,7 @@ const Products = () => {
   const [type, setType] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
-  const [UserId, setUserId]=useState('');
+  const [UserId, setUserId] = useState('');
   const [image, setImage] = useState(null);
   const [success, setSuccess] = useState('');
   const [showCreate, setShowCreate] = useState(false);
@@ -66,16 +65,15 @@ const Products = () => {
       formData.append('type', type);
       formData.append('price', price);
       formData.append('description', description);
-      formData.append('userId',UserId);
+      formData.append('userId', UserId);
 
       if (image) {
         formData.append('images', image);
       }
 
-      await axios.post(`${BASE}/products`, formData, {
+      await axios.post(`${products.getAllProducts}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
         }
       });
 
@@ -100,7 +98,7 @@ const Products = () => {
       if (!token) {
         throw new Error('No token found');
       }
-      await axios.delete(`${BASE}/products/${id}`, {
+      await axios.delete(`${products.getAllProducts}/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -137,8 +135,9 @@ const Products = () => {
 
       if (image) {
         formData.append('images', image);
-      }else{
-        formData.append('images',new File([],data.find(item=>item.id===editId).images[0].imageUrl.split('/').pop()))
+      } else {
+        const existingImageUrl = data.find(item => item.id === editId)?.imageUrl?.[0] || '';
+        formData.append('images', new File([], existingImageUrl.split('/').pop()));
       }
 
       console.log('Updating data with:', {
@@ -149,10 +148,9 @@ const Products = () => {
         image: image ? image.name : 'No new image'
       });
 
-      const response = await axios.put(`${auth.updateUser}/products/${editId}`, formData, {
+      const response = await axios.put(`${products.getAllProducts}/${editId}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
         }
       });
 
@@ -164,9 +162,10 @@ const Products = () => {
         type,
         price,
         description,
-        images: image ? [{ ...item.images[0], imageUrl: `${BASE}/api/${image.name}` }] : item.images
+        images: image ? [{ ...item.imageUrl[0], imageUrl: `${image.name}` }] : item.imageUrl
       } : item);
 
+      fetchData();
       setData(updatedData);
       setOriginal(updatedData);
       setEditId(null);
@@ -175,7 +174,7 @@ const Products = () => {
       setPrice('');
       setDescription('');
       setImage(null);
-      setSuccess('Edit Success')
+      setSuccess('Edit Success');
     } catch (error) {
       console.error('Error updating data: ', error);
       setError('Error updating data');
@@ -214,13 +213,13 @@ const Products = () => {
                         value={search}
                         onChange={handleSearch}
                       />
-                      <button className="btn btn-primary" onClick={() => setShowCreate(true)}>Create</button>
+                      <button className="btn btn-primary" style={{ width: '100px' }} onClick={() => setShowCreate(true)}>Create</button>
                     </div>
                   </div>
                 </div>
                 <div className="card-body">
                   {error && <p style={{ color: 'red' }}>{error}</p>}
-                  {success && <p style={{color: 'green'}}>{success}</p>}
+                  {success && <p style={{ color: 'green' }}>{success}</p>}
                   <table id="example2" className="table table-bordered table-hover">
                     <thead>
                       <tr>
@@ -228,7 +227,7 @@ const Products = () => {
                         <th>Type</th>
                         <th>Price</th>
                         <th>Description</th>
-                        <th style={{width:'350px'}}>Images</th>
+                        <th style={{ width: '350px' }}>Images</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
@@ -238,40 +237,44 @@ const Products = () => {
                           {editId === item.id ? (
                             <>
                               <td>
-                                <input 
-                                  type="text" 
-                                  value={name} 
-                                  onChange={(e) => setName(e.target.value)} 
-                                  placeholder="Edit name"                             
+                                <input
+                                  type="text"
+                                  value={name}
+                                  onChange={(e) => setName(e.target.value)}
+                                  placeholder="Edit name"
+                                  style={{ width: '50%', margin: '0 auto', display: 'block' }}
                                 />
                               </td>
                               <td>
-                                <input 
-                                  type="text" 
-                                  value={type} 
-                                  onChange={(e) => setType(e.target.value)} 
+                                <input
+                                  type="text"
+                                  value={type}
+                                  onChange={(e) => setType(e.target.value)}
                                   placeholder="Edit type"
+                                  style={{ width: '50%', margin: '0 auto', display: 'block' }}
                                 />
                               </td>
                               <td>
-                                <input 
-                                  type="number" 
-                                  value={price} 
-                                  onChange={(e) => setPrice(e.target.value)} 
+                                <input
+                                  type="number"
+                                  value={price}
+                                  onChange={(e) => setPrice(e.target.value)}
                                   placeholder="Edit price"
+                                  style={{ width: '50%', margin: '0 auto', display: 'block' }}
                                 />
                               </td>
                               <td>
-                                <input 
-                                  type="text" 
-                                  value={description} 
-                                  onChange={(e) => setDescription(e.target.value)} 
+                                <input
+                                  type="text"
+                                  value={description}
+                                  onChange={(e) => setDescription(e.target.value)}
                                   placeholder="Edit description"
+                                  style={{ width: '50%', margin: '0 auto', display: 'block' }}
                                 />
                               </td>
                               <td>
-                                <input 
-                                  type="file" 
+                                <input
+                                  type="file"
                                   onChange={(e) => setImage(e.target.files[0])}
                                   placeholder="Edit Image"
                                 />
@@ -287,19 +290,21 @@ const Products = () => {
                               <td>{item.price}</td>
                               <td>{item.description}</td>
                               <td>
-                                {item.images && item.images.length>0 && (
-                                  <img src={`${BASE}/${item.images[0].imageUrl}`}
-                                       alt="Item"
-                                       style={{width:'100px',height:'100px'}}
+                                {item.imageUrl && item.imageUrl.length > 0 && (
+                                  <img
+                                  src={`${products.getAllProducts}/${item.imageUrl[0]}`}
+                                    alt="Item"
+                                    style={{ width: '100px', height: '100px' }}
                                   />
                                 )}
                               </td>
+
                               <td>
-                                <div style={{display:'flex',alignItems:'center'}}>
-                                  <button className="btn btn-primary" style={{marginRight:'10px'}} onClick={() => handleEdit(item)}>Edit</button>
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                  <button className="btn btn-primary" style={{ marginRight: '10px' }} onClick={() => handleEdit(item)}>Edit</button>
                                   <button className="btn btn-danger" onClick={() => handleDelete(item.id)}>Delete</button>
                                 </div>
-                                
+
                               </td>
                             </>
                           )}
@@ -314,58 +319,58 @@ const Products = () => {
         </div>
       </section>
       {showCreate && (
-        <div className="modal" style={{display:'block',backgroundColor:'rgba(0,0,0,0.5',position:'fixed',top:0,left:0,right:0,bottom:0,zIndex:999}}>
-          <div className="modal-dialog" style={{maxWidth:'500px',margin:'5% auto',backgroundColor:'white',padding:'20px',borderRadius:'5px'}}>
+        <div className="modal" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999 }}>
+          <div className="modal-dialog" style={{ maxWidth: '500px', margin: '5% auto', backgroundColor: 'white', padding: '20px', borderRadius: '5px' }}>
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">Create Product</h5>
-                <button type="button" className="close" onClick={()=>setShowCreate(false)}>&times;</button>
+                <button type="button" className="close" onClick={() => setShowCreate(false)}>&times;</button>
               </div>
               <div className="modal-body">
-                <input 
-                  type="text" 
-                  value={name} 
-                  onChange={(e) => setName(e.target.value)} 
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   placeholder="Enter name"
                   className="form-control mb-2"
                 />
-                <input 
-                  type="text" 
-                  value={type} 
-                  onChange={(e) => setType(e.target.value)} 
+                <input
+                  type="text"
+                  value={type}
+                  onChange={(e) => setType(e.target.value)}
                   placeholder="Enter type"
                   className="form-control mb-2"
                 />
-                <input 
-                  type="number" 
-                  value={price} 
-                  onChange={(e) => setPrice(e.target.value)} 
+                <input
+                  type="number"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
                   placeholder="Enter price"
                   className="form-control mb-2"
                 />
-                <input 
-                  type="text" 
-                  value={description} 
-                  onChange={(e) => setDescription(e.target.value)} 
+                <input
+                  type="text"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                   placeholder="Enter description"
                   className="form-control mb-2"
                 />
                 <input
                   type="text"
                   value={UserId}
-                  onChange={(e)=>setUserId(e.target.value)}
+                  onChange={(e) => setUserId(e.target.value)}
                   placeholder="Enter UserId"
                   className="form-control mb-2"
                 />
-                <input 
-                  type="file" 
+                <input
+                  type="file"
                   onChange={(e) => setImage(e.target.files[0])}
                   aria-label="Upload Image"
                   className="form-control mb-2"
                 />
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={()=>setShowCreate(false)}>Close</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowCreate(false)}>Close</button>
                 <button type="button" className="btn btn-primary" onClick={handleCreate}>Create</button>
               </div>
             </div>

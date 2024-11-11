@@ -1,90 +1,128 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import Header from "../components/Header";
 import SideNav from "../components/SideNav";
 import Footer from "../components/Footer";
-import { BASE_URL } from "../context/config";
-import {IMAGE} from "../context/config";
+import { auth, kind } from "../pathApi";
 import { useTranslation } from 'react-i18next';
- 
-const Post = () => {
+import { PostContext } from '../context/AuthProvider';
+
+const Post = (post) => {
   const { t, i18n } = useTranslation();
   const [data, setData] = useState([]);
   const [error, setError] = useState('');
   const [editId, setEditId] = useState(null);
   const [Caption, setCaption] = useState('');
-  const [UserId, setUserId] = useState('');
   const [Kind, setKind] = useState('');
   const [Image, setImage] = useState(null);
-  const [filter, setFilter]=useState('');
-  const [original, setOriginal]=useState([]);
-  const [success, setSuccess]=useState('');
-  const [showCreate, setShowCreate]=useState(false);
-  const [search, setSearch]=useState('');
-  const [currentPage,setCurrentPage]=useState(1);
-  const [postsPerPage]=useState(10);
- 
+  const [filter, setFilter] = useState('');
+  const [original, setOriginal] = useState([]);
+  const [success, setSuccess] = useState('');
+  const [showCreate, setShowCreate] = useState(false);
+  const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [postsPerPage] = useState(10);
+  const [kindOption, setKindOption] = useState([]);
+  const [newKind, setNewKind] = useState('');
+  const [selectedKind, setSelectedKind] = useState('');
+  const {setPostLength} = useContext(PostContext);
+
   useEffect(() => {
     fetchData();
-  }, []);
- 
-  useEffect(()=>{
-    if(success){
-      const timer=setTimeout(()=>setSuccess(''),3000);
-      return ()=>clearTimeout(timer);
+    fetchKind();
+  },[]);
+
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => setSuccess(''), 3000);
+      return () => clearTimeout(timer);
     }
-  },[success]);
- 
+  }, [success]);
+
   const fetchData = async () => {
     try {
       const token = localStorage.getItem('userToken');
       if (!token) {
         throw new Error('No token found');
       }
- 
-      const res = await axios.get(`${BASE_URL}/post/`, {
+
+      const res = await axios.get(`${auth.updateUser}/post/`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
- 
+
       setData(res.data);
       setOriginal(res.data);
       console.log(res.data);
+      setPostLength(res.data.length);
     } catch (error) {
       console.error('Error fetching data:', error);
       setError('Error fetching data');
     }
   };
- 
-  const handleCreate = async () => {
+
+  const fetchKind = async () => {
+    const token = localStorage.getItem('userToken');
     try {
-      const token = localStorage.getItem('userToken');
-      if (!token) {
-        throw new Error('Invalid data');
-      }
- 
-      const formData = new FormData();
-      formData.append('caption', Caption);
-      formData.append('kind', Kind);
-      formData.append('userId', UserId);
- 
-      if (Image) {
-        formData.append('images', Image);
-      }
- 
-      await axios.post(`${BASE_URL}/post/`, formData, {
+      const res = await axios.get(kind.getKind,{
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setKindOption(res.data);
+    }catch(error){
+      setError('Error fetching kind');
+      console.error('Fetch kinds error:',error);
+    }
+  };
+
+  const handleCreateKind = async () => {
+    const token = localStorage.getItem('userToken');
+    const formData = new FormData();
+    formData.append('kind',newKind);
+    try {
+      await axios.post(`${kind.getKind}create`, formData,{
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         }
       });
- 
+
+      fetchKind();
+      setNewKind('');
+    } catch (error) {
+      console.error('Error creating kind:', error);
+    }
+  };
+
+  const handleCreate = async () => {
+    const token = localStorage.getItem('userToken');
+    const userId = localStorage.getItem('userId');
+    try {
+      if(newKind && !kindOption.some((k)=>k.kind=== newKind)){
+        await handleCreateKind()
+      }
+
+      const formData = new FormData();
+      formData.append('caption', Caption);
+      formData.append('kind', newKind||selectedKind);
+      formData.append('userId', userId);
+
+      if (Image) {
+        formData.append('images', Image);
+      }
+
+      await axios.post(`${auth.updateUser}/post/`, formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
       fetchData();
       setCaption('');
-      setUserId('');
       setKind('');
       setImage(null);
+      setSelectedKind('');
       setSuccess('Create Success');
       setShowCreate(false);
     } catch (error) {
@@ -92,80 +130,87 @@ const Post = () => {
       setError('Error creating data');
     }
   };
- 
+
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem('userToken');
       if (!token) {
         throw new Error('No token found');
       }
-      await axios.delete(`${BASE_URL}/post/${id}`, {
+      await axios.delete(`${auth.updateUser}/post/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
- 
+
       setData(prevData => prevData.filter(item => item.id !== id));
-      setOriginal(prevData=>prevData.filter(item=>item.id!==id));
+      setOriginal(prevData => prevData.filter(item => item.id !== id));
       setSuccess('Delete Success');
     } catch (error) {
       console.error('Error deleting data: ', error);
       setError('Error deleting data');
     }
   };
- 
+
   const handleEdit = (item) => {
     setEditId(item.id);
     setCaption(item.caption);
-    setUserId(item.userId);
     setKind(item.postKind);
+    setImage(null);
   };
- 
-const handleSave = async () => {
+
+  const handleSave = async () => {
     try {
       const token = localStorage.getItem('userToken');
       if (!token || !editId) {
         throw new Error('No token or data found');
       }
- 
+
+      if(newKind && !kindOption.some((k)=>k.kind === newKind)){
+        await handleCreateKind();
+      }
+
       const formData = new FormData();
       formData.append('caption', Caption);
-      formData.append('kind', Kind);
- 
+      formData.append('kind', newKind||Kind);
+
       if (Image) {
         formData.append('images', Image);
-      } else {
-        formData.append('images', new File([], data.find(item => item.id === editId).postImages[0].imageUrl.split('/').pop()));
-      }
- 
+    } else {
+        const existingImage = data.find(item => item.id === editId).postImages[0].imageUrl;
+        formData.append('images', new File([], existingImage.split('/').pop()));
+    }
+
       console.log('Updating data with:', {
         caption: Caption,
-        kind: Kind,
+        kind: Kind || newKind,
         image: Image ? Image.name : 'No new image'
       });
- 
-      const response = await axios.put(`${BASE_URL}/post/${editId}`, formData, {
+
+      const response = await axios.put(`${auth.updateUser}/post/${editId}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         }
       });
- 
+
       console.log('Server response:', response);
- 
+
       const updatedData = data.map(item => item.id === editId ? {
         ...item,
         caption: Caption,
-        postKind: Kind,
+        kind: Kind || newKind,
         postImages: Image ? [{ ...item.postImages[0], imageUrl: `${Image.name}` }] : item.postImages
       } : item);
- 
+
+
+      fetchData();
+      fetchKind();
       setData(updatedData);
       setOriginal(updatedData);
       setEditId(null);
       setCaption('');
       setKind('');
-      setUserId('');
       setImage(null);
       setSuccess('Edit Success')
     } catch (error) {
@@ -173,43 +218,43 @@ const handleSave = async () => {
       setError('Error updating data');
     }
   };
- 
-  const handleFilter=(e)=>{
-    const selectFilter=e.target.value;
+
+  const handleFilter = (e) => {
+    const selectFilter = e.target.value;
     setFilter(selectFilter);
-    const filteredData=selectFilter ? original.filter(item=>item.postKind===selectFilter) : original;
+    const filteredData = selectFilter ? original.filter(item => item.postKind === selectFilter) : original;
     setData(filteredData);
   };
- 
-  const handleSearch=(e)=>{
-    const value=e.target.value;
+
+  const handleSearch = (e) => {
+    const value = e.target.value;
     setSearch(value);
-    const searchedData=value?original.filter(item=>
-      item.caption.toLowerCase().includes(value.toLowerCase())||
-      item.authorName.toLowerCase().includes(value.toLowerCase())||
+    const searchedData = value ? original.filter(item =>
+      item.caption.toLowerCase().includes(value.toLowerCase()) ||
+      item.authorName.toLowerCase().includes(value.toLowerCase()) ||
       item.postKind.toLowerCase().includes(value.toLowerCase())
-    ):original;
+    ) : original;
     setData(searchedData);
   };
- 
-  const indexOfLastPost=currentPage*postsPerPage;
-  const indexOfFirstPost=indexOfLastPost-postsPerPage;
-  const currentPosts=data.slice(indexOfFirstPost,indexOfLastPost);
- 
-  const pageinate=(pageNumber)=>setCurrentPage(pageNumber);
- 
-  const nextPage=()=>{
-    if(currentPage<Math.ceil(data.length/postsPerPage)){
-      setCurrentPage(currentPage+1);
+
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPosts = data.slice(indexOfFirstPost, indexOfLastPost);
+
+  const pageinate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const nextPage = () => {
+    if (currentPage < Math.ceil(data.length / postsPerPage)) {
+      setCurrentPage(currentPage + 1);
     }
   };
- 
-  const prevPage=()=>{
-    if(currentPage>1){
-      setCurrentPage(currentPage-1);
+
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
     }
   };
- 
+
   return (
     <div>
       <Header />
@@ -222,7 +267,7 @@ const handleSave = async () => {
                 <div className="card-header">
                   <div className="d-flex justify-content-between align-items-center">
                     <h3 className="card-title" style={{ fontWeight: 'bold', fontSize: '28px' }}>{t('post')}</h3>
-                    <div className="d-flex">
+                    <div className="d-flex justify-content-between" style={{ paddingRight: '0.5cm' }}>
                       <input
                         className="form-control form-control-sidebar"
                         type="search"
@@ -231,27 +276,33 @@ const handleSave = async () => {
                         value={search}
                         onChange={handleSearch}
                       />
-                      <button className="btn btn-primary" onClick={() => setShowCreate(true)}>{t('create')}</button>
+                      <button
+                        className="btn btn-primary "
+                        style={{ width: '100px' }}
+                        onClick={() => setShowCreate(true)}
+                      >
+                        {t('create')}
+                      </button>
                     </div>
                   </div>
                 </div>
                 <div className="card-body">
                   {error && <p style={{ color: 'red' }}>{error}</p>}
-                  {success && <p style={{color: 'green'}}>{success}</p>}
+                  {success && <p style={{ color: 'green' }}>{success}</p>}
                   <table id="example2" className="table table-bordered table-hover">
                     <thead>
                       <tr>
                         <th>{t('user_name')}</th>
-                        <th style={{width:'350px'}}>{t('image')}</th>
+                        <th style={{ width: '350px' }}>{t('image')}</th>
                         <th>{t('caption')}</th>
                         <th>{t('kind')}
-                          <div style={{float: 'right'}}>
-                          <select value={filter} onChange={handleFilter} className="form-comtrol">
-                            <option value="">{t('all')}</option>
-                            <option value="cat">{t('cat')}</option>
-                            <option value="dog">{t('dog')}</option>
-                            <option value="other">{t('other')}</option>
-                          </select>
+                          <div style={{ float: 'right' }}>
+                            <select value={filter} onChange={handleFilter}>
+                              <option value="">{t('all')}</option>
+                              {kindOption.map(kind => (
+                                <option key={kind.id} value={kind.kind}>{kind.kind}</option>
+                              ))}
+                            </select>
                           </div>
                         </th>
                         <th>{t('actions')}</th>
@@ -263,12 +314,13 @@ const handleSave = async () => {
                           {editId === item.id ? (
                             <>
                               <td>{item.authorName}</td>
-                              <td>                            
+                              <td>
                                 <input
                                   type="file"
                                   onChange={(e) => setImage(e.target.files[0])}
                                   placeholder="Edit Image"
-                                />
+                                  multiple
+                                />                               
                               </td>
                               <td>
                                 <input
@@ -276,17 +328,23 @@ const handleSave = async () => {
                                   value={Caption}
                                   onChange={(e) => setCaption(e.target.value)}
                                   placeholder="Edit Caption"
-                                  style={{width:'50%', margin:'0 auto', display:'block'}}
+                                  style={{ width: '50%', margin: '0 auto', display: 'block' }}
                                 />
                               </td>
                               <td>
                                 <input
                                   type="text"
-                                  value={Kind}
-                                  onChange={(e) => setKind(e.target.value)}
+                                  value={newKind}
+                                  onChange={(e) => setNewKind(e.target.value)}
                                   placeholder="Edit Kind"
-                                  style={{width:'50%', margin:'0 auto', display:'block'}}
+                                  style={{ width: '50%', margin: '0 auto', display: 'block' }}
+                                  list="kind-options"
                                 />
+                                <datalist id="kind-options">
+                                  {kindOption.map((kind) => (
+                                    <option key={kind.id} value={kind.kind} />
+                                  ))}
+                                </datalist>
                               </td>
                               <td>
                                 <button onClick={handleSave} className="btn btn-primary">Save</button>
@@ -296,19 +354,19 @@ const handleSave = async () => {
                             <>
                               <td>{item.authorName}</td>
                               <td>
-                                {item.postImages && item.postImages.length>0 && (
-                                  <img src={`${BASE_URL}/${item.postImages[0].imageUrl}`}
-                                       alt="Post"
-                                       style={{width:'100px',height:'100px'}}
+                                {item.postImages && item.postImages.length > 0 && (
+                                  <img src={`${auth.updateUser}/${item.postImages[0].imageUrl}`}
+                                    alt="Post"
+                                    style={{ width: '100px', height: '100px' }}
                                   />
                                 )}
                               </td>
                               <td>{item.caption}</td>
                               <td>{item.postKind}</td>
                               <td>
-                                <div style={{display:'flex',alignItems:'center'}}>
-                                <button className="btn btn-primary" style={{width:'80px',height:'40px',marginRight:'10px'}} onClick={() => handleEdit(item)}>{t('edit')}</button>
-                                <button className="btn btn-danger" style={{width:'80px',height:'40px'}} onClick={() => handleDelete(item.id)}>{t('delete')}</button>
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                  <button className="btn btn-primary" style={{ width: '80px', height: '40px', marginRight: '10px' }} onClick={() => handleEdit(item)}>{t('edit')}</button>
+                                  <button className="btn btn-danger" style={{ width: '80px', height: '40px' }} onClick={() => handleDelete(item.id)}>{t('delete')}</button>
                                 </div>
                               </td>
                             </>
@@ -318,11 +376,11 @@ const handleSave = async () => {
                     </tbody>
                   </table>
                   <div className="pagination">
-                    <button onClick={prevPage} className="btn btn-light" disabled={currentPage===1}>&laquo;</button>
-                    {Array.from({length:Math.ceil(data.length/postsPerPage)},(_,index)=>(
-                      <button key={index+1} onClick={()=>pageinate(index+1)} className={`btn ${currentPage===index+1 ? `btn-primary`:'btn-light'}`}>{index+1}</button>
+                    <button onClick={prevPage} className="btn btn-light" disabled={currentPage === 1}>&laquo;</button>
+                    {Array.from({ length: Math.ceil(data.length / postsPerPage) }, (_, index) => (
+                      <button key={index + 1} onClick={() => pageinate(index + 1)} className={`btn ${currentPage === index + 1 ? `btn-primary` : 'btn-light'}`}>{index + 1}</button>
                     ))}
-                    <button onClick={nextPage} className="btn btn-light" disabled={currentPage===Math.ceil(data.length/postsPerPage)}>&raquo;</button>
+                    <button onClick={nextPage} className="btn btn-light" disabled={currentPage === Math.ceil(data.length / postsPerPage)}>&raquo;</button>
                   </div>
                 </div>
               </div>
@@ -331,12 +389,12 @@ const handleSave = async () => {
         </div>
       </section>
       {showCreate && (
-        <div className="modal" style={{display:'block',backgroundColor:'rgba(0,0,0,0.5',position:'fixed',top:0,left:0,right:0,bottom:0,zIndex:999}}>
-          <div className="modal-dialog" style={{maxWidth:'500px',margin:'10% auto',backgroundColor:'white',padding:'20px',borderRadius:'5px'}}>
+        <div className="modal" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999 }}>
+          <div className="modal-dialog" style={{ maxWidth: '500px', margin: '10% auto', backgroundColor: 'white', padding: '20px', borderRadius: '5px' }}>
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">{t('create_post')}</h5>
-                <button type="button" className="close" onClick={()=>setShowCreate(false)}>
+                <button type="button" className="close" onClick={() => setShowCreate(false)}>
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
@@ -344,41 +402,41 @@ const handleSave = async () => {
                 <input
                   type="text"
                   value={Caption}
-                  onChange={(e)=>setCaption(e.target.value)}
-                  placeholder="Enter Caption"
+                  onChange={(e) => setCaption(e.target.value)}
+                  placeholder={t('enter_caption')}
                   className="form-control mb-2"
                 />
                 <input
                   type="text"
-                  value={UserId}
-                  onChange={(e)=>setUserId(e.target.value)}
-                  placeholder="Enter UserId"
+                  value={newKind}
+                  onChange={(e) => setNewKind(e.target.value)}
+                  placeholder={t('enter_kind')}
                   className="form-control mb-2"
+                  list="kind-options"
                 />
-                <input
-                  type="text"
-                  value={Kind}
-                  onChange={(e)=>setKind(e.target.value)}
-                  placeholder="Enter Kind"
-                  className="form-control mb-2"
-                />
+                <datalist id="kind-options">
+                  {kindOption.map((kind) => (
+                    <option key={kind.id} value={kind.kind} />
+                  ))}
+                </datalist>
                 <input
                   type="file"
-                  onChange={(e)=>setImage(e.target.files[0])}
+                  onChange={(e) => setImage(e.target.files[0])}
                   className="form-control mb-2"
+                  multiple
                 />
-                </div>
-                <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={()=>setShowCreate(false)}>{t('cancel')}</button>
-                  <button type="button" className="btn btn-primary" onClick={handleCreate}>{t('save')}</button>
-                </div>
               </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowCreate(false)}>{t('cancel')}</button>
+                <button type="button" className="btn btn-primary" onClick={handleCreate}>{t('save')}</button>
+              </div>
+            </div>
           </div>
-        </div>  
+        </div>
       )}
       <Footer />
     </div>
   );
 }
- 
+
 export default Post;

@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import Header from "../components/Header";
 import SideNav from "../components/SideNav";
 import Footer from '../components/Footer';
+import { useTranslation } from 'react-i18next';
 
 const Hospital = () => {
-    const [selected, setSelected] = useState('Processing'); 
+    const { t, i18n } = useTranslation();
+    const [selected, setSelected] = useState('Processing');
 
     const categories = ['Processing', 'Accepted'];
 
@@ -31,7 +33,7 @@ const Hospital = () => {
                             <div className="card">
                                 <div className="card-header">
                                     <div className="d-flex justify-content-between align-items-center">
-                                        <h3 className="card-title" style={{ fontWeight: 'bold', fontSize: '28px' }}>Hospital</h3>
+                                        <h3 className="card-title" style={{ fontWeight: 'bold', fontSize: '28px' }}>{t('hospital')}</h3>
                                     </div>
                                 </div>
                                 <div className="card-body">
@@ -57,8 +59,8 @@ const Hospital = () => {
                                         <table className="table table-bordered" style={{ marginTop: '20px' }}>
                                             <thead>
                                                 <tr>
-                                                    <th>Name</th>
-                                                    <th>Address</th>
+                                                    <th>{t('hospital_name')}</th>
+                                                    <th>{t('hospital_address')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -76,8 +78,9 @@ const Hospital = () => {
                                         <table className="table table-bordered" style={{ marginTop: '20px' }}>
                                             <thead>
                                                 <tr>
-                                                    <th>Name</th>
-                                                    <th>Address</th>
+                                                    <th>{t('hospital_name')}</th>
+                                                    <th>{t('hospital_address')}</th>
+                                                    <th>Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -85,6 +88,23 @@ const Hospital = () => {
                                                     <tr key={index}>
                                                         <td>{item.name}</td>
                                                         <td>{item.address}</td>
+                                                        <td>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-primary"
+                                                                style={{ width: '80px', height: '40px', marginRight: '10px' }}
+                                                            >
+                                                                Accept
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-secondary"
+                                                                style={{ width: '80px', height: '40px' }}
+                                                            >
+                                                                Cancel
+                                                            </button>
+
+                                                        </td>
                                                     </tr>
                                                 ))}
                                             </tbody>

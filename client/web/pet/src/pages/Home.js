@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Header from "../components/Header"; //介面的上面
 import SideNav from "../components/SideNav"; //介面左邊的menu
 import Footer from "../components/Footer"; //介面的底部
-import axios from "axios";
 import { Link } from "react-router-dom";
-import { BASE_URL } from '../context/config';
 import { useTranslation } from 'react-i18next';
+import { PostContext } from '../context/AuthProvider';
  
 function Home() {
     const { t, i18n } = useTranslation();    
+    const {postLength} = useContext(PostContext);
         return (
             <div>
                 <Header />
@@ -56,7 +56,7 @@ function Home() {
                                     <div className="small-box bg-success">
                                         <div className="inner">
                                             <p>{t('total_mypetpost')}</p>
-                                            <h3>--</h3>
+                                            <h3>{postLength}</h3>
                                         </div>
                                         <div className="icon">
                                             <i className="nav-icon far fa-newspaper" />

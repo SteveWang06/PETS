@@ -1,9 +1,9 @@
 import { useState, useContext, useEffect } from 'react';
-import AuthContext from '../context/AuthProvider';
+import {AuthContext} from '../context/AuthProvider';
 import './css/login.css';
 import logo from '../image/petlogo.png';
 import axios from "axios";
-import { BASE_URL } from "../context/config";
+import { auth } from "../pathApi";
 import { Navigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -37,7 +37,7 @@ const Login = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const res = await axios.post(`${BASE_URL}/login`, {
+      const res = await axios.post(`${auth.updateUser}/login`, {
         email: inputEmail,
         password: inputPassword,
       });
@@ -50,6 +50,7 @@ const Login = () => {
 
         localStorage.setItem("userInfo", JSON.stringify(userInfo));
         localStorage.setItem("userToken", userInfo.token);
+        localStorage.setItem("userId", userInfo.userId);
         setAuth({ token: userInfo.token, userInfo });
         setSuccess(true);
         setError('');
