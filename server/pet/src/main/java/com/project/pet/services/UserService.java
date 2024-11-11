@@ -3,11 +3,7 @@ package com.project.pet.services;
 
 import com.project.pet.dto.SignupDTO;
 import com.project.pet.dto.UserProfileDTO;
-import com.project.pet.models.Post;
-import com.project.pet.models.Product;
-import com.project.pet.models.Role;
-import com.project.pet.models.RoleEnum;
-import com.project.pet.models.User;
+import com.project.pet.models.*;
 import com.project.pet.repository.RoleRepository;
 import com.project.pet.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,4 +67,16 @@ public class UserService implements UserDetailsService {
     List<Product> products = user != null ? user.getProducts() : new ArrayList<>();
     return new UserProfileDTO(user, posts, products);
   }
+
+  public List<Address> findAddressesByRole(RoleEnum roleEnum) {
+    List<User> users = userRepository.findByRoleName(roleEnum);
+    List<Address> addresses = new ArrayList<>();
+
+    for (User user : users) {
+      addresses.addAll(user.getAddresses());
+    }
+
+    return addresses;
+  }
+
 }

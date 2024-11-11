@@ -68,7 +68,9 @@ public class User implements UserDetails {
   @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
   private Role role;
 
-  private  String address;
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  @JsonManagedReference
+  private List<Address> addresses;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -184,13 +186,12 @@ public class User implements UserDetails {
     return this;
   }
 
-  public String getAddress() {
-    return address;
+  public List<Address> getAddresses() {
+    return addresses;
   }
 
-  public User setAddress(String address) {
-    this.address = address;
-    return this;
+  public void setAddresses(List<Address> addresses) {
+    this.addresses = addresses;
   }
 
   @Override
@@ -202,7 +203,7 @@ public class User implements UserDetails {
         ", email='" + email + '\'' +
         ", createdAt=" + createdAt +
         ", updatedAt=" + birthday +
-        ", address=" + address +
+        ", address=" + addresses +
         '}';
   }
 }

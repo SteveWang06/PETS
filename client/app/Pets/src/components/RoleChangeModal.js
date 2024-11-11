@@ -1,35 +1,37 @@
 import React, { useState } from "react";
-import { View, Text, Modal, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, Modal, TouchableOpacity, StyleSheet, TextInput } from "react-native";
 import { handleRequestChangeRole } from "../services/requester/UserRequester";
 import { useDispatch, useSelector } from "react-redux";
 import { theme } from "../core/theme";
 import { showMessage } from "react-native-flash-message";
 import FlashMessage from "react-native-flash-message";
+
 const RoleChangeModal = ({ showRoleModal, setShowRoleModal, currentRole }) => {
   const [requestedRole, setRequestedRole] = useState("BUSINESS");
+  const [address, setAddress] = useState(""); // State để lưu trữ địa chỉ nhập vào
 
   const userData = useSelector((state) => state.auth.userData);
   const userId = userData.userId;
   const userToken = userData.token;
+
   const handleRoleChange = (role) => {
     setRequestedRole(role);
   };
 
   const handleRequest = async () => {
-    // Gởi yêu cầu lên server với userId và requestedRole
-    handleRequestChangeRole(userId, userToken, requestedRole);
+    // Gửi yêu cầu lên server với userId, requestedRole, và address
+    handleRequestChangeRole(userId, userToken, requestedRole, address);
     showMessage({
-        message: "Request sended!",
-        type: "success",
-        floating: true,
-        duration: 2000,
-        autoHide: true,
-      });
+      message: "Request sent!",
+      type: "success",
+      floating: true,
+      duration: 2000,
+      autoHide: true,
+    });
 
-      setTimeout(() => {
-        setShowRoleModal(false);
-      }, 2000);
-    
+    setTimeout(() => {
+      setShowRoleModal(false);
+    }, 2000);
   };
 
   return (
@@ -72,6 +74,15 @@ const RoleChangeModal = ({ showRoleModal, setShowRoleModal, currentRole }) => {
               <Text style={styles.buttonText}>USER</Text>
             </TouchableOpacity>
           </View>
+
+          {/* TextInput để nhập địa chỉ */}
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your address"
+            value={address}
+            onChangeText={setAddress} // Cập nhật state khi người dùng nhập
+          />
+
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.roleButton} onPress={handleRequest}>
               <Text style={styles.buttonText}>Request</Text>
@@ -85,7 +96,7 @@ const RoleChangeModal = ({ showRoleModal, setShowRoleModal, currentRole }) => {
           </View>
         </View>
       </View>
-      <FlashMessage position="top" style={{ marginBottom: 50 }}/>
+      <FlashMessage position="top" style={{ marginBottom: 50 }} />
     </Modal>
   );
 };
@@ -141,6 +152,15 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     backgroundColor: "#d9534f",
+  },
+  input: {
+    height: 40,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+    fontSize: 16,
   },
 });
 
