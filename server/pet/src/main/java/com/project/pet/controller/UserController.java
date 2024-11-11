@@ -1,11 +1,14 @@
 package com.project.pet.controller;
 
 import com.project.pet.dto.UserProfileDTO;
+import com.project.pet.models.Address;
+import com.project.pet.models.RoleEnum;
 import com.project.pet.models.User;
 import com.project.pet.security.GetAllUserPermission;
 import com.project.pet.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -49,4 +52,11 @@ public class UserController {
     UserProfileDTO userWithPostsDTO = userService.getUserProfile(userId);
     return ResponseEntity.ok(userWithPostsDTO);
   }
+
+  @GetMapping("/hospital-addresses")
+  public ResponseEntity<List<Address>> getHospitalAddresses() {
+    List<Address> addresses = userService.findAddressesByRole(RoleEnum.HOSPITAL);
+    return ResponseEntity.ok(addresses);
+  }
+
 }

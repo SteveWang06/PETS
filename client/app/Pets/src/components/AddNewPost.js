@@ -103,7 +103,6 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
         multiple: true,
       });
 
-      console.log("ad new: ",result);
       
       if (!result.cancelled) {
         const newUris = [];

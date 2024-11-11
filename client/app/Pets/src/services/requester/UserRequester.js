@@ -422,11 +422,12 @@ const handleSubmitEditProfile = async (
   }
 };
 
-const handleRequestChangeRole = async (userId, userToken, requestedRole) => {
+const handleRequestChangeRole = async (userId, userToken, requestedRole, address) => {
   // Gởi yêu cầu lên server với userId và requestedRole
   const formData = new FormData();
   formData.append("userId", userId);
   formData.append("requestedRole", requestedRole);
+  formData.append("address", address)
   try {
     const response = await fetch(ApiPaths.changeRole, {
       method: "POST",

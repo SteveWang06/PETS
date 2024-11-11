@@ -119,7 +119,6 @@ const EditProfileModal = ({
         quality: 1,
       });
 
-      console.log(result);
       if (!result.cancelled) {
         const newUri = result.assets[0].uri;
         setSelectedImage(newUri);
