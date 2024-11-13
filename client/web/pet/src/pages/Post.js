@@ -5,9 +5,9 @@ import SideNav from "../components/SideNav";
 import Footer from "../components/Footer";
 import { auth, kind } from "../pathApi";
 import { useTranslation } from 'react-i18next';
-import { PostContext } from '../context/AuthProvider';
+import { LengthContext } from '../context/AuthProvider';
 
-const Post = (post) => {
+const Post = () => {
   const { t, i18n } = useTranslation();
   const [data, setData] = useState([]);
   const [error, setError] = useState('');
@@ -25,7 +25,7 @@ const Post = (post) => {
   const [kindOption, setKindOption] = useState([]);
   const [newKind, setNewKind] = useState('');
   const [selectedKind, setSelectedKind] = useState('');
-  const {setPostLength} = useContext(PostContext);
+  const {setPostLength} = useContext(LengthContext);
 
   useEffect(() => {
     fetchData();

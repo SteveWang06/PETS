@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider, PostProvider } from './context/AuthProvider';
+import { AuthProvider, LengthProvider } from './context/AuthProvider';
 import PrivateRoute from './PrivateRoute';
 import './i18n'
 import Home from "./pages/Home";
@@ -21,7 +21,7 @@ function App() {
     <div className="wrapper">
       <BrowserRouter>
         <AuthProvider>
-          <PostProvider>
+          <LengthProvider>
           <Routes>
             <Route path="/" element={<Login />} />
             <Route
@@ -101,7 +101,7 @@ function App() {
               }
             />
           </Routes>
-          </PostProvider>
+          </LengthProvider>
         </AuthProvider>
       </BrowserRouter>
     </div>
