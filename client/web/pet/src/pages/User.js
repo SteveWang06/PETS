@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext} from 'react';
 import axios from 'axios';
 import Header from "../components/Header";
 import SideNav from "../components/SideNav";
 import Footer from "../components/Footer";
 import { auth } from '../pathApi';
 import { useTranslation } from 'react-i18next';
+import { LengthContext } from '../context/AuthProvider'
  
 const User=()=> {
   const { t, i18n } = useTranslation();
@@ -23,6 +24,7 @@ const User=()=> {
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(10);
   const [original, setOriginal] = useState([]);
+  const {setUserLength}= useContext(LengthContext);
  
   useEffect(() => {
     fetchUsers();
@@ -51,6 +53,7 @@ const User=()=> {
       setUsers(res.data);
       setOriginal(res.data);
       console.log(res.data);
+      setUserLength(res.data.length)
     } catch (error) {
       console.error('Error fetching users:', error);
       setError('Error fetching users');

@@ -12,15 +12,17 @@ export const AuthProvider=({ children })=>{
     )
 }
 
-const PostContext = createContext({});
-export const PostProvider=({ children })=>{
+const LengthContext = createContext({});
+export const LengthProvider=({ children })=>{
     const [postLength, setPostLength] = useState(0);
+    const [userLength, setUserLength] = useState(0);
+    const [productLength, setProductLength] = useState(0);
 
     return(
-        <PostContext.Provider value={{postLength, setPostLength}}>
+        <LengthContext.Provider value={{postLength, setPostLength, userLength, setUserLength, productLength, setProductLength}}>
             {children}
-        </PostContext.Provider>
+        </LengthContext.Provider>
     );
 };
 
-export {AuthContext, PostContext};
+export {AuthContext, LengthContext};

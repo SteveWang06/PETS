@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext} from 'react';
 import axios from 'axios';
 import Header from "../components/Header";
 import SideNav from "../components/SideNav";
 import Footer from "../components/Footer";
 import { products } from '../pathApi';
+import {LengthContext} from '../context/AuthProvider';
 
 const Products = () => {
   const [data, setData] = useState([]);
@@ -19,6 +20,7 @@ const Products = () => {
   const [showCreate, setShowCreate] = useState(false);
   const [search, setSearch] = useState('');
   const [original, setOriginal] = useState([]);
+  const {setProductLength} = useContext(LengthContext);
 
   useEffect(() => {
     fetchData();
@@ -46,7 +48,8 @@ const Products = () => {
 
       setData(res.data);
       setOriginal(res.data);
-      console.log(res);
+      console.log(res.data);
+      setProductLength(res.data.length)
     } catch (error) {
       console.error('Error fetching data:', error);
       setError('Error fetching data');
@@ -118,6 +121,7 @@ const Products = () => {
     setType(item.type);
     setPrice(item.price);
     setDescription(item.description);
+    setImage(null);
   };
 
   const handleSave = async () => {
@@ -290,9 +294,9 @@ const Products = () => {
                               <td>{item.price}</td>
                               <td>{item.description}</td>
                               <td>
-                                {item.imageUrl && item.imageUrl.length > 0 && (
+                                {item.imageUrl && item.imageUrl[0].length > 0 && (
                                   <img
-                                  src={`${products.getAllProducts}/${item.imageUrl[0]}`}
+                                    src={`${products.getAllProducts}/${item.imageUrl[0]}`}
                                     alt="Item"
                                     style={{ width: '100px', height: '100px' }}
                                   />

@@ -4,11 +4,13 @@ import SideNav from "../components/SideNav"; //介面左邊的menu
 import Footer from "../components/Footer"; //介面的底部
 import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
-import { PostContext } from '../context/AuthProvider';
+import { LengthContext } from '../context/AuthProvider';
  
 function Home() {
     const { t, i18n } = useTranslation();    
-    const {postLength} = useContext(PostContext);
+    const {postLength} = useContext(LengthContext);
+    const {userLength} = useContext(LengthContext);
+    const {productLength} = useContext(LengthContext);
         return (
             <div>
                 <Header />
@@ -42,7 +44,7 @@ function Home() {
                                     <div className="small-box bg-warning">
                                         <div className="inner">
                                             <p>{t('total_user')}</p>
-                                            <h3>12</h3>
+                                            <h3>{ userLength }</h3>
                                         </div>
                                         <div className="icon">
                                             <i className="nav-icon fas fa-user" />
@@ -63,42 +65,14 @@ function Home() {
                                         </div>
                                         <Link to="/post" className="small-box-footer">{t('moreinfo')} <i className="fas fa-arrow-circle-right" /></Link>
                                     </div>
-                                </div>
-                                {/* Total Homeless Pet Post */}
-                                <div className="col-lg-3 col-6">
-                                    {/* small box */}
-                                    <div className="small-box bg-success">
-                                        <div className="inner">
-                                            <p>{t('total_homelesspetpost')}</p>
-                                            <h3>--</h3>
-                                        </div>
-                                        <div className="icon">
-                                            <i className="nav-icon far fa-newspaper" />
-                                        </div>
-                                        <Link to="/post" className="small-box-footer">{t('moreinfo')} <i className="fas fa-arrow-circle-right" /></Link>
-                                    </div>
-                                </div>
-                                {/* Total Give Pet Post */}
-                                <div className="col-lg-3 col-6">
-                                    {/* small box */}
-                                    <div className="small-box bg-success">
-                                        <div className="inner">
-                                            <p>{t('total_givepetpost')}</p>
-                                            <h3>--</h3>
-                                        </div>
-                                        <div className="icon">
-                                            <i className="nav-icon far fa-newspaper" />
-                                        </div>
-                                        <Link to="/post" className="small-box-footer">{t('moreinfo')} <i className="fas fa-arrow-circle-right" /></Link>
-                                    </div>
-                                </div>
+                                </div>                               
                                 {/* Total Shop */}
                                 <div className="col-lg-3 col-6">
                                     {/* small box */}
                                     <div className="small-box bg-info">
                                         <div className="inner">
                                             <p>{t('total_shop')}</p>
-                                            <h3>150</h3>
+                                            <h3>--</h3>
                                         </div>
                                         <div className="icon">
                                             <i className="nav-icon fas fa-store" />
@@ -112,7 +86,7 @@ function Home() {
                                     <div className="small-box bg-info">
                                         <div className="inner">
                                             <p>{t('total_products')}</p>
-                                            <h3>150</h3>
+                                            <h3>{productLength}</h3>
                                         </div>
                                         <div className="icon">
                                             <i className="nav-icon fas fa-box-open" />
