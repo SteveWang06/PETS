@@ -3,7 +3,7 @@ import axios from 'axios';
 import Header from "../components/Header";
 import SideNav from "../components/SideNav";
 import Footer from '../components/Footer';
-import { auth } from "../pathApi";
+import { baseURL, formatImageUrl } from "../pathApi";
 
 const Profile = () => {
     const [success, setSuccess] = useState('');
@@ -38,7 +38,7 @@ const Profile = () => {
                 throw new Error('No token found');
             }
 
-            const res = await axios.get(`${auth.updateUser}/user/${userId}`, {
+            const res = await axios.get(`${baseURL.baseURL}/api/auth/user/${userId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -62,7 +62,7 @@ const Profile = () => {
         try {
             const token = localStorage.getItem('userToken');
             const userId = localStorage.getItem('userId');
-            await axios.put(`${auth.updateUser}/user/${userId}`, data.user, {
+            await axios.put(`${baseURL.baseURL}/api/auth/user/${userId}`, data.user, {
                 headers: { 'Authorization': `Bearer ${token}` },
             });
             setIsEditing(false);
@@ -80,13 +80,13 @@ const Profile = () => {
             <section className="content-wrapper">
                 <div className="container-fluid">
                     <div className="row">
-                        <div className="col-12">
+                        <div className="col-4">
                             <div className="card">
                                 <div className="card-header d-flex justify-content-between align-items-center">
                                     <h4>Profile</h4>
                                     <button
                                         className="btn btn-primary"
-                                        style={{ marginRight: '3cm' }}
+                                        style={{ marginRight: '3cm', position:'absolute',top:'20px',right:'10px'}}
                                         onClick={() => setIsEditing(!isEditing)}
                                     >
                                         {isEditing ? 'Cancel' : 'Edit'}
@@ -96,7 +96,7 @@ const Profile = () => {
                                     <div className="card-body box-profile">
                                         <div className="text-center">
                                             <img
-                                                src={`${auth.updateUser}/${data.user.avatar?.imageUrl}`}
+                                                src={`${formatImageUrl.formatImageUrl}/${data.user.avatar?.imageUrl}`}
                                                 style={{ width: '150px', height: '150px' }}
                                                 alt="Profile"
                                             />
@@ -110,7 +110,10 @@ const Profile = () => {
                                     <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label>Name :</label>
+                                                <label>
+                                                    <i className="nav-icon fas fa-user" style={{ marginRight: '8px' }}/>
+                                                    Name :
+                                                </label>
                                                 {isEditing ? (
                                                     <input
                                                         type="text"
@@ -126,7 +129,10 @@ const Profile = () => {
                                         </div>
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label>Birthday :</label>
+                                                <label>
+                                                    <i className="fas fa-birthday-cake" style={{ marginRight: '8px' }}></i> 
+                                                    Birthday :
+                                                </label>
                                                 {isEditing ? (
                                                     <input
                                                         type="date"
@@ -142,7 +148,10 @@ const Profile = () => {
                                         </div>
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label>Role :</label>
+                                                <label>
+                                                    <i className="fas fa-users-cog" style={{ marginRight: '8px' }}></i>
+                                                    Role :
+                                                </label>
                                                 {isEditing ? (
                                                     <input
                                                         type="text"
@@ -158,7 +167,10 @@ const Profile = () => {
                                         </div>
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label>Email :</label>
+                                                <label>
+                                                    <i className="fas fa-envelope" style={{ marginRight: '8px' }}></i>
+                                                    Email :
+                                                </label>
                                                 {isEditing ? (
                                                     <input
                                                         type="email"
@@ -174,7 +186,10 @@ const Profile = () => {
                                         </div>
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label>Address :</label>
+                                                <label>
+                                                    <i className="fas fa-map-marker-alt" style={{ marginRight: '8px' }}></i>
+                                                    Address :
+                                                </label>
                                                 {isEditing ? (
                                                     <input
                                                         type="text"
@@ -198,15 +213,14 @@ const Profile = () => {
                                     </div>
                                 </div>
                             </div>
+                        </div>
                             <div className="card-header d-flex justify-content-between align-items-center">
-                                <h4>Post</h4>
+                                
                             </div>
-                            <div className="col-12">
+                            <div className="col-7">
                                 <div className="card">
                                     <div className="card-header p-2">
-                                        <ul className="nav nav-pills">
-                                            <li className="nav-item"><a className="nav-link active" href="#activity" data-toggle="tab">Post</a></li>
-                                        </ul>
+                                    <h4>Post</h4>
                                     </div>{/* /.card-header */}
                                     <div className="card-body">
                                         <div className="tab-content">
@@ -456,8 +470,6 @@ const Profile = () => {
                                 </div>
                                 {/* /.card */}
                             </div>
-
-                        </div>
                     </div>
                 </div>
             </section>

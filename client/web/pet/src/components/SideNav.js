@@ -1,15 +1,43 @@
-import React, {useContext}from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {AuthContext} from '../context/AuthProvider';
+import { AuthContext } from '../context/AuthProvider';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { baseURL, formatImageUrl } from "../pathApi";
 
 function SideNav() {
     const location = useLocation();
     const { t, i18n } = useTranslation();
     const { setAuth } = useContext(AuthContext);
-    const navigate=useNavigate();
+    const [error, setError] = useState('');
+    const [data, setData] = useState([]);
+    const navigate = useNavigate();
     const getNavLinkClass = (path) => location.pathname === path ? 'nav-link active' : 'nav-link';
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        try {
+            const token = localStorage.getItem('userToken');
+            const userId = localStorage.getItem('userId');
+            if (!token || !userId) {
+                throw new Error('No token found');
+            }
+
+            const res = await axios.get(`${baseURL.baseURL}/api/auth/user/${userId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            setData(res.data.user);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setError('Error fetching data');
+        }
+    };
 
     const handleLogout = () => {
         localStorage.removeItem('userInfo')
@@ -31,24 +59,16 @@ function SideNav() {
                 <div className="sidebar">
                     {/* Sidebar user panel (optional) */}
                     <div className="user-panel mt-3 pb-3 mb-3 d-flex">
-                        <div className="image">
-                            <img src="dist/img/user2-160x160.jpg" className="img-circle elevation-2" alt="User Image" />
-                        </div>
+                        <img
+                            src={`${formatImageUrl.formatImageUrl}/${data.avatar?.imageUrl}`}
+                            style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover'}}
+                            alt="Profile"
+                        />
                         <div className="info">
                             <Link to="/profile" className="d-block">FCU Admin</Link>
                         </div>
                     </div>
-                    {/* SidebarSearch Form */}
-                    <div className="form-inline">
-                        <div className="input-group" data-widget="sidebar-search">
-                            <input className="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search" />
-                            <div className="input-group-append">
-                                <button className="btn btn-sidebar">
-                                    <i className="fas fa-search fa-fw" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    
                     {/* Sidebar Menu */}
                     <nav className="mt-2">
                         <ul className="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
@@ -92,14 +112,6 @@ function SideNav() {
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link to="/forms" className={getNavLinkClass('/forms')}>
-                                    <i className="nav-icon fas fa-edit" />
-                                    <p>
-                                        {t('forms')}
-                                    </p>
-                                </Link>
-                            </li>
-                            <li className="nav-item">
                                 <Link to="/doctors" className={getNavLinkClass('/doctors')}>
                                     <i className="nav-icon fas fa-user-md" />
                                     <p>
@@ -118,14 +130,6 @@ function SideNav() {
                             <p>
                                 <hr color="white" />
                             </p>
-                            <li className="nav-item">
-                                <a href="#" className="nav-link">
-                                    <i className="nav-icon fas fa-cogs" />
-                                    <p>
-                                        {t('setting')}
-                                    </p>
-                                </a>
-                            </li>
                             <li className="nav-item">
                                 <Link to='/' className={getNavLinkClass('/')} onClick={handleLogout} >
                                     <i className="nav-icon fas fa-sign-out-alt" />

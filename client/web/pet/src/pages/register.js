@@ -1,7 +1,7 @@
 import React, { useState, useEffect} from 'react';
 import logo from '../image/petlogo.png';
 import axios from 'axios';
-import { BASE_URL } from "../context/config";
+import { baseURL } from "../pathApi";
 import { Link, useNavigate} from "react-router-dom";
 
 const Register = () => {
@@ -52,7 +52,7 @@ const Register = () => {
     
           console.log(newUser);
     
-          await axios.post(`${BASE_URL}/register`, newUser, {
+          await axios.post(`${baseURL.baseURL}/api/auth/register`, newUser, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type':'multipart/form-data'

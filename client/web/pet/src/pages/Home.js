@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import Header from "../components/Header"; //介面的上面
 import SideNav from "../components/SideNav"; //介面左邊的menu
 import Footer from "../components/Footer"; //介面的底部
@@ -8,9 +8,8 @@ import { LengthContext } from '../context/AuthProvider';
  
 function Home() {
     const { t, i18n } = useTranslation();    
-    const {postLength} = useContext(LengthContext);
-    const {userLength} = useContext(LengthContext);
-    const {productLength} = useContext(LengthContext);
+    const {postLength,userLength,productLength}=useContext(LengthContext);
+
         return (
             <div>
                 <Header />
@@ -123,9 +122,6 @@ function Home() {
                                     </div>
                                 </div>
                             </div>
-                            {/* /.row */}
-                            {/* Main row */}
- 
                         </div>{/* /.container-fluid */}
                     </section>
                     {/* /.content */}

@@ -3,7 +3,7 @@ import {AuthContext} from '../context/AuthProvider';
 import './css/login.css';
 import logo from '../image/petlogo.png';
 import axios from "axios";
-import { auth } from "../pathApi";
+import { baseURL } from "../pathApi";
 import { Navigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -37,7 +37,7 @@ const Login = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const res = await axios.post(`${auth.updateUser}/login`, {
+      const res = await axios.post(`${baseURL.baseURL}/api/auth/login`, {
         email: inputEmail,
         password: inputPassword,
       });

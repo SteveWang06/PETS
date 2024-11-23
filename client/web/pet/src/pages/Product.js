@@ -3,10 +3,12 @@ import axios from 'axios';
 import Header from "../components/Header";
 import SideNav from "../components/SideNav";
 import Footer from "../components/Footer";
-import { products } from '../pathApi';
-import {LengthContext} from '../context/AuthProvider';
+import { baseURL, formatImageUrl} from '../pathApi';
+import { useTranslation } from 'react-i18next';
+import { LengthContext } from '../context/AuthProvider';
 
 const Products = () => {
+  const { t, i18n } = useTranslation();
   const [data, setData] = useState([]);
   const [error, setError] = useState('');
   const [editId, setEditId] = useState(null);
@@ -14,7 +16,6 @@ const Products = () => {
   const [type, setType] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
-  const [UserId, setUserId] = useState('');
   const [image, setImage] = useState(null);
   const [success, setSuccess] = useState('');
   const [showCreate, setShowCreate] = useState(false);
@@ -40,7 +41,7 @@ const Products = () => {
         throw new Error('No token found');
       }
 
-      const res = await axios.get(`${products.getAllProducts}`, {
+      const res = await axios.get(`${baseURL.baseURL}/api/products`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -59,6 +60,7 @@ const Products = () => {
   const handleCreate = async () => {
     try {
       const token = localStorage.getItem('userToken');
+      const userId = localStorage.getItem('userId');
       if (!token) {
         throw new Error('Invalid data');
       }
@@ -68,13 +70,13 @@ const Products = () => {
       formData.append('type', type);
       formData.append('price', price);
       formData.append('description', description);
-      formData.append('userId', UserId);
+      formData.append('userId', userId);
 
       if (image) {
         formData.append('images', image);
       }
 
-      await axios.post(`${products.getAllProducts}`, formData, {
+      await axios.post(`${baseURL.baseURL}/api/products`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
         }
@@ -85,7 +87,6 @@ const Products = () => {
       setType('');
       setPrice('');
       setDescription('');
-      setUserId('');
       setImage(null);
       setSuccess('Create Success');
       setShowCreate(false);
@@ -101,7 +102,7 @@ const Products = () => {
       if (!token) {
         throw new Error('No token found');
       }
-      await axios.delete(`${products.getAllProducts}/${id}`, {
+      await axios.delete(`${baseURL.baseURL}/api/products/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -152,7 +153,7 @@ const Products = () => {
         image: image ? image.name : 'No new image'
       });
 
-      const response = await axios.put(`${products.getAllProducts}/${editId}`, formData, {
+      const response = await axios.put(`${baseURL.baseURL}/api/products/${editId}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
         }
@@ -207,17 +208,17 @@ const Products = () => {
               <div className="card">
                 <div className="card-header">
                   <div className="d-flex justify-content-between align-items-center">
-                    <h3 className="card-title" style={{ fontWeight: 'bold', fontSize: '28px' }}>Products</h3>
+                    <h3 className="card-title" style={{ fontWeight: 'bold', fontSize: '28px' }}>{t('products')}</h3>
                     <div className="d-flex">
                       <input
                         className="form-control form-control-sidebar"
                         type="search"
-                        placeholder="Search"
+                        placeholder={t('search')}
                         aria-label="Search"
                         value={search}
                         onChange={handleSearch}
                       />
-                      <button className="btn btn-primary" style={{ width: '100px' }} onClick={() => setShowCreate(true)}>Create</button>
+                      <button className="btn btn-primary" style={{ width: '100px' }} onClick={() => setShowCreate(true)}>{t('create')}</button>
                     </div>
                   </div>
                 </div>
@@ -227,12 +228,12 @@ const Products = () => {
                   <table id="example2" className="table table-bordered table-hover">
                     <thead>
                       <tr>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Price</th>
-                        <th>Description</th>
-                        <th style={{ width: '350px' }}>Images</th>
-                        <th>Actions</th>
+                        <th>{t('user_name')}</th>
+                        <th>{t('type')}</th>
+                        <th>{t('price')}</th>
+                        <th>{t('description')}</th>
+                        <th style={{ width: '350px' }}>{t('image')}</th>
+                        <th>{t('actions')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -284,7 +285,7 @@ const Products = () => {
                                 />
                               </td>
                               <td>
-                                <button onClick={handleSave} className="btn btn-primary">Save</button>
+                                <button onClick={handleSave} className="btn btn-primary">{t('save')}</button>
                               </td>
                             </>
                           ) : (
@@ -296,19 +297,17 @@ const Products = () => {
                               <td>
                                 {item.imageUrl && item.imageUrl[0].length > 0 && (
                                   <img
-                                    src={`${products.getAllProducts}/${item.imageUrl[0]}`}
+                                    src={`${formatImageUrl.formatImageUrl}/${item.imageUrl[0]}`}
                                     alt="Item"
                                     style={{ width: '100px', height: '100px' }}
                                   />
                                 )}
                               </td>
-
                               <td>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                                  <button className="btn btn-primary" style={{ marginRight: '10px' }} onClick={() => handleEdit(item)}>Edit</button>
-                                  <button className="btn btn-danger" onClick={() => handleDelete(item.id)}>Delete</button>
+                                  <button className="btn btn-primary" style={{ marginRight: '10px' }} onClick={() => handleEdit(item)}>{t('edit')}</button>
+                                  <button className="btn btn-danger" onClick={() => handleDelete(item.id)}>{t('delete')}</button>
                                 </div>
-
                               </td>
                             </>
                           )}
@@ -327,7 +326,7 @@ const Products = () => {
           <div className="modal-dialog" style={{ maxWidth: '500px', margin: '5% auto', backgroundColor: 'white', padding: '20px', borderRadius: '5px' }}>
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Create Product</h5>
+                <h5 className="modal-title">{t('create_product')}</h5>
                 <button type="button" className="close" onClick={() => setShowCreate(false)}>&times;</button>
               </div>
               <div className="modal-body">
@@ -335,35 +334,28 @@ const Products = () => {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter name"
+                  placeholder={t('enter_username')}
                   className="form-control mb-2"
                 />
                 <input
                   type="text"
                   value={type}
                   onChange={(e) => setType(e.target.value)}
-                  placeholder="Enter type"
+                  placeholder={t('enter_type')}
                   className="form-control mb-2"
                 />
                 <input
                   type="number"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
-                  placeholder="Enter price"
+                  placeholder={t('enter_price')}
                   className="form-control mb-2"
                 />
                 <input
                   type="text"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Enter description"
-                  className="form-control mb-2"
-                />
-                <input
-                  type="text"
-                  value={UserId}
-                  onChange={(e) => setUserId(e.target.value)}
-                  placeholder="Enter UserId"
+                  placeholder={t('enter_description')}
                   className="form-control mb-2"
                 />
                 <input
@@ -374,8 +366,8 @@ const Products = () => {
                 />
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowCreate(false)}>Close</button>
-                <button type="button" className="btn btn-primary" onClick={handleCreate}>Create</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowCreate(false)}>{t('cancel')}</button>
+                <button type="button" className="btn btn-primary" onClick={handleCreate}>{t('create')}</button>
               </div>
             </div>
           </div>

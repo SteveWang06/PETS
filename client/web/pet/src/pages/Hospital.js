@@ -1,26 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from "../components/Header";
 import SideNav from "../components/SideNav";
 import Footer from '../components/Footer';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
 
 const Hospital = () => {
     const { t, i18n } = useTranslation();
     const [selected, setSelected] = useState('Processing');
+    const [acceptedData, setAcceptedData] = useState([]);
+    const [processingData, setProcessingData] = useState([]);
 
     const categories = ['Processing', 'Accepted'];
 
-    const acceptedData = [
-        { name: 'John Doe', address: '123 Main St' },
-        { name: 'Jane Smith', address: '456 Elm St' },
-        { name: 'Michael Johnson', address: '789 Oak St' },
-    ];
-
-    const processingData = [
-        { name: 'Alice Brown', address: '321 Maple St' },
-        { name: 'Bob White', address: '654 Pine St' },
-        { name: 'Cathy Green', address: '987 Cedar St' },
-    ];
+    // Fetch hospital addresses data on component mount
+    useEffect(() => {
+        axios.get('http://localhost:8080/api/auth/hospital-addresses')
+            .then((response) => {
+                const hospitalData = response.data;
+                // Assuming 'accepted' data is based on some logic in your response
+                setAcceptedData(hospitalData.filter(item => item.status === 'Accepted'));
+                setProcessingData(hospitalData.filter(item => item.status === 'Processing'));
+            })
+            .catch((error) => {
+                console.error("There was an error fetching the hospital addresses!", error);
+            });
+    }, []);
 
     return (
         <div>
@@ -66,7 +71,7 @@ const Hospital = () => {
                                             <tbody>
                                                 {acceptedData.map((item, index) => (
                                                     <tr key={index}>
-                                                        <td>{item.name}</td>
+                                                        <td>{item.user.username}</td>
                                                         <td>{item.address}</td>
                                                     </tr>
                                                 ))}
@@ -86,7 +91,7 @@ const Hospital = () => {
                                             <tbody>
                                                 {processingData.map((item, index) => (
                                                     <tr key={index}>
-                                                        <td>{item.name}</td>
+                                                        <td>{item.user.username}</td>
                                                         <td>{item.address}</td>
                                                         <td>
                                                             <button
@@ -103,7 +108,6 @@ const Hospital = () => {
                                                             >
                                                                 Cancel
                                                             </button>
-
                                                         </td>
                                                     </tr>
                                                 ))}

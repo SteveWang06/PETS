@@ -85,6 +85,22 @@ const Shop = () => {
                                                     <tr key={index}>
                                                         <td>{item.name}</td>
                                                         <td>{item.address}</td>
+                                                        <td>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-primary"
+                                                                style={{ width: '80px', height: '40px', marginRight: '10px' }}
+                                                            >
+                                                                Accept
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-secondary"
+                                                                style={{ width: '80px', height: '40px' }}
+                                                            >
+                                                                Cancel
+                                                            </button>
+                                                        </td>
                                                     </tr>
                                                 ))}
                                             </tbody>

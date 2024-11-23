@@ -12,7 +12,6 @@ import Shop from './pages/Shop';
 import Product from './pages/Product';
 import Hospital from './pages/Hospital';
 import Doctor from './pages/Doctor';
-import Forms from './pages/Forms';
 import Profile from './pages/Profile';
 
 
@@ -77,14 +76,6 @@ function App() {
               element={
                 <PrivateRoute>
                   <Doctor/>
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="forms"
-              element={
-                <PrivateRoute>
-                  <Forms/>
                 </PrivateRoute>
               }
             />

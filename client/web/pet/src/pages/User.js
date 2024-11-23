@@ -3,7 +3,7 @@ import axios from 'axios';
 import Header from "../components/Header";
 import SideNav from "../components/SideNav";
 import Footer from "../components/Footer";
-import { auth } from '../pathApi';
+import { baseURL, formatImageUrl } from '../pathApi';
 import { useTranslation } from 'react-i18next';
 import { LengthContext } from '../context/AuthProvider'
  
@@ -44,7 +44,7 @@ const User=()=> {
         throw new Error('No token found');
       }
  
-      const res = await axios.get(`${auth.updateUser}/user`, {
+      const res = await axios.get(`${baseURL.baseURL}/api/auth/user`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -71,7 +71,7 @@ const User=()=> {
  
       console.log(newUser);
  
-      await axios.post(`${auth.updateUser}/register`, newUser, {
+      await axios.post(`${baseURL.baseURL}/api/auth/register`, newUser, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -119,7 +119,7 @@ const User=()=> {
         formData.append('image', new File([], users.find(item => item.id === editId).avatar.imageUrl.split('/').pop()));
       }
  
-      const res = await axios.put(`${auth.updateUser}/${editId}`, formData, {
+      const res = await axios.put(`${baseURL.baseURL}/api/auth/${editId}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -159,7 +159,7 @@ const User=()=> {
       if (!token) {
         throw new Error('No token found');
       }
-      await axios.delete(`${auth.updateUser}/${id}`, {
+      await axios.delete(`${baseURL.baseURL}/api/auth/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -301,9 +301,9 @@ const User=()=> {
                               <td>{user.userName}</td>
                               <td>{user.email}</td>
                               <td>{user.birthday}</td>
-                              <td>{user.address}</td>
+                              <td>{user.addresses[0]?.address}</td>
                               <td>
-                                <img src={`${auth.updateUser}/${user.avatar?.imageUrl}`} alt="User" style={{ width: '50px', height: '50px' }} />
+                                <img src={`${formatImageUrl.formatImageUrl}/${user.avatar?.imageUrl}`} alt="User" style={{ width: '50px', height: '50px' }} />
                               </td>
                               <td>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>

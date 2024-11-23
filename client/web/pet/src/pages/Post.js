@@ -3,7 +3,7 @@ import axios from 'axios';
 import Header from "../components/Header";
 import SideNav from "../components/SideNav";
 import Footer from "../components/Footer";
-import { auth, kind } from "../pathApi";
+import { baseURL, formatImageUrl } from "../pathApi";
 import { useTranslation } from 'react-i18next';
 import { LengthContext } from '../context/AuthProvider';
 
@@ -46,7 +46,7 @@ const Post = () => {
         throw new Error('No token found');
       }
 
-      const res = await axios.get(`${auth.updateUser}/post/`, {
+      const res = await axios.get(`${baseURL.baseURL}/api/auth/post/`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -65,7 +65,7 @@ const Post = () => {
   const fetchKind = async () => {
     const token = localStorage.getItem('userToken');
     try {
-      const res = await axios.get(kind.getKind,{
+      const res = await axios.get(`${baseURL.baseURL}/api/post/kind/`,{
         headers: { 'Authorization': `Bearer ${token}` }
       });
       setKindOption(res.data);
@@ -80,7 +80,7 @@ const Post = () => {
     const formData = new FormData();
     formData.append('kind',newKind);
     try {
-      await axios.post(`${kind.getKind}create`, formData,{
+      await axios.post(`${baseURL.baseURL}/api/post/kind/create`, formData,{
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -111,7 +111,7 @@ const Post = () => {
         formData.append('images', Image);
       }
 
-      await axios.post(`${auth.updateUser}/post/`, formData, {
+      await axios.post(`${baseURL.baseURL}api/auth/post/`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -137,7 +137,7 @@ const Post = () => {
       if (!token) {
         throw new Error('No token found');
       }
-      await axios.delete(`${auth.updateUser}/post/${id}`, {
+      await axios.delete(`${baseURL.baseURL}/api/auth/post/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -187,7 +187,7 @@ const Post = () => {
         image: Image ? Image.name : 'No new image'
       });
 
-      const response = await axios.put(`${auth.updateUser}/post/${editId}`, formData, {
+      const response = await axios.put(`${baseURL.baseURL}/api/auth/post/${editId}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -355,7 +355,7 @@ const Post = () => {
                               <td>{item.authorName}</td>
                               <td>
                                 {item.postImages && item.postImages.length > 0 && (
-                                  <img src={`${auth.updateUser}/${item.postImages[0].imageUrl}`}
+                                  <img src={`${formatImageUrl.formatImageUrl}/${item.postImages[0].imageUrl}`}
                                     alt="Post"
                                     style={{ width: '100px', height: '100px' }}
                                   />
