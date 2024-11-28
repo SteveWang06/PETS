@@ -9,13 +9,10 @@ const Facebook = () => {
 }
 
 const styles = StyleSheet.create({
-    image: {
-        color: "#FA2409",
-        height: 50,
-        width: 50,
-        paddingHorizontal: 30,
-        paddingVertical: 10,
-    },
-  })
+  image: {
+    height: 50,
+    width: 50,
+  },
+});
 
 export default Facebook

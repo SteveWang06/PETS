@@ -114,7 +114,7 @@ const EditProfileModal = ({
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ["images"],
         allowsEditing: false,
         quality: 1,
       });
@@ -371,6 +371,12 @@ const pickerSelectStyles = StyleSheet.create({
     width: "100%",
     marginTop: 10,
   },
+  placeholder: {
+    // Style riêng cho placeholder
+    color: "gray",
+    fontSize: 15,
+  },
 });
+
 
 export default EditProfileModal;

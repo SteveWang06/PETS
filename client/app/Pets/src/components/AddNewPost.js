@@ -11,15 +11,16 @@ import {
   ImageBackground,
 } from "react-native";
 import React, { useState, useContext, useEffect, useRef } from "react";
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import { AntDesign } from "@expo/vector-icons";
 import { uploadImages, getPostKindFromDataBase } from "../services/requester/UserRequester";
-import { BASE_URL } from "../config";
+import { BASE_URL, FORMAT_IMG_URL } from "../config";
 import { Dropdown } from "react-native-element-dropdown";
 import ActionSheet from 'react-native-actionsheet';
 import { useTranslation } from 'react-i18next';
+import { addNewPost } from "../redux/actions/postActions";
 
 const imgDir = FileSystem.documentDirectory + "images/";
 const ensureDirExists = async () => {
@@ -44,7 +45,7 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
         
         setDataDropdown(formattedData)
       } catch (error) {
-        console.error('Error fetching posts:', error);
+        console.error('Add new post Error fetching posts:', error);
       }
     };
 
@@ -53,11 +54,11 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
   
   const [isFocus, setIsFocus] = useState(false);
   //const [value, setValue] = useState(null);
-  const renderLabel = () => {
+  const renderLabel = ({ kind = null, isFocus = false }) => {
     if (kind || isFocus) {
       return (
         <Text style={[styles.label, isFocus && { color: "blue" }]}>
-          {t('selectKind')}
+          {t("selectKind")}
         </Text>
       );
     }
@@ -96,11 +97,10 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ["images", "videos"],
         allowsEditing: false,
         allowsMultipleSelection: true,
         quality: 1,
-        multiple: true,
       });
 
       
@@ -172,6 +172,8 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
     );
   };
 
+
+
   const userData = useSelector((state) => state.auth.userData);
     const userId = userData.userId;
     const userToken = userData.token;
@@ -183,7 +185,7 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
       <View style={styles.header}>
         <Image
           source={{
-            uri: `${BASE_URL}/${avatar}`,
+            uri: `${FORMAT_IMG_URL}/${avatar}`,
           }}
           style={styles.avatar}
         />
@@ -193,28 +195,31 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
 
       <View>
         <TextInput
-          placeholder= {t('inputCaption')}
+          placeholder={t("inputCaption")}
           value={caption}
           onChangeText={(text) => setCaption(text)}
           style={styles.input}
         />
 
         <View style={styles.container}>
-          {renderLabel()}
+          {renderLabel({ kind, isFocus })}
+
           <Dropdown
             style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            iconStyle={styles.iconStyle}
-            data={dataDropdown}
-            search
+            placeholderStyle={styles.placeholderStyle || { fontSize: 16 }}
+            selectedTextStyle={styles.selectedTextStyle || { fontSize: 16 }}
+            inputSearchStyle={
+              styles.inputSearchStyle || { height: 40, fontSize: 16 }
+            }
+            iconStyle={styles.iconStyle || { width: 20, height: 20 }}
+            data={dataDropdown || []} // Default to an empty array if dataDropdown is undefined
+            search={true}
             maxHeight={300}
             labelField='label'
             valueField='kind'
-            placeholder={!isFocus ? t('selectKind') : "..."}
-            searchPlaceholder={t('search')}
-            value={kind}
+            placeholder={!isFocus ? t("selectKind") : "..."}
+            searchPlaceholder={t("search")}
+            value={kind || null}
             onFocus={() => setIsFocus(true)}
             onBlur={() => setIsFocus(false)}
             onChange={(item) => {
@@ -223,7 +228,7 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
             }}
             renderLeftIcon={() => (
               <AntDesign
-                style={styles.icon}
+                style={styles.icon || {}}
                 color={isFocus ? "blue" : "black"}
                 name='Safety'
                 size={20}
@@ -239,11 +244,11 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
               justifyContent: "space-evenly",
               //marginVertical: 20,
             }}>
-            <Button title={t('selectImage')} onPress={showActionSheet} />
+            <Button title={t("selectImage")} onPress={showActionSheet} />
 
             <ActionSheet
               ref={actionSheet}
-              title={t('chooseImageIn')}
+              title={t("chooseImageIn")}
               options={buttons}
               cancelButtonIndex={2}
               onPress={(index) => {
@@ -258,7 +263,6 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
                     break;
                 }
               }}
-            
             />
           </View>
 
@@ -290,7 +294,7 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
           <TouchableOpacity
             style={styles.cancelButton}
             onPress={handleModalVisibility}>
-            <Text style={styles.text}>{t('cancel')}</Text>
+            <Text style={styles.text}>{t("cancel")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[
@@ -301,10 +305,17 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
               },
             ]}
             onPress={() => {
-              uploadImages(userId, userToken, caption, images, handleModalVisibility, kind);
+              uploadImages(
+                userId,
+                userToken,
+                caption,
+                images,
+                handleModalVisibility,
+                kind
+              );
             }}
             disabled={images.length <= 0}>
-            <Text style={styles.text}>{t('post')}</Text>
+            <Text style={styles.text}>{t("post")}</Text>
           </TouchableOpacity>
         </View>
       </View>

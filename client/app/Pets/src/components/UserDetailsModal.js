@@ -10,6 +10,7 @@ import {
   ScrollView,
   Dimensions,
   TextInput,
+  Linking,
 } from "react-native";
 import {
   FontAwesome,
@@ -18,12 +19,17 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { BASE_URL } from "../config";
+import { FORMAT_IMG_URL } from "../config";
 import PostCard from "./PostCard";
-import ProductCardInUserProfile from "./ProductCardInUserProfile";
+const ProductCardInUserProfile = React.lazy(() =>
+  import("./ProductCardInUserProfile")
+);
+
 import MapModal from "./MapModal"; // Import MapModal component
 import * as Location from "expo-location";
 import Geocoder from 'react-native-geocoding';
-import { GOOGLE_MAPS_API_KEY } from '../services/config/googleMapConfig';
+import { GOOGLE_MAPS_API_KEY } from "@env";
+
 
 Geocoder.init(GOOGLE_MAPS_API_KEY);
 
@@ -49,12 +55,15 @@ const UserDetailsModal = ({
   const [userCurrentAddress, setUserCurrentAddress] = useState(null)
 
   useEffect(() => {
-    const address = user.user.address;
+    const address = user.user?.addresses?.[0]?.address;
+
+    
     if (user) {
       handleSearch();
       setDestination(address) 
     }
   }, [user, searchText, searchType, searchPrice]);
+
 
   const handleSearch = () => {
     if (!user) return;
@@ -128,19 +137,22 @@ const UserDetailsModal = ({
   };
 
   const handleLocationPress = async () => {
-    const address = user.user.address; // Lấy địa chỉ từ user
-    // Lấy tọa độ từ địa chỉ
-    const coordinates = await getAddressCoordinates(address);
-    if (coordinates) {
-      setDestination(coordinates);
+    const address = user.user?.addresses?.[0]?.address; // Correct address extraction
+    if (address) {
+      const encodedAddress = encodeURIComponent(address); // Encode the address for the URL
+      const googleMapsUrl = `https://www.google.com/maps/search/?q=${encodedAddress}`;
 
-      setShowMapModal(true); // Hiển thị Modal Map
+      // Open Google Maps in the browser
+      Linking.openURL(googleMapsUrl).catch((err) =>
+        console.error("Failed to open Google Maps", err)
+      );
     } else {
-      alert('Không thể tìm thấy địa chỉ trên bản đồ.');
+      alert("Address not available.");
     }
   };
 
-  console.log(destination);
+
+
 
   const renderPosts = () => (
     <ScrollView style={{ width }}>
@@ -153,10 +165,10 @@ const UserDetailsModal = ({
             id={post.id}
             authorName={post.author.userName}
             authorId={post.author.id}
-            authorAvatar={`${BASE_URL}/${user.user.avatar.imageUrl}`}
+            authorAvatar={`${FORMAT_IMG_URL}/${user.user.avatar.imageUrl}`}
             caption={post.caption}
             postImages={post.postImages.map(
-              (image) => `${BASE_URL}/${image.imageUrl}`
+              (image) => `${FORMAT_IMG_URL}/${image.imageUrl}`
             )}
             like={post.postLike}
           />
@@ -196,35 +208,36 @@ const UserDetailsModal = ({
   
   
   return (
-    <Modal visible={visible} transparent={true} animationType="slide">
+    <Modal visible={visible} transparent={true} animationType='slide'>
       <View style={styles.modalContainer}>
         <View style={[styles.contentContainer, { width, height }]}>
           <View style={styles.header}>
             <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-              <FontAwesome name="close" size={24} color="#000" />
+              <FontAwesome name='close' size={24} color='#000' />
             </TouchableOpacity>
             {showSearchButton && activeTab === "products" && (
               <TouchableOpacity
                 style={styles.searchButton}
-                onPress={toggleSearchInputs}
-              >
-                <FontAwesome name="search" size={24} color="#000" />
+                onPress={toggleSearchInputs}>
+                <FontAwesome name='search' size={24} color='#000' />
               </TouchableOpacity>
             )}
           </View>
           {user && (
             <>
               <Image
-                source={{ uri: `${BASE_URL}/${user.user.avatar.imageUrl}` }}
+                source={{
+                  uri: `${FORMAT_IMG_URL}/${user.user.avatar.imageUrl}`,
+                }}
                 style={styles.avatar}
               />
               <Text style={styles.userName}>{user.user.userName}</Text>
               <View style={styles.email}>
                 <TouchableOpacity style={styles.iconContact}>
                   <MaterialCommunityIcons
-                    name="email"
+                    name='email'
                     size={24}
-                    color="black"
+                    color='black'
                   />
                 </TouchableOpacity>
                 <Text>{user.user.email}</Text>
@@ -232,16 +245,18 @@ const UserDetailsModal = ({
               <View style={styles.address}>
                 <TouchableOpacity
                   style={styles.iconContact}
-                  onPress={handleLocationPress}
-                >
+                  onPress={handleLocationPress}>
                   <Entypo
-                    name="location"
+                    name='location'
                     size={22}
-                    color="red"
+                    color='red'
                     style={styles.iconContact}
                   />
+                  <Text>
+                    {user.user?.addresses?.[0]?.address ||
+                      "No address available"}
+                  </Text>
                 </TouchableOpacity>
-                <Text>{user.user.address}</Text>
               </View>
             </>
           )}
@@ -250,33 +265,35 @@ const UserDetailsModal = ({
             <View style={styles.searchContainer}>
               <TextInput
                 style={styles.input}
-                placeholder="Name"
+                placeholder='Name'
                 onChangeText={(text) => setSearchText(text)}
                 value={searchText}
               />
               <TextInput
                 style={styles.input}
-                placeholder="Type"
+                placeholder='Type'
                 onChangeText={(text) => setSearchType(text)}
                 value={searchType}
               />
               <TextInput
                 style={styles.input}
-                placeholder="Price"
+                placeholder='Price'
                 onChangeText={(text) => setSearchPrice(text)}
                 value={searchPrice}
-                keyboardType="numeric"
+                keyboardType='numeric'
               />
             </View>
           )}
 
           <View style={styles.tabContainer}>
             <TouchableOpacity
-              style={[styles.tabButton, activeTab === "posts" && styles.activeTab]}
-              onPress={() => handleTabChange("posts")}
-            >
+              style={[
+                styles.tabButton,
+                activeTab === "posts" && styles.activeTab,
+              ]}
+              onPress={() => handleTabChange("posts")}>
               <AntDesign
-                name="picture"
+                name='picture'
                 size={24}
                 color={activeTab === "posts" ? "#fff" : "#000"}
               />
@@ -289,10 +306,9 @@ const UserDetailsModal = ({
               onPress={() => {
                 handleTabChange("products");
                 setShowSearchInputs(false);
-              }}
-            >
+              }}>
               <Entypo
-                name="shop"
+                name='shop'
                 size={24}
                 color={activeTab === "products" ? "#fff" : "#000"}
               />
@@ -301,15 +317,12 @@ const UserDetailsModal = ({
           {activeTab === "posts" ? renderPosts() : renderProducts()}
 
           {/* Modal bản đồ */}
-          <MapModal
+          {/* <MapModal
             visible={showMapModal}
             onClose={() => setShowMapModal(false)}
             destination={destination}
             address={user.user.address}
-          />
-
-          
-          
+          /> */}
         </View>
       </View>
     </Modal>
@@ -367,6 +380,8 @@ const styles = StyleSheet.create({
   },
   iconContact: {
     marginRight: 5,
+    flexDirection: "row",
+    alignItems: "center",
   },
   rowContainer: {
     flexDirection: "row",

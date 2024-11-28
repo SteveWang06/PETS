@@ -9,7 +9,7 @@ import MapView, {
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import axios from "axios";
-import { GOOGLE_MAPS_API_KEY } from "../services/config/googleMapConfig";
+import { GOOGLE_MAPS_API_KEY } from "@env";
 
 const MapModal = ({ visible, onClose, destination, address }) => {
   const [selectedAddress, setSelectedAddress] = useState(null);

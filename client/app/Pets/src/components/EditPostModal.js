@@ -59,7 +59,7 @@ const EditPostModal = ({
         
         setDataDropdown(formattedData)
       } catch (error) {
-        console.error('Error fetching posts:', error);
+        console.error('Edit post modal Error fetching posts:', error);
       }
     };
 

@@ -4,7 +4,7 @@
     "slug": "Pets",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "newArchEnabled": true,
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -14,6 +14,9 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "extra": {
+      "googleMapsApiKey": "AIzaSyATRRAPLIHg3A627J59b2KPK9rjXRDMMtM"
+    },
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
@@ -24,7 +27,8 @@
       },
       "config": {
         "googleMapsApiKey": "AIzaSyATRRAPLIHg3A627J59b2KPK9rjXRDMMtM"
-      }
+      },
+      "bundleIdentifier": "com.anonymous.Pets"
     },
     "android": {
       "adaptiveIcon": {
@@ -32,12 +36,13 @@
         "backgroundColor": "#ffffff"
       },
       "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION",
-        "ACCESS_BACKGROUND_LOCATION"
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.RECORD_AUDIO"
       ],
       "config": {
         "googleMaps": {

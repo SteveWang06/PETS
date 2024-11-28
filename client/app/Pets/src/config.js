@@ -1,5 +1,5 @@
-export const BASE_URL = 'http://localhost:8080/api/auth'
-// export const BASE_URL = 'http://ec2-13-211-239-71.ap-southeast-2.compute.amazonaws.com:8080/api/auth'
-// export const FORMAT_IMG_URL = 'http://ec2-13-211-239-71.ap-southeast-2.compute.amazonaws.com:8080/'
-
-
+export const BASE_URL = 'http://localhost:8080'
+export const BASE_URL_DEEP_LEARNING = "http://127.0.0.1:5000";
+export const FORMAT_IMG_URL = 'http://localhost:8080/api/auth'
+// export const BASE_URL = 'https://fcupet.com'
+// export const FORMAT_IMG_URL = 'https://fcupet.com/api/auth'

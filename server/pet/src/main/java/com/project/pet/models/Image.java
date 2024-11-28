@@ -27,6 +27,11 @@ public class Image {
   @JsonBackReference
   private Product product;
 
+  @ManyToOne
+  @JoinColumn(name = "request_id")
+  @JsonBackReference
+  private RoleUpdateRequest request;
+
   public Long getId() {
     return id;
   }
@@ -65,5 +70,13 @@ public class Image {
 
   public void setProduct(Product product) {
     this.product = product;
+  }
+
+  public RoleUpdateRequest getRequest() {
+    return request;
+  }
+
+  public void setRequest(RoleUpdateRequest request) {
+    this.request = request;
   }
 }

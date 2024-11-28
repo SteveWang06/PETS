@@ -12,18 +12,20 @@ import {
 import PostCard from "../components/PostCard";
 import { getPostsFromDatabase } from "../services/requester/UserRequester"; // Import hàm từ module UserRequester
 import HomepageHeader from "../components/HomepageHeader";
-import { BASE_URL } from "../config";
+
+import { FORMAT_IMG_URL } from "../config";
 import { getPostKindFromDataBase } from "../services/requester/UserRequester";
-import FlashMessage, { showMessage } from 'react-native-flash-message';
-import { useTranslation } from 'react-i18next';
+import FlashMessage, { showMessage } from "react-native-flash-message";
+import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserById } from "../redux/actions/authAction";
 import { logout } from "../redux/actions/authAction";
-
+import { setPosts } from "../redux/actions/postActions";
 const { width, height } = Dimensions.get("screen");
 const capitalizeFirstLetter = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 };
+
 
 const Tab = React.forwardRef(({ data, item, onItemPress, isSelected }, ref) => {
   const { t } = useTranslation();
@@ -43,6 +45,7 @@ const Tab = React.forwardRef(({ data, item, onItemPress, isSelected }, ref) => {
     </TouchableOpacity>
   );
 });
+
 
 const Indicator = ({ measures, scrollX, data }) => {
   const inputRange = data.map((_, index) => index * width);
@@ -71,6 +74,7 @@ const Indicator = ({ measures, scrollX, data }) => {
     />
   );
 };
+
 
 const Tabs = ({ data, scrollX, onItemPress, currentTabIndex }) => {
   const [measures, setMeasures] = useState([]);
@@ -137,8 +141,10 @@ const Tabs = ({ data, scrollX, onItemPress, currentTabIndex }) => {
   );
 };
 
+
+
 const HomePage = () => {
-  const [posts, setPosts] = useState([]);
+  //const [posts, setPosts] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [currentTabIndex, setCurrentTabIndex] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -146,44 +152,57 @@ const HomePage = () => {
   const [titles, setTitles] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
-
   const userData = useSelector((state) => state.auth.userData);
   const userId = userData.userId;
   const userToken = userData.token;
 
+  const posts = useSelector((state) => state.posts.posts);
+
+  const [liked, setLiked] = useState(false);
+
+  const handlePostLiked = () => {
+    setLiked(!liked);
+  };
+  
+  
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        setIsLoading(true);
-        const data = await getPostsFromDatabase();
-        const formattedPosts = data.map((post) => ({
-          id: post.id,
-          authorId: post.userId,
-          authorName: post.authorName,
-          authorAvatar: post.authorAvatar
-            ? `${BASE_URL}/${post.authorAvatar.imageUrl}`
-            : null,
-          caption: post.caption,
-          like: post.postLike,
-          kind: post.postKind,
-          images: post.postImages.map(
-            (image) => `${BASE_URL}/${image.imageUrl}`
-          ),
-        }));
-        setPosts(formattedPosts);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    setIsLoading(true);
     fetchPosts();
-    dispatch(getUserById({userId, userToken}))
-  }, [refreshing]);
+    dispatch(getUserById({ userId, userToken }));
+    fetchPostKind();
+    setIsLoading(false);
+  }, [posts]);
 
   
+  const fetchPosts = async () => {
+    try {
+      //setIsLoading(true);
+      const data = await getPostsFromDatabase();
+      const formattedPosts = data.map((post) => ({
+        id: post.id,
+        authorId: post.userId,
+        authorName: post.authorName,
+        authorAvatar: post.authorAvatar
+          ? `${FORMAT_IMG_URL}/${post.authorAvatar.imageUrl}`
+          : null,
+        caption: post.caption,
+        like: post.postLike,
+        kind: post.postKind,
+        images: post.postImages.map(
+          (image) => `${FORMAT_IMG_URL}/${image.imageUrl}`
+        ),
+      }));
+      //setPosts(formattedPosts);
+      //setIsLoading(false);
+      dispatch(setPosts(formattedPosts));
+    } catch (error) {
+      console.error("Home page Error fetching posts:", error);
+    } finally {
+      //setIsLoading(false);
+    }
+  };
+
   const onRefresh = () => {
     setRefreshing(true);
     setTimeout(() => {
@@ -198,18 +217,28 @@ const HomePage = () => {
     setCurrentTabIndex(itemIndex);
   };
 
-  useEffect(() => {
-    const fetchPostKind = async () => {
-      try {
-        const data = await getPostKindFromDataBase();
-        setTitles(data);
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchPostKind = async () => {
+  //     try {
+  //       const data = await getPostKindFromDataBase();
+  //       setTitles(data);
+  //     } catch (error) {
+  //       console.error("Error fetching posts kind:", error);
+  //     }
+  //   };
 
-    fetchPostKind();
-  }, []);
+  //   fetchPostKind();
+  // }, []);
+
+  
+  const fetchPostKind = async () => {
+    try {
+      const data = await getPostKindFromDataBase();
+      setTitles(data);
+    } catch (error) {
+      console.error("Error fetching posts kind:", error);
+    }
+  };
 
   const dataWithRefs = titles.map((item) => ({
     key: item.kind,
@@ -225,8 +254,6 @@ const HomePage = () => {
     scrollX.setValue(offsetX);
   };
 
-
-  
   return (
     <View style={{ flex: 1 }}>
       <HomepageHeader />
@@ -236,10 +263,11 @@ const HomePage = () => {
         onItemPress={onItemPress}
         currentTabIndex={currentTabIndex}
       />
-     
+
       {isLoading ? (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <ActivityIndicator size="large" color="#0000ff" />
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <ActivityIndicator size='large' color='#0000ff' />
         </View>
       ) : (
         <Animated.FlatList
@@ -256,33 +284,42 @@ const HomePage = () => {
               <ScrollView
                 style={{ width }}
                 refreshControl={
-                  <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                  />
                 }>
-                {posts
-                  .slice()
-                  .reverse()
-                  .filter((post) => post.kind === item.content)
-                  .map((formattedPosts) => (
-                    <PostCard
-                      key={formattedPosts.id}
-                      id={formattedPosts.id}
-                      authorId={formattedPosts.authorId}
-                      authorName={formattedPosts.authorName}
-                      authorAvatar={formattedPosts.authorAvatar}
-                      caption={formattedPosts.caption}
-                      postImages={formattedPosts.images}
-                      kind={formattedPosts.kind}
-                      like={formattedPosts.like}
-                    />
-                  ))}
+                {posts &&
+                  Array.isArray(posts) &&
+                  posts
+                    .slice()
+                    .reverse()
+                    .filter((post) => post.kind === item.content)
+                    .map((formattedPosts) => (
+                      <PostCard
+                        key={formattedPosts.id}
+                        id={formattedPosts.id}
+                        authorId={formattedPosts.authorId}
+                        authorName={formattedPosts.authorName}
+                        authorAvatar={formattedPosts.authorAvatar}
+                        caption={formattedPosts.caption}
+                        postImages={formattedPosts.images}
+                        kind={formattedPosts.kind}
+                        like={formattedPosts.like}
+                        liked={liked}
+                        onPostLiked={handlePostLiked}
+                      />
+                    ))}
               </ScrollView>
             </View>
           )}
         />
       )}
-      <FlashMessage position="top" />
+      <FlashMessage position='top' />
     </View>
   );
 };
+
+
 
 export default HomePage;
