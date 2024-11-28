@@ -9,7 +9,12 @@ import {
   FlatList,
   ActivityIndicator
 } from "react-native";
-import { BASE_URL } from "../config";
+import {
+  BASE_URL
+} from "../config";
+import {
+  FORMAT_IMG_URL
+} from "../config";
 import UserDetailsModal from "./UserDetailsModal";
 import EditProductModalInShop from "./EditProductModalInShop"; 
 import { useSelector, useDispatch } from "react-redux";
@@ -32,7 +37,6 @@ const ProductCard = ({ product, addToCart }) => {
   const userId = useSelector((state) => state.auth.userData.userId);
   const author = product.user.id;
 
-  console.log(product)
 
   const dispatch = useDispatch();
   const toggleModal = () => {
@@ -41,13 +45,17 @@ const ProductCard = ({ product, addToCart }) => {
 
   const toggleUserModal = () => {
     setUserModalVisible(!userModalVisible);
-    setShowModal(!showModal);
+    //setShowModal(!showModal);
   };
 
   const renderSmallImage = ({ item, index }) => (
     <TouchableOpacity onPress={() => setSelectedImageIndex(index)}>
       <Image
-        source={{ uri: `${BASE_URL}/${item}` }}
+        source = {
+          {
+            uri: `${FORMAT_IMG_URL}/${item}`
+          }
+        }
         style={[
           styles.smallImage,
           index === selectedImageIndex && styles.selectedImage,
@@ -93,7 +101,11 @@ const ProductCard = ({ product, addToCart }) => {
   return (
     <TouchableOpacity style={styles.card} onPress={toggleModal}>
       <Image
-        source={{ uri: `${BASE_URL}/${product.imageUrl[0]}` }}
+        source = {
+          {
+            uri: `${FORMAT_IMG_URL}/${product.imageUrl[0]}`
+          }
+        }
         style={styles.image}
       />
       <View style={styles.nameEditContainer}>
@@ -142,7 +154,7 @@ const ProductCard = ({ product, addToCart }) => {
           </TouchableOpacity>
           <Image
             source={{
-              uri: `${BASE_URL}/${product.imageUrl[selectedImageIndex]}`,
+              uri: `${FORMAT_IMG_URL}/${product.imageUrl[selectedImageIndex]}`,
             }}
             style={styles.largeImage}
           />
@@ -157,7 +169,11 @@ const ProductCard = ({ product, addToCart }) => {
           </TouchableOpacity>
           <View style={styles.shopInfo}>
             <Image
-              source={{ uri: `${BASE_URL}/${product.user.avatar.imageUrl}` }}
+              source = {
+                {
+                  uri: `${FORMAT_IMG_URL}/${product.user.avatar.imageUrl}`
+                }
+              }
               style={styles.avatar}
             />
             <Text style={styles.userName}>{product.user.userName}</Text>
@@ -186,6 +202,7 @@ const ProductCard = ({ product, addToCart }) => {
         onClose={toggleUserModal}
         addToCart={addToCart}
       />
+
       <EditProductModalInShop
         visible={editModalVisible}
         onClose={handleEdit}

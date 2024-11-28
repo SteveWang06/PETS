@@ -39,7 +39,6 @@ const getUserIdFromAsyncStorage = async () => {
       // return { userId: parseInt(userId), userName, token };
       return { userId: parseInt(userId), userName, userToken };
     } else {
-      console.log("No userId found in AsyncStorage");
       return null;
     }
   } catch (error) {
@@ -121,7 +120,7 @@ const uploadImages = async (
 
     console.log("Response from server:", response.data);
   } catch (error) {
-    console.error("Error uploading images:", error);
+    console.error("Error uploading post:", error);
   }
 };
 
@@ -274,7 +273,6 @@ const handleDeleteComment = async (commentId, token) => {
   try {
     // const userInfo = await getUserIdFromAsyncStorage();
     // const { token } = userInfo;
-    console.log("commentId in handleDeleteComment: ", commentId);
     const response = await axios.delete(
       `${ApiPaths.deleteComment}/${commentId}`,
       {
@@ -356,7 +354,7 @@ const getUserByIdFromDatabase = async (userId, token) => {
 const getQRcode = async (userId, token) => {
   try {
     const response = await axios.get(
-      `http://localhost:8080/api/auth/qr/${userId}`,
+      `${ApiPaths.getUserQrCode}/${userId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -402,7 +400,7 @@ const handleSubmitEditProfile = async (
       });
     }
 
-    const response = await fetch(`http://localhost:8080/api/auth/${userId}`, {
+    const response = await fetch(`${ApiPaths.updateUser}/${userId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "multipart/form-data",
@@ -537,6 +535,92 @@ const getPostById = async (postId, token) => {
   }
 };
 
+const checkLikes = async (userId, postId) => {
+  try {
+    const response = await axios.get(
+      `${ApiPaths.checkLikes}?userId=${userId}&postId=${postId}`
+    );
+    
+    return response.data; // true hoặc false
+
+  } catch (error) {
+    console.error(
+      "Error checking likes:",
+      error.response?.data || error.message
+    );
+  }
+};
+
+const likeToggle = async (userId, postId) => {
+  try {
+    const formData = new FormData();
+    formData.append("userId", userId);
+    formData.append("postId", postId);
+    const response = await axios.post(
+      `${ApiPaths.likeToggle}`, formData
+    );
+    // return response.data; // true hoặc false
+  } catch (error) {
+    console.error(
+      "Error toggle likes:",
+      error.response?.data || error.message
+    );
+  }
+};
+
+const handleAskPetAI = async (imageUrl, userId) => {
+    try {
+      // Gọi API http://127.0.0.1:5000/predict để lấy dữ liệu
+      const response = await fetch(ApiPaths.predictPetBreed, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          image_url: imageUrl,
+        }),
+      });
+
+      const data = await response.json();
+      console.log("data of chat gpt: ",data);
+      
+
+      if (data) {
+        // Lấy các giá trị từ data trả về
+        const { detailed_info, image_url, predicted_breed_info } = data;
+        const { appearance, name } = predicted_breed_info;
+
+        // Tạo payload cho API tiếp theo
+        const payload = {
+          detailedInfo: detailed_info,
+          imageUrl: image_url,
+          appearance: appearance,
+          nameBreed: name,
+        };
+
+        // Gọi API http://localhost:8080/api/chatbots/user/{userId} để gửi dữ liệu
+        const chatBotResponse = await fetch(
+          `http://localhost:8080/api/chatbots/user/${userId}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        const chatBotData = await chatBotResponse.json();
+        return chatBotData
+      }
+    } catch (error) {
+      console.error("Error during the API calls:", error);
+    }
+
+    
+  };
+
+
 export {
   getPostsFromDatabase,
   uploadImages,
@@ -557,5 +641,8 @@ export {
   handleDeletePost,
   handleUpdateProduct,
   handleDeleteProduct,
-  getPostById
+  getPostById,
+  checkLikes,
+  likeToggle,
+  handleAskPetAI
 };

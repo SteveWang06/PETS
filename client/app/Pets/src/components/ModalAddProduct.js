@@ -14,6 +14,7 @@ const ensureDirExists = async () => {
   }
 };
 
+
 const ModalAddProduct = ({ visible, onClose, onAddProduct }) => {
   const { t } = useTranslation();
   const [images, setImages] = useState([]);
@@ -81,7 +82,7 @@ const ModalAddProduct = ({ visible, onClose, onAddProduct }) => {
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ["images", "videos"],
         allowsEditing: false,
         allowsMultipleSelection: true,
         quality: 1,
@@ -185,51 +186,51 @@ const ModalAddProduct = ({ visible, onClose, onAddProduct }) => {
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
-    backgroundColor: 'white',
-    marginTop: 'auto',
+    backgroundColor: "white",
+    marginTop: "auto",
     marginBottom: 0,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     padding: 10,
     borderRadius: 5,
-    width: '100%',
+    width: "100%",
     marginBottom: 10,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    width: '100%',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
     marginTop: 20,
   },
   cancelButton: {
-    backgroundColor: '#FF6347',
+    backgroundColor: "#FF6347",
     padding: 10,
     borderRadius: 5,
-    width: '40%',
-    alignItems: 'center',
+    width: "40%",
+    alignItems: "center",
   },
   postButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: "#4CAF50",
     padding: 10,
     borderRadius: 5,
-    width: '40%',
-    alignItems: 'center',
+    width: "40%",
+    alignItems: "center",
   },
   buttonText: {
     fontSize: 16,
-    color: 'white',
+    color: "white",
   },
   iconStyle: {
     marginRight: 0,

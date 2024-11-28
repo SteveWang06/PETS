@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import AddNewPostPage from "../page/AddNewPostPage";
+import PetAiPage from "../page/PetAiPage";
 import HomePage from "../page/HomePage";
 import ShopPage from "../page/ShopPage";
 import ProfilePage from "../page/ProfilePage";
@@ -14,34 +14,33 @@ const HomeScreen = () => {
   const { t } = useTranslation();
   
   return (
-    <Tab.Navigator 
-      activeColor="#f0edf6"
-      inactiveColor="#FAE009"
-      barStyle={{ backgroundColor: '#8B0000' }}>
+    <Tab.Navigator
+      activeColor='#f0edf6'
+      inactiveColor='#FAE009'
+      barStyle={{ backgroundColor: "#8B0000" }}>
       <Tab.Screen
         name='home'
         component={HomePage}
         options={{
-          tabBarLabel: t('home'),
+          tabBarLabel: t("home"),
           tabBarIcon: () => <MaterialCommunityIcons name='home' size={24} />,
         }}
       />
       <Tab.Screen
-        name='friend'
-        component={AddNewPostPage}
+        name='petAI'
+        component={PetAiPage}
         options={{
-          tabBarLabel: t('friends'),
+          tabBarLabel: "PetAI",
           tabBarIcon: () => (
-            <MaterialCommunityIcons name='account-multiple' size={24} />
+            <MaterialCommunityIcons name='robot-excited' size={24} />
           ),
         }}
       />
-
       <Tab.Screen
         name='shop'
         component={ShopPage}
         options={{
-          tabBarLabel: t('shop'),
+          tabBarLabel: t("shop"),
           tabBarIcon: () => (
             <MaterialCommunityIcons name='shopping' size={24} />
           ),
@@ -52,7 +51,7 @@ const HomeScreen = () => {
         name='hospital'
         component={HospitalPage}
         options={{
-          tabBarLabel: t('hospital'),
+          tabBarLabel: t("hospital"),
           tabBarIcon: () => (
             <MaterialCommunityIcons name='hospital-building' size={24} />
           ),
@@ -62,7 +61,7 @@ const HomeScreen = () => {
         name='profile'
         component={ProfilePage}
         options={{
-          tabBarLabel: t('profile'),
+          tabBarLabel: t("profile"),
           tabBarIcon: () => (
             <MaterialCommunityIcons name='face-man' size={24} />
           ),

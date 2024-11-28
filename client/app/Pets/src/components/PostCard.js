@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useId } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   Modal,
   Alert,
   TouchableOpacity,
+  TouchableWithoutFeedback,
 } from "react-native";
 import {
   AntDesign,
@@ -19,16 +20,22 @@ import {
 } from "@expo/vector-icons";
 import EditPostModal from "./EditPostModal"; // Assuming you have implemented EditPostModal
 import { useDispatch, useSelector } from "react-redux";
-import { updatePostLike } from "../redux/actions/postActions";
+import { updatePostLike, likeStatus } from "../redux/actions/postActions";
 import CommentModal from "./CommentModal";
 import ActionSheet from "react-native-actionsheet";
+import FlashMessage, { showMessage } from "react-native-flash-message";
 import {
   handleDeletePost,
   getPostById,
   getUserByIdFromDatabase,
+  checkLikes,
+  likeToggle,
+  handleAskPetAI
 } from "../services/requester/UserRequester";
 import PostModal from "./PostModal";
-
+import { useNavigation } from "@react-navigation/native";
+import * as FileSystem from "expo-file-system";
+import * as MediaLibrary from "expo-media-library";
 const PostCard = ({
   id,
   authorId,
@@ -38,25 +45,101 @@ const PostCard = ({
   postImages,
   kind,
   like,
-  onLikeToggle,
+  liked,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalCommentVisible, setModalCommentVisible] = useState(false);
-  const actionSheet = useRef();
+  const iconActionSheet = useRef();
+  const imageActionSheet = useRef(null);
   const [isAuthor, setIsAuthor] = useState(false);
   const [userRole, setUserRole] = useState();
   const [fullPostModalVisible, setFullPostModalVisible] = useState(false);
+  const userData = useSelector((state) => state.auth.userData);
+  const userToken = userData.token;
+  const dispatch = useDispatch();
+  const userName = userData.userName;
+  const userId = useSelector((state) => state.auth.userData.userId);
+  const buttons = ["edit", "delete", "cancel"];
+  const actionImage = ["Download Image", "Ask PetAI", "cancel"];
+  const navigation = useNavigation();
+  const selectedImageUrl = useRef(null);
 
+  const [isLiked, setIsLiked] = useState(liked);
   const handleModalVisibility = (visibility) => {
     setModalVisible(visibility);
   };
 
   const handleModalCommentVisibility = () => {
+    // setModalCommentVisible(!modalCommentVisible);
     setModalCommentVisible(!modalCommentVisible);
   };
 
   const handlePressLiked = () => {
-    onLikeToggle(id, like);
+    // Cập nhật trạng thái like trong Redux
+    dispatch(updatePostLike(id, !isLiked, userToken));
+    // Cập nhật trạng thái cục bộ để hiển thị nhanh
+    setIsLiked(!isLiked);
+    likeToggle(userId, id);
+  };
+
+  const showImageOptions = () => {
+    imageActionSheet.current.show();
+  };
+
+  const handleImageOption = (index, imageUrl) => {
+
+    if (index === 0) handleDownloadImage(imageUrl);
+    if (index === 1) askPetAI(imageUrl, userId);
+  };
+
+  // Xin quyền truy cập thư viện ảnh
+  const requestMediaLibraryPermission = async () => {
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+    return status === "granted";
+  };
+
+  const handleDownloadImage = async (imageUrl) => {
+    try {
+      const hasPermission = await requestMediaLibraryPermission();
+      if (!hasPermission) {
+        Alert.alert("Permission denied!", "Unable to save image to gallery.");
+        return;
+      }
+
+      // Tải ảnh về
+      const downloadPath = `${FileSystem.documentDirectory}image.jpg`;
+      const { uri } = await FileSystem.downloadAsync(imageUrl, downloadPath);
+
+      // Kiểm tra xem album "Pet" đã có hay chưa
+      let album = await MediaLibrary.getAlbumAsync("Pet");
+
+      // Nếu album không có, tạo mới
+      if (!album) {
+        album = await MediaLibrary.createAlbumAsync("Pet", uri, false);
+      } else {
+        // Nếu album đã có, lưu ảnh vào album hiện có
+        const asset = await MediaLibrary.createAssetAsync(uri);
+        await MediaLibrary.addAssetsToAlbumAsync([asset], album.id, false);
+      }
+
+      // Hiển thị thông báo thành công
+      showMessage({
+        message: "Image saved successfully",
+        type: "success",
+        floating: true,
+        duration: 500,
+        autoHide: true,
+      });
+    } catch (error) {
+      console.log("Error:", error);
+      Alert.alert("Error", "An error occurred while saving the image.");
+    }
+  };
+
+  const askPetAI = async (imageUrl, userId) => {
+    handleAskPetAI(imageUrl, userId)
+    navigation.navigate("petAI");
+    console.log("Ask PetAI: ", selectedImageUrl);
   };
 
   const renderItem = ({ item, index }) => {
@@ -72,16 +155,30 @@ const PostCard = ({
         </TouchableOpacity>
       );
     }
-    return <Image source={{ uri: item }} style={styles.image} />;
-  };
+    return (
+      <View>
+        <TouchableOpacity
+          onPress={() => {
+            selectedImageUrl.current = item;
 
-  const isLiked = useSelector((state) => state.post?.posts[id] || false);
-  const userData = useSelector((state) => state.auth.userData);
-  const userToken = userData.token;
-  const dispatch = useDispatch();
-  const userName = userData.userName;
-  const userId = useSelector((state) => state.auth.userData.userId);
-  const buttons = ["edit", "delete", "cancel"];
+            showImageOptions();
+          }}>
+          <Image source={{ uri: item }} style={styles.image} />
+        </TouchableOpacity>
+        <ActionSheet
+          ref={imageActionSheet}
+          title={"Action"}
+          options={actionImage}
+          cancelButtonIndex={2}
+          onPress={(index) => {
+            if (selectedImageUrl) {
+              handleImageOption(index, selectedImageUrl.current); 
+            }
+          }}
+        />
+      </View>
+    );
+  };
 
   const checkAuthorPost = () => {
     if (userId === authorId) {
@@ -91,13 +188,29 @@ const PostCard = ({
     }
   };
 
+  const checkLiked = async (userId, id) => {
+    const newIsLiked = await checkLikes(userId, id);
+    setIsLiked(newIsLiked);
+    dispatch(likeStatus(isLiked));
+  };
+
   useEffect(() => {
     checkAuthorPost();
     fetchUserById();
+    checkLiked(userId, id);
   }, []);
 
+  const fetchUserById = async () => {
+    try {
+      const response = await getUserByIdFromDatabase(authorId, userToken);
+      setUserRole(response.user.role.name);
+    } catch (error) {
+      console.error("Failed to fetch user data:", error);
+    }
+  };
+
   const showActionSheet = () => {
-    actionSheet.current.show();
+    iconActionSheet.current.show();
   };
 
   const handleEdit = () => {
@@ -117,15 +230,6 @@ const PostCard = ({
       setFullPostModalVisible(true);
     } catch (error) {
       console.error("Failed to fetch full post data:", error);
-    }
-  };
-
-  const fetchUserById = async () => {
-    try {
-      const response = await getUserByIdFromDatabase(authorId, userToken);
-      setUserRole(response.user.role.name);
-    } catch (error) {
-      console.error("Failed to fetch user data:", error);
     }
   };
 
@@ -175,20 +279,15 @@ const PostCard = ({
           )}
 
           <ActionSheet
-            ref={actionSheet}
-            title={"action"}
+            ref={iconActionSheet}
+            title={"Action"}
             options={buttons}
             cancelButtonIndex={2}
             onPress={(index) => {
-              switch (index) {
-                case 0:
-                  handleEdit();
-                  break;
-                case 1:
-                  handleDelete();
-                  break;
-                default:
-                  break;
+              if (index === 0) {
+                handleEdit();
+              } else if (index === 1) {
+                handleDelete();
               }
             }}
           />
@@ -225,13 +324,15 @@ const PostCard = ({
           <Image source={{ uri: postImages[0] }} style={styles.singleImage} />
         ) : (
           <View>
-            <FlatList
-              data={postImages.slice(0, 4)} // Only pass the first 4 images to FlatList
-              renderItem={renderItem}
-              keyExtractor={(item, index) => index.toString()}
-              numColumns={numColumns}
-              key={numColumns}
-            />
+            <View>
+              <FlatList
+                data={postImages.slice(0, 4)} // Only pass the first 4 images to FlatList
+                renderItem={renderItem}
+                keyExtractor={(item, index) => index.toString()}
+                numColumns={numColumns}
+                key={numColumns}
+              />
+            </View>
           </View>
         )}
       </View>
@@ -241,9 +342,7 @@ const PostCard = ({
       </View>
       <View style={styles.line}></View>
       <View style={styles.action}>
-        <Pressable
-          style={styles.like}
-          onPress={() => dispatch(updatePostLike(id, !isLiked, userToken))}>
+        <Pressable style={styles.like} onPress={handlePressLiked}>
           <MaterialCommunityIcons
             name={isLiked ? "thumb-up" : "thumb-up-outline"}
             size={20}

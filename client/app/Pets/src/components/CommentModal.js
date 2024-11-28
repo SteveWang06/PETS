@@ -15,7 +15,12 @@ import {
   getPostsByIdFromDatabase,
   handleAddCommentToPost,
 } from "../services/requester/UserRequester";
-import { BASE_URL } from "../config";
+import {
+  BASE_URL
+} from "../config";
+import {
+  FORMAT_IMG_URL
+} from "../config";
 import {
   AntDesign,
   Feather,
@@ -49,53 +54,57 @@ const CommentModal = ({
     />
   );
 
+  
+
   useEffect(() => {
-    const fetchPost = async (postId) => {
-      try {
-        const data = await getPostsByIdFromDatabase(postId);
-        const formattedPost = {
-          id: data.id,
-          authorName: data.authorName,
-          authorAvatar: data.authorAvatar
-            ? `${BASE_URL}/${data.authorAvatar.imageUrl}`
-            : null,
-          caption: data.caption,
-          like: data.postLike,
-          kind: data.postKind,
-          images: data.postImages.map(
-            (image) => `${BASE_URL}/${image.imageUrl}`
-          ),
-          comments: data.postComment.map((comment) => {
-            const userId = comment.userId;
-
-            const formattedUser = userId
-              ? {
-                  id: userId.id,
-                  username: userId.userName,
-                  avatar: userId.avatar
-                    ? `${BASE_URL}/${userId.avatar.imageUrl}`
-                    : null,
-                }
-              : null;
-
-            return {
-              id: comment.id,
-              content: comment.content,
-              uploadAt: comment.uploadAt,
-              commentAuthorId: userId.id,
-              authorName: formattedUser.username,
-              authorCommentAvatar: formattedUser.avatar,
-            };
-          }),
-        };
-        setPost(formattedPost);
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-      }
-    };
     fetchPost(postId);
   }, [post]);
 
+  
+  const fetchPost = async (postId) => {
+    try {
+      const data = await getPostsByIdFromDatabase(postId);
+
+      const formattedPost = {
+        id: data.id,
+        authorName: data.authorName,
+        authorAvatar: data.authorAvatar
+          ? `${FORMAT_IMG_URL}/${data.authorAvatar.imageUrl}`
+          : null,
+        caption: data.caption,
+        like: data.postLike,
+        kind: data.postKind,
+        images: data.postImages.map(
+          (image) => `${FORMAT_IMG_URL}/${image.imageUrl}`
+        ),
+        comments: data.postComment.map((comment) => {
+          const userId = comment.userId;
+
+          const formattedUser = userId
+            ? {
+                id: userId.id,
+                username: userId.userName,
+                avatar: userId.avatar
+                  ? `${FORMAT_IMG_URL}/${userId.avatar.imageUrl}`
+                  : null,
+              }
+            : null;
+
+          return {
+            id: comment.id,
+            content: comment.content,
+            uploadAt: comment.uploadAt,
+            commentAuthorId: userId.id,
+            authorName: formattedUser.username,
+            authorCommentAvatar: formattedUser.avatar,
+          };
+        }),
+      };
+      setPost(formattedPost);
+    } catch (error) {
+      console.error("Comment modal Error fetching posts:", error);
+    }
+  };
   
   const userData = useSelector((state) => state.auth.userData);
   const userId = userData.userId;
@@ -131,15 +140,23 @@ const CommentModal = ({
   };
   return (
     <Modal
-      animationType="slide"
+      animationType='slide'
       transparent={false}
       visible={visible}
-      onRequestClose={onClose}
-    >
+      onRequestClose={onClose}>
       <SafeAreaView style={styles.container}>
-        <ScrollView style={styles.scrollView}>
-          <View>
-            {post && (
+        {post && (
+          <FlatList
+            data={[...post.comments].reverse()}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <RenderItemComments
+                key={item.id}
+                item={item}
+                commentAuthorId={item.commentAuthorId}
+              />
+            )}
+            ListHeaderComponent={
               <View style={styles.card}>
                 <View style={styles.header}>
                   <Image
@@ -155,60 +172,37 @@ const CommentModal = ({
                 </View>
                 <Text style={styles.content}>{post.caption}</Text>
 
-                <View style={styles.listImage}>
-                  <FlatList
-                    data={post.images}
-                    renderItem={renderItem}
-                    keyExtractor={(item, index) => index.toString()}
-                    numColumns={4}
-                  />
-                </View>
+                <FlatList
+                  data={post.images}
+                  renderItem={renderItem}
+                  keyExtractor={(item, index) => index.toString()}
+                  numColumns={4}
+                  style={styles.listImage}
+                />
                 <View style={styles.likeIconAndLikeQuantity}>
                   <MaterialCommunityIcons
-                    name="thumb-up"
+                    name='thumb-up'
                     size={15}
                     color={"#099BFA"}
                   />
                   <Text style={styles.likeQuantity}>{post.like}</Text>
                 </View>
-
                 <View style={styles.line}></View>
-
-                <View>
-                  {post && post.comments.length > 0 ? (
-                    <View>
-                      <FlatList
-                        data={post.comments.slice().reverse()}
-                        renderItem={({ item }) => (
-                          <RenderItemComments
-                            key={item.id}
-                            item={item}
-                            commentAuthorId={item.commentAuthorId}
-                          />
-                        )}
-                        keyExtractor={(item) => item.id}
-                        numColumns={1}
-                      />
-                    </View>
-                  ) : (
-                    <View style={styles.noCommentsContainer}>
-                      <Text style={styles.noCommentsText}>
-                        {t("notComment")}
-                      </Text>
-                    </View>
-                  )}
-                </View>
               </View>
-            )}
-          </View>
-        </ScrollView>
+            }
+            ListEmptyComponent={
+              <View style={styles.noCommentsContainer}>
+                <Text style={styles.noCommentsText}>{t("notComment")}</Text>
+              </View>
+            }
+          />
+        )}
         <View style={styles.inputComment}>
           <TextInput
             style={styles.input}
             onChangeText={setText}
             value={text}
             placeholder={t("comment")}
-            keyboardType={text}
           />
           {text.length > 0 ? (
             <TouchableOpacity
@@ -216,13 +210,12 @@ const CommentModal = ({
               onPress={() => {
                 handleAddCommentToPost(postId, text, userId, token);
                 setText("");
-              }}
-            >
-              <FontAwesome name="send" size={20} color="black" />
+              }}>
+              <FontAwesome name='send' size={20} color='black' />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity style={styles.iconClose} onPress={onClose}>
-              <FontAwesome name="close" size={24} color="#000" />
+              <FontAwesome name='close' size={24} color='#000' />
             </TouchableOpacity>
           )}
         </View>

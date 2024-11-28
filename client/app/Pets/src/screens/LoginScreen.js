@@ -9,8 +9,17 @@ import { loginRequest, registerRequest } from "../redux/actions/authAction";
 import Facebook from "../components/loginWithSocialMedia/Facebook";
 import Google from "../components/loginWithSocialMedia/Google";
 import { showMessage } from "react-native-flash-message";
-import FlashMessage from "react-native-flash-message"; // Correctly import FlashMessage
+import FlashMessage from "react-native-flash-message";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+// import {
+//   GoogleSignin,
+//   statusCodes,
+// } from "@react-native-google-signin/google-signin";
 
+// import * as Google from "expo-auth-session/providers/google";
+// import * as WebBrowser from "expo-web-browser";
+
+// WebBrowser.maybeCompleteAuthSession();
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -19,6 +28,8 @@ const LoginScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+
+  
 
   const handleLogin = async () => {
     try {
@@ -38,37 +49,50 @@ const LoginScreen = ({ navigation }) => {
         duration: 2000,
         autoHide: true,
       });
-
-      setTimeout(() => {
-        setActiveTab("login");
-      }, 2000);
+      setTimeout(() => setActiveTab("login"), 2000);
     } catch (error) {
       setError(error.message);
     }
   };
 
   const handleTogglePasswordVisibility = () => {
-    setShowPassword(!showPassword); // Toggle the state to show/hide password
+    setShowPassword(!showPassword);
   };
 
   useEffect(() => {
     setError(null);
   }, [email, password, username]);
 
+  // const signInWithGoogle = async () => {
+  //   try {
+  //     await GoogleSignin.hasPlayServices();
+  //     const userInfo = await GoogleSignin.signIn();
+  //     Alert.alert("Đăng nhập thành công!", JSON.stringify(userInfo));
+  //   } catch (error) {
+  //     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+  //       Alert.alert("Bạn đã hủy đăng nhập.");
+  //     } else if (error.code === statusCodes.IN_PROGRESS) {
+  //       Alert.alert("Đang xử lý, vui lòng chờ.");
+  //     } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+  //       Alert.alert("Dịch vụ Google Play không khả dụng.");
+  //     } else {
+  //       Alert.alert("Đăng nhập thất bại.", error.message);
+  //     }
+  //   }
+  // };
+
   return (
     <Background>
       <View style={styles.tabsContainer}>
         <TouchableOpacity
           style={[styles.tabButton, activeTab === "login" && styles.activeTab]}
-          onPress={() => setActiveTab("login")}
-        >
+          onPress={() => setActiveTab("login")}>
           <Text
             style={
               activeTab === "login"
                 ? styles.tabButtonText
                 : styles.noActiveTabButtonText
-            }
-          >
+            }>
             Login
           </Text>
         </TouchableOpacity>
@@ -77,92 +101,98 @@ const LoginScreen = ({ navigation }) => {
             styles.tabButton,
             activeTab === "register" && styles.activeTab,
           ]}
-          onPress={() => setActiveTab("register")}
-        >
+          onPress={() => setActiveTab("register")}>
           <Text
             style={
               activeTab === "register"
                 ? styles.tabButtonText
                 : styles.noActiveTabButtonText
-            }
-          >
+            }>
             Register
           </Text>
         </TouchableOpacity>
       </View>
+
       <View style={styles.formContainer}>
+        {/* Conditionally render fields for the login or register tab */}
         {activeTab === "register" && (
           <TextInput
             style={styles.input}
-            label="User name"
+            label='User name'
             value={username}
             onChangeText={(text) => setUsername(text)}
-            autoCapitalize="none"
+            autoCapitalize='none'
           />
         )}
         <TextInput
           style={styles.input}
-          label="Email"
+          label='Email'
           value={email}
           onChangeText={(text) => setEmail(text)}
-          autoCapitalize="none"
-          autoCompleteType="email"
-          textContentType="emailAddress"
-          keyboardType="email-address"
+          autoCapitalize='none'
+          autoCompleteType='email'
+          textContentType='emailAddress'
+          keyboardType='email-address'
         />
-        <TextInput
-          style={styles.input}
-          label="Password"
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-          secureTextEntry={!showPassword}
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.input}
+            label='Password'
+            value={password}
+            onChangeText={(text) => setPassword(text)}
+            secureTextEntry={!showPassword}
+          />
+          <TouchableOpacity
+            onPress={handleTogglePasswordVisibility}
+            style={styles.icon}>
+            <MaterialCommunityIcons
+              name={showPassword ? "eye-off" : "eye"}
+              size={24}
+              color={theme.colors.primary}
+            />
+          </TouchableOpacity>
+        </View>
 
         {error && <Text style={styles.errorText}>{error}</Text>}
-        <TouchableOpacity onPress={handleTogglePasswordVisibility}>
-          <Text style={styles.togglePasswordText}>
-            {showPassword ? "Hide" : "Show"} Password
-          </Text>
+
+        <TouchableOpacity
+          onPress={() => navigation.replace("ForgotPasswordScreen")}>
+          <Text style={styles.forgot}>Forgot your password?</Text>
         </TouchableOpacity>
 
-        <Button
-          disabled={email.length === 0 || password.length === 0}
-          mode="contained"
+        <TouchableOpacity
           onPress={activeTab === "login" ? handleLogin : handleRegister}
+          disabled={email.length === 0 || password.length === 0}
           style={[
-            styles.button,
+            styles.customButton,
             {
               backgroundColor:
-                email.length && password.length > 0
+                email.length > 0 && password.length > 0
                   ? theme.colors.red
                   : theme.colors.grey,
             },
-          ]}
-        >
-          {activeTab === "login" ? "Login" : "Register"}
-        </Button>
+          ]}>
+          <Text style={styles.buttonText}>
+            {activeTab === "login" ? "Login" : "Register"}
+          </Text>
+        </TouchableOpacity>
 
         <View
           style={{
             flexDirection: "row",
             justifyContent: "center",
-          }}
-        >
+            marginTop: 20,
+          }}>
           <TouchableOpacity>
             <Facebook />
           </TouchableOpacity>
-
           <TouchableOpacity>
             <Google />
           </TouchableOpacity>
         </View>
       </View>
-      <TouchableOpacity
-        onPress={() => navigation.replace("ForgotPasswordScreen")}
-      >
-        <Text style={styles.forgot}>Forgot your password?</Text>
-      </TouchableOpacity>
-      <FlashMessage position="top" style={{ marginBottom: 50 }}/>
+
+      <FlashMessage position='top' style={{ marginBottom: 50 }} />
     </Background>
   );
 };
@@ -205,23 +235,38 @@ const styles = StyleSheet.create({
     width: "100%",
     marginBottom: 10,
   },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  icon: {
+    position: "absolute",
+    right: 10,
+    padding: 5,
+  },
   button: {
     margin: 20,
-    backgroundColor: theme.colors.red,
+    //backgroundColor: theme.colors.red,
   },
   forgot: {
     alignSelf: "center",
     marginTop: 20,
+    marginBottom: 20,
     color: theme.colors.secondary,
   },
   errorText: {
     color: "red",
     marginBottom: 10,
   },
-  togglePasswordText: {
-    alignSelf: "flex-end",
-    marginVertical: 10,
-    color: theme.colors.primary,
+  customButton: {
+    padding: 10,
+    alignItems: "center",
+    borderRadius: 15,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 

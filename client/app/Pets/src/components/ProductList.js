@@ -83,9 +83,9 @@ const ProductList = ({ addToCart }) => {
           value={searchPrice}
           keyboardType="numeric"
         />
-        <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+        {/* <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
           <Text style={styles.searchButtonText}>Search</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       {/* Product List */}
