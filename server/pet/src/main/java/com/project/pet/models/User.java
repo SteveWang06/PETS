@@ -72,6 +72,10 @@ public class User implements UserDetails {
   @JsonManagedReference
   private List<Address> addresses;
 
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  @JsonManagedReference // Quản lý ánh xạ tới ChatBot
+  private List<ChatBot> chatBots;
+
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.getName().toString());
@@ -192,6 +196,14 @@ public class User implements UserDetails {
 
   public void setAddresses(List<Address> addresses) {
     this.addresses = addresses;
+  }
+
+  public List<ChatBot> getChatBots() {
+    return chatBots;
+  }
+
+  public void setChatBots(List<ChatBot> chatBots) {
+    this.chatBots = chatBots;
   }
 
   @Override

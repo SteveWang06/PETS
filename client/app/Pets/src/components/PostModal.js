@@ -17,6 +17,7 @@ import {
   handleAddCommentToPost,
 } from "../services/requester/UserRequester";
 import { BASE_URL } from "../config";
+import { FORMAT_IMG_URL } from "../config";
 import RenderItemComments from "./RenderItemComments";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
@@ -56,13 +57,13 @@ const PostModal = ({ postId, visible, onClose, userRole }) => {
           id: data.id,
           authorName: data.authorName,
           authorAvatar: data.authorAvatar
-            ? `${BASE_URL}/${data.authorAvatar.imageUrl}`
+            ? `${FORMAT_IMG_URL}/${data.authorAvatar.imageUrl}`
             : null,
           caption: data.caption,
           like: data.postLike,
           kind: data.postKind,
           images: data.postImages.map(
-            (image) => `${BASE_URL}/${image.imageUrl}`
+            (image) => `${FORMAT_IMG_URL}/${image.imageUrl}`
           ),
           comments: data.postComment.map((comment) => {
             const userId = comment.userId;
@@ -72,7 +73,7 @@ const PostModal = ({ postId, visible, onClose, userRole }) => {
                   id: userId.id,
                   username: userId.userName,
                   avatar: userId.avatar
-                    ? `${BASE_URL}/${userId.avatar.imageUrl}`
+                    ? `${FORMAT_IMG_URL}/${userId.avatar.imageUrl}`
                     : null,
                 }
               : null;
@@ -89,7 +90,7 @@ const PostModal = ({ postId, visible, onClose, userRole }) => {
         };
         setPost(formattedPost);
       } catch (error) {
-        console.error("Error fetching posts:", error);
+        console.error("Post modal Error fetching posts:", error);
       } finally {
         setIsLoading(false);
       }

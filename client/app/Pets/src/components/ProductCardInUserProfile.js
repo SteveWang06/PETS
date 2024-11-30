@@ -9,7 +9,12 @@ import {
   FlatList,
   ActivityIndicator
 } from "react-native";
-import { BASE_URL } from "../config";
+import {
+  BASE_URL
+} from "../config";
+import {
+  FORMAT_IMG_URL
+} from "../config";
 import UserDetailsModal from "./UserDetailsModal";
 import EditProductModal from "./EditProductModal"; // Import EditProductModal
 import { useSelector, useDispatch } from "react-redux";
@@ -59,7 +64,11 @@ const ProductCardInUserProfile = ({ product, addToCart }) => {
   const renderSmallImage = ({ item, index }) => (
     <TouchableOpacity onPress={() => setSelectedImageIndex(index)}>
       <Image
-        source={{ uri: `${BASE_URL}/${item.imageUrl}` }}
+        source = {
+          {
+            uri: `${FORMAT_IMG_URL}/${item.imageUrl}`
+          }
+        }
         style={[
           styles.smallImage,
           index === selectedImageIndex && styles.selectedImage,
@@ -97,7 +106,11 @@ const ProductCardInUserProfile = ({ product, addToCart }) => {
   return (
     <TouchableOpacity style={styles.card} onPress={toggleModal}>
       <Image
-        source={{ uri: `${BASE_URL}/${product.imageUrl[0].imageUrl}` }}
+        source = {
+          {
+            uri: `${FORMAT_IMG_URL}/${product.imageUrl[0].imageUrl}`
+          }
+        }
         style={styles.image}
       />
       <View style={styles.nameEditContainer}>
@@ -146,7 +159,7 @@ const ProductCardInUserProfile = ({ product, addToCart }) => {
           </TouchableOpacity>
           <Image
             source={{
-              uri: `${BASE_URL}/${product.imageUrl[selectedImageIndex].imageUrl}`,
+              uri: `${FORMAT_IMG_URL}/${product.imageUrl[selectedImageIndex].imageUrl}`,
             }}
             style={styles.largeImage}
           />
@@ -161,7 +174,11 @@ const ProductCardInUserProfile = ({ product, addToCart }) => {
           </TouchableOpacity>
           <View style={styles.shopInfo}>
             <Image
-              source={{ uri: `${BASE_URL}/${product.user.avatar.imageUrl}` }}
+              source = {
+                {
+                  uri: product.user.avatar ? `${FORMAT_IMG_URL}/${product.user.avatar.imageUrl}` : "URL_ẢNH_MẶC_ĐỊNH"
+                }
+              }
               style={styles.avatar}
             />
             <Text style={styles.userName}>{product.user.userName}</Text>

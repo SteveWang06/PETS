@@ -1,7 +1,9 @@
 package com.project.pet.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class RoleUpdateRequest {
@@ -21,6 +23,11 @@ public class RoleUpdateRequest {
   private LocalDateTime requestDate;
 
   private boolean approved;
+
+  @OneToMany(cascade = CascadeType.ALL)
+  @JoinColumn(name = "image_id")
+  @JsonManagedReference
+  private List<Image> images;
 
   // Constructors, getters, and setters
 
@@ -62,5 +69,13 @@ public class RoleUpdateRequest {
 
   public void setApproved(boolean approved) {
     this.approved = approved;
+  }
+
+  public List<Image> getImages() {
+    return images;
+  }
+
+  public void setImages(List<Image> images) {
+    this.images = images;
   }
 }

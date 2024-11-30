@@ -19,3 +19,8 @@ export const ADD_PRODUCT_SUCCESS = 'ADD_PRODUCT_SUCCESS';
 export const ADD_PRODUCT_ERROR = 'ADD_PRODUCT_ERROR';
 export const UPDATE_PROFILE = 'UPDATE_PROFILE';
 export const GET_USER_SUCCESS = 'GET_USER_SUCCESS';
+
+export const SET_POSTS = 'SET_POSTS';
+export const ADD_LIKE = 'ADD_LIKE';
+export const REMOVE_LIKE = "REMOVE_LIKE";
+export const LIKE_STATUS = 'LIKE_STATUS';

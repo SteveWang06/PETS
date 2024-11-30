@@ -5,6 +5,7 @@ import storage from '@react-native-async-storage/async-storage'
 import authReducer from "./authReducer";
 import registerReducer from "./registerReducer";
 import productReducer from "./productReducer";
+import likeStatusReducer from "./postReducer";
 
 
 
@@ -19,9 +20,10 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   auth: persistReducer(persistConfig, authReducer),
-  post: persistReducer(persistConfig, postReducer),
+  posts: persistReducer(persistConfig, postReducer),
   register: registerReducer,
   products: persistReducer(persistConfig, productReducer),
+  likeStatus: persistReducer(persistConfig, likeStatusReducer),
 });
 
 export default rootReducer;

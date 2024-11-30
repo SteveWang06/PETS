@@ -95,7 +95,7 @@ public class ProductController {
       @ApiResponse(responseCode = "404", description = "Product not found",
           content = @Content) })
   @PutMapping("/{id}")
-  @ShopRole
+  //@ShopRole
   @SecurityRequirement(name = "bearerAuth")
   public ResponseEntity<ProductDTO> updateProduct(
       @PathVariable Long id,
@@ -122,7 +122,7 @@ public class ProductController {
       @ApiResponse(responseCode = "404", description = "Product not found",
           content = @Content) })
   @DeleteMapping("/{id}")
-  @ShopRole
+  //@ShopRole
   @SecurityRequirement(name = "bearerAuth")
   public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
     boolean deleted = productService.deleteProduct(id);

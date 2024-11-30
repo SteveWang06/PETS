@@ -17,6 +17,9 @@ import {
   Modal,
   ActivityIndicator,
   TextInput,
+  FlatList,
+  Animated,
+  VirtualizedList
 } from "react-native";
 import { AuthContext } from "../context/AuthContext";
 import { Button } from "react-native-paper";
@@ -37,6 +40,7 @@ import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet from "../components/BottomSheet";
 import { BASE_URL } from "../config";
+import { FORMAT_IMG_URL } from "../config";
 import PostCard from "../components/PostCard";
 import { useDispatch, useSelector } from "react-redux";
 import { updatePostLike, setPosts } from "../redux/actions/postActions";
@@ -47,8 +51,7 @@ import EditProfileModal from "../components/EditProfileModal";
 import RoleChangeModal from "../components/RoleChangeModal";
 import ProductCardInUserProfile from "../components/ProductCardInUserProfile";
 import { fetchUserById } from "../services/requester/fetcher/User";
-import { useQuery } from '@tanstack/react-query';
-
+import { useQuery } from "@tanstack/react-query";
 const languages = [
   { code: "en", label: "English" },
   { code: "zh_tw", label: "中文" },
@@ -80,6 +83,7 @@ const ProfilePage = () => {
   const [searchType, setSearchType] = useState("");
   const [searchPrice, setSearchPrice] = useState("");
   const [products, setProducts] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(userAvatar || "");
 
   const changeLanguage = useCallback((code) => {
     i18next.changeLanguage(code);
@@ -104,17 +108,13 @@ const ProfilePage = () => {
   const profile = useSelector((state) => state.auth.profileData);
   const userId = userData.userId;
   const userToken = userData.token;
-
-  
   const dispatch = useDispatch();
-  const handleLikeToggle = (postId, liked) => {
-    dispatch(updatePostLike(postId, !liked));
-  };
-
+  const likeStatus = useSelector((state) => state.likeStatus);
   
   const openLanguagesList = () => {
     setShowLanguagesList(true);
   };
+
 
   const closeLanguagesList = () => {
     setShowLanguagesList(false);
@@ -148,19 +148,23 @@ const ProfilePage = () => {
     };
 
     fetchQRCode();
-    setUserAvatar(`${BASE_URL}/${profile.user.avatar.imageUrl}`);
-    setUserName(profile.user.userName);
-    setUserBirthDay(profile.user.birthday);
-    setUserEmail(profile.user.email);
-    setCurrentRole(profile.user.role.name);
+
+    setUserAvatar(
+      profile?.user.avatar?.imageUrl
+        ? `${FORMAT_IMG_URL}/${profile.user.avatar.imageUrl}`
+        : require("../assets/logo.png")
+    );
+
+    setUserName(profile?.user.userName);
+    setUserBirthDay(profile?.user.birthday);
+    setUserEmail(profile?.user.email);
+    setCurrentRole(profile?.user.role.name);
   }, [userId, userToken]);
 
   const handleUpdateProfile = (updatedUserData) => {
     dispatch(updateProfile(userData.userId, userData.token, updatedUserData));
     closeModalEditProfile();
   };
-
-
 
   useEffect(() => {
     if (profile) {
@@ -219,26 +223,35 @@ const ProfilePage = () => {
     }
   };
 
+
   const renderPosts = () => (
-    <ScrollView style={{ width }}>
-      {profile.posts
-        .slice()
-        .reverse()
-        .map((post) => (
+    <View style={{ height: 470 }}>
+      <FlatList
+        data={profile?.posts?.slice().reverse() || []}
+        keyExtractor={(post) => post.id.toString()}
+        renderItem={({ item: post }) => (
           <PostCard
-            key={post.id}
             id={post.id}
             authorId={post.author.id}
             authorName={post.author.userName}
-            authorAvatar={`${BASE_URL}/${post.author.avatar.imageUrl}`}
+            authorAvatar={
+              post.author.avatar
+                ? `${FORMAT_IMG_URL}/${post.author.avatar.imageUrl}`
+                : require("../assets/logo.png")
+            }
             caption={post.caption}
-            postImages={post.postImages.map(
-              (image) => `${BASE_URL}/${image.imageUrl}`
-            )}
+            postImages={
+              post.postImages?.map(
+                (image) => `${FORMAT_IMG_URL}/${image.imageUrl}`
+              ) || []
+            }
             like={post.postLike}
+            liked={likeStatus}
           />
-        ))}
-    </ScrollView>
+        )}
+        style={{ width }}
+      />
+    </View>
   );
 
   const handleTabChange = (tab) => {
@@ -251,36 +264,67 @@ const ProfilePage = () => {
     }
   };
 
-  const renderProducts = () => (
-    <ScrollView style={{ width }}>
-      <View style={styles.rowContainer}>
-        {filteredProducts.map(
-          (product, index) =>
-            index % 2 === 0 && (
-              <View key={product.id} style={styles.productRow}>
-                <ProductCardInUserProfile product={product} />
-                {index + 1 < filteredProducts.length && (
-                  <ProductCardInUserProfile
-                    key={filteredProducts[index + 1].id}
-                    product={filteredProducts[index + 1]}
-                  />
-                )}
-              </View>
-            )
+  const renderProducts = () => {
+    const numColumns = 2; // Replace this with a dynamic value if needed.
+
+    return (
+      <View style={{ height: 470 }}>
+        {showSearchInputs && (
+          <View style={styles.searchContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder='Name'
+              onChangeText={(text) => {
+                setSearchText(text);
+                handleSearch();
+              }}
+              value={searchText}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder='Type'
+              onChangeText={(text) => {
+                setSearchType(text);
+                handleSearch();
+              }}
+              value={searchType}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder='Price'
+              onChangeText={(text) => {
+                setSearchPrice(text);
+                handleSearch();
+              }}
+              value={searchPrice}
+              keyboardType='numeric'
+            />
+          </View>
         )}
+        <FlatList
+          data={filteredProducts || []}
+          key={numColumns} // Unique key to force re-render when numColumns changes
+          keyExtractor={(product) => product.id.toString()}
+          numColumns={numColumns}
+          renderItem={({ item: product }) => (
+            <ProductCardInUserProfile product={product} />
+          )}
+          columnWrapperStyle={styles.productRow} // Ensure proper spacing for grid
+          style={{ width }}
+        />
       </View>
-    </ScrollView>
-  );
+    );
+  };
 
   const toggleSearchInputs = () => {
     setShowSearchInputs(!showSearchInputs);
   };
 
-  const birthdayString = Array.isArray(profile.user.birthday)
-    ? `${profile.user.birthday[0]}-${profile.user.birthday[1]}-${profile.user.birthday[2]}`
-    : "";
+  const birthdayString =
+    profile && profile.user && Array.isArray(profile.user.birthday)
+      ? `${profile.user.birthday[0]}-${profile.user.birthday[1]}-${profile.user.birthday[2]}`
+      : "";
 
-  
   return (
     <View>
       <GestureHandlerRootView>
@@ -355,19 +399,33 @@ const ProfilePage = () => {
         </View>
       </GestureHandlerRootView>
 
-      <ScrollView style={{ zIndex: -1 }}>
+      <View style={{ zIndex: -1, height: 650 }}>
         <View style={styles.headerContainer}>
           <View style={styles.header}>
             <View style={styles.circle}></View>
 
             <Image
-              source={{
-                uri: `${BASE_URL}/${profile.user.avatar.imageUrl}`,
-              }}
+              source={
+                selectedImage &&
+                typeof selectedImage === "string" &&
+                selectedImage.trim() !== ""
+                  ? { uri: selectedImage }
+                  : userAvatar &&
+                    typeof userAvatar === "string" &&
+                    userAvatar.trim() !== ""
+                  ? { uri: userAvatar }
+                  : require("../assets/logo.png") // Fallback nếu cả hai đều rỗng
+              }
               style={styles.avatar}
             />
+
             <View style={styles.userInfoContainer}>
-              <Text style={styles.userName}>{profile.user.userName}</Text>
+              <Text style={styles.userName}>
+                {" "}
+                {profile && profile.user
+                  ? profile.user.userName
+                  : "Unknow"}{" "}
+              </Text>
               <TouchableOpacity onPress={() => setShowRoleModal(true)}>
                 {renderRoleIcon(currentRole)}
               </TouchableOpacity>
@@ -409,72 +467,40 @@ const ProfilePage = () => {
             </View>
           </View>
 
-          {showSearchInputs && (
-            <View style={styles.searchContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder='Name'
-                onChangeText={(text) => {
-                  setSearchText(text);
-                  handleSearch();
-                }}
-                value={searchText}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder='Type'
-                onChangeText={(text) => {
-                  setSearchType(text);
-                  handleSearch();
-                }}
-                value={searchType}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder='Price'
-                onChangeText={(text) => {
-                  setSearchPrice(text);
-                  handleSearch();
-                }}
-                value={searchPrice}
-                keyboardType='numeric'
-              />
-            </View>
-          )}
-
           {currentRole != "USER" ? (
-          <View style={styles.tabContainer}>
-            <TouchableOpacity
-              style={[
-                styles.tabButton,
-                activeTab === "posts" && styles.activeTab,
-              ]}
-              onPress={() => handleTabChange("posts")}>
-              <AntDesign
-                name='picture'
-                size={24}
-                color={activeTab === "posts" ? "#fff" : "#000"}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.tabButton,
-                activeTab === "products" && styles.activeTab,
-              ]}
-              onPress={() => {
-                handleTabChange("products");
-                setShowSearchInputs(false); // Hide search inputs when switching tabs
-              }}>
-              <Entypo
-                name='shop'
-                size={24}
-                color={activeTab === "products" ? "#fff" : "#000"}
-              />
-            </TouchableOpacity>
-          </View>) : null}
-          {activeTab === "posts" ? renderPosts() : renderProducts()}
+            <View style={styles.tabContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.tabButton,
+                  activeTab === "posts" && styles.activeTab,
+                ]}
+                onPress={() => handleTabChange("posts")}>
+                <AntDesign
+                  name='picture'
+                  size={24}
+                  color={activeTab === "posts" ? "#fff" : "#000"}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.tabButton,
+                  activeTab === "products" && styles.activeTab,
+                ]}
+                onPress={() => {
+                  handleTabChange("products");
+                  setShowSearchInputs(false); // Hide search inputs when switching tabs
+                }}>
+                <Entypo
+                  name='shop'
+                  size={24}
+                  color={activeTab === "products" ? "#fff" : "#000"}
+                />
+              </TouchableOpacity>
+            </View>
+          ) : null}
         </View>
-      </ScrollView>
+        {activeTab === "posts" ? renderPosts() : renderProducts()}
+      </View>
 
       <RoleChangeModal
         showRoleModal={showRoleModal}
@@ -497,7 +523,11 @@ const styles = StyleSheet.create({
   },
   tabContainer: {
     flexDirection: "row",
-    margin: 10,
+    marginLeft: 20,
+    marginRight: 20,
+    marginBottom: 10,
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 10,
     overflow: "hidden",
   },
@@ -518,6 +548,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 15,
+    marginTop: 10,
+    marginLeft: 20,
+    marginRight: 20,
   },
   rowContainer: {
     flexDirection: "row",
@@ -561,13 +594,13 @@ const styles = StyleSheet.create({
     left: 45,
   },
   header: {
-    marginBottom: 30,
+    marginBottom: 10,
     flexDirection: "row",
     width: "90%",
     height: 200,
     alignItems: "center",
     backgroundColor: "#8B0000",
-    marginTop: 120,
+    marginTop: 90,
     borderRadius: 10,
     position: "relative",
   },
@@ -723,5 +756,5 @@ const styles = StyleSheet.create({
   },
 });
 
-// export default ProfilePage;
-export default memo(ProfilePage);
+export default ProfilePage;
+//export default memo(ProfilePage);

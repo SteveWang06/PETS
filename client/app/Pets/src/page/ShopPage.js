@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Modal,
+  Alert,
+  SafeAreaView,
+} from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import ProductList from '../components/ProductList';
 import { useSelector, useDispatch } from "react-redux";
@@ -92,22 +101,26 @@ const ShopPage = () => {
   
 
   return (
-    <View style={styles.container}>
-      {role === 'BUSINESS' || role === 'HOSPITAL' ? (
-        <TouchableOpacity style={styles.addProductButton} onPress={toggleAddProductModal}>
-          <Ionicons name="add-circle" size={30} color="#4CAF50" />
+    <SafeAreaView style={styles.container}>
+      {role === "BUSINESS" || role === "HOSPITAL" ? (
+        <TouchableOpacity
+          style={styles.addProductButton}
+          onPress={toggleAddProductModal}>
+          <Ionicons name='add-circle' size={30} color='#4CAF50' />
         </TouchableOpacity>
       ) : null}
 
-      <TouchableOpacity style={styles.cartIconContainer} onPress={toggleCartModal}>
-        <Ionicons name="cart" size={30} color="#000" />
+      <TouchableOpacity
+        style={styles.cartIconContainer}
+        onPress={toggleCartModal}>
+        <Ionicons name='cart' size={30} color='#000' />
         {cart.length > 0 && (
           <View style={styles.cartBadge}>
             <Text style={styles.cartBadgeText}>{cart.length}</Text>
           </View>
         )}
       </TouchableOpacity>
-      
+
       <View style={styles.productList}>
         <ProductList addToCart={addToCart} />
       </View>
@@ -116,23 +129,30 @@ const ShopPage = () => {
       <Modal
         visible={showCart}
         transparent={true}
-        animationType="slide"
-        onRequestClose={toggleCartModal}
-      >
+        animationType='slide'
+        onRequestClose={toggleCartModal}>
         <View style={styles.modalContainer}>
           <Text style={styles.cartTitle}>Your Cart</Text>
           <FlatList
             data={cart}
             renderItem={renderCartItem}
             keyExtractor={(item) => item.id.toString()}
-            ListEmptyComponent={<Text style={styles.emptyCart}>Your cart is empty</Text>}
+            ListEmptyComponent={
+              <Text style={styles.emptyCart}>Your cart is empty</Text>
+            }
           />
           <Text style={styles.totalPrice}>Total: ${getTotalPrice()}</Text>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.closeButton} onPress={toggleCartModal}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={toggleCartModal}>
               <Text style={styles.closeText}>Close</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.payButton} onPress={() => Alert.alert('Pay', 'Implement payment functionality here')}>
+            <TouchableOpacity
+              style={styles.payButton}
+              onPress={() =>
+                Alert.alert("Pay", "Implement payment functionality here")
+              }>
               <Text style={styles.payText}>Pay</Text>
             </TouchableOpacity>
           </View>
@@ -145,8 +165,7 @@ const ShopPage = () => {
         onClose={toggleAddProductModal}
         onAddProduct={handleAddProduct}
       />
-
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -155,118 +174,119 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cartIconContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 60,
     right: 30,
     zIndex: 10,
   },
   addProductButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 60,
     left: 30,
     zIndex: 10,
   },
   productList: {
     marginTop: 50,
+    height: 590,
   },
   cartBadge: {
-    position: 'absolute',
+    position: "absolute",
     right: -10,
     top: -10,
-    backgroundColor: 'red',
+    backgroundColor: "red",
     borderRadius: 10,
     width: 20,
     height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   cartBadgeText: {
-    color: 'white',
+    color: "white",
     fontSize: 12,
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: 'white',
-    marginTop: 'auto',
+    backgroundColor: "white",
+    marginTop: "auto",
     marginBottom: 0,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   cartTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
-    marginTop: 40
+    marginTop: 40,
   },
   cartItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 10,
-    width: '100%',
+    width: "100%",
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: "#ccc",
   },
   itemDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     flex: 1,
   },
   itemText: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     padding: 5,
     borderRadius: 5,
     marginHorizontal: 5,
     fontSize: 14,
   },
   quantityContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   quantityText: {
     marginHorizontal: 10,
     fontSize: 16,
   },
   emptyCart: {
-    textAlign: 'center',
-    color: '#888',
+    textAlign: "center",
+    color: "#888",
   },
   totalPrice: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginVertical: 10,
   },
   closeButton: {
-    backgroundColor: '#FF6347',
+    backgroundColor: "#FF6347",
     padding: 10,
     borderRadius: 5,
-    width: '40%',
-    alignItems: 'center',
+    width: "40%",
+    alignItems: "center",
   },
   closeText: {
     fontSize: 16,
-    color: 'white',
+    color: "white",
   },
   payButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: "#4CAF50",
     padding: 10,
     borderRadius: 5,
-    width: '40%',
-    alignItems: 'center',
+    width: "40%",
+    alignItems: "center",
   },
   payText: {
     fontSize: 16,
-    color: 'white',
+    color: "white",
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
     marginTop: 20,
     marginBottom: 40,
   },
