@@ -17,7 +17,7 @@
   "products":"Products",
   "hospital":"Hospital",
   "forms":"Forms",
-  "doctors":"Doctors",
+  "doctors":"Doctor",
   "post":"Post",
   "setting":"Setting",
   "logout":"Logout",
@@ -57,11 +57,16 @@
   "enter_type":"Enter Type",
   "enter_price":"Enter Price",
   "enter_description":"Enter Description",
+  "enter_address":"Enter Address",
   "hospital_name":"Name",
   "hospital_address":"Address",
   "processing":"Processing",
   "accepted":"Accepted",
   "type":"Type",
   "price":"Price",
-  "description":"Description"
+  "description":"Description",
+  "user_address":"Address",
+  "profile":"Profile",
+  "role":"Role",
+  "create_admin":"Create Admin"
 }

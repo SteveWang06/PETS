@@ -78,6 +78,7 @@ const Doctor = () => {
                                                 <tr>
                                                     <th>Name</th>
                                                     <th>Address</th>
+                                                    <th>Image</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -85,6 +86,7 @@ const Doctor = () => {
                                                     <tr key={index}>
                                                         <td>{item.name}</td>
                                                         <td>{item.address}</td>
+                                                        <td>{item.image}</td>
                                                         <td>
                                                             <button
                                                                 type="button"

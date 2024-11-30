@@ -56,11 +56,16 @@
   "enter_type":"輸入類別",
   "enter_price":"輸入價格",
   "enter_description":"輸入產品描述",
+  "enter_address":"輸入地址",
   "hospital_name":"名稱",
   "hospital_address":"地址",
   "processing":"審核中",
   "accepted":"已通過審核",
   "type":"類別",
   "price":"價格",
-  "description":"描述"
+  "description":"描述",
+  "user_address":"地址",
+  "profile":"個人資料",
+  "role":"角色",
+  "create_admin":"新增管理員"
 }

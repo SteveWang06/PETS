@@ -25,12 +25,12 @@ const Post = () => {
   const [kindOption, setKindOption] = useState([]);
   const [newKind, setNewKind] = useState('');
   const [selectedKind, setSelectedKind] = useState('');
-  const {setPostLength} = useContext(LengthContext);
+  const { setPostLength } = useContext(LengthContext);
 
   useEffect(() => {
     fetchData();
     fetchKind();
-  },[]);
+  }, []);
 
   useEffect(() => {
     if (success) {
@@ -65,22 +65,22 @@ const Post = () => {
   const fetchKind = async () => {
     const token = localStorage.getItem('userToken');
     try {
-      const res = await axios.get(`${baseURL.baseURL}/api/post/kind/`,{
+      const res = await axios.get(`${baseURL.baseURL}/api/post/kind/`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       setKindOption(res.data);
-    }catch(error){
+    } catch (error) {
       setError('Error fetching kind');
-      console.error('Fetch kinds error:',error);
+      console.error('Fetch kinds error:', error);
     }
   };
 
   const handleCreateKind = async () => {
     const token = localStorage.getItem('userToken');
     const formData = new FormData();
-    formData.append('kind',newKind);
+    formData.append('kind', newKind);
     try {
-      await axios.post(`${baseURL.baseURL}/api/post/kind/create`, formData,{
+      await axios.post(`${baseURL.baseURL}/api/post/kind/create`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -98,20 +98,20 @@ const Post = () => {
     const token = localStorage.getItem('userToken');
     const userId = localStorage.getItem('userId');
     try {
-      if(newKind && !kindOption.some((k)=>k.kind=== newKind)){
+      if (newKind && !kindOption.some((k) => k.kind === newKind)) {
         await handleCreateKind()
       }
 
       const formData = new FormData();
       formData.append('caption', Caption);
-      formData.append('kind', newKind||selectedKind);
+      formData.append('kind', newKind || selectedKind);
       formData.append('userId', userId);
 
       if (Image) {
         formData.append('images', Image);
       }
 
-      await axios.post(`${baseURL.baseURL}api/auth/post/`, formData, {
+      await axios.post(`${baseURL.baseURL}/api/auth/post/`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -166,20 +166,20 @@ const Post = () => {
         throw new Error('No token or data found');
       }
 
-      if(newKind && !kindOption.some((k)=>k.kind === newKind)){
+      if (newKind && !kindOption.some((k) => k.kind === newKind)) {
         await handleCreateKind();
       }
 
       const formData = new FormData();
       formData.append('caption', Caption);
-      formData.append('kind', newKind||Kind);
+      formData.append('kind', newKind || Kind);
 
       if (Image) {
         formData.append('images', Image);
-    } else {
+      } else {
         const existingImage = data.find(item => item.id === editId).postImages[0].imageUrl;
         formData.append('images', new File([], existingImage.split('/').pop()));
-    }
+      }
 
       console.log('Updating data with:', {
         caption: Caption,
@@ -320,7 +320,7 @@ const Post = () => {
                                   onChange={(e) => setImage(e.target.files[0])}
                                   placeholder="Edit Image"
                                   multiple
-                                />                               
+                                />
                               </td>
                               <td>
                                 <input
@@ -354,11 +354,17 @@ const Post = () => {
                             <>
                               <td>{item.authorName}</td>
                               <td>
-                                {item.postImages && item.postImages.length > 0 && (
-                                  <img src={`${formatImageUrl.formatImageUrl}/${item.postImages[0].imageUrl}`}
-                                    alt="Post"
-                                    style={{ width: '100px', height: '100px' }}
-                                  />
+                                {item.postImages && item.postImages.length > 0 ? (
+                                  item.postImages.map((img, index) => (
+                                    <img
+                                      key={index}
+                                      src={`${formatImageUrl.formatImageUrl}/${img.imageUrl}`}
+                                      alt={`Post Image ${index + 1}`}
+                                      style={{ width: '100px', height: '100px', margin: '5px' }}
+                                    />
+                                  ))
+                                ) : (
+                                  <span>No images</span>
                                 )}
                               </td>
                               <td>{item.caption}</td>

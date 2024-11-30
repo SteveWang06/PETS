@@ -97,7 +97,7 @@ const User=()=> {
     setEmail(user.email);
     setImage(null);
     setAddress(user.address || '');
-    setBirthday(user.birthday ? new Date(user.birthday).toISOString().split('T')[0] : '');
+    setBirthday(user.birthday);
   };
  
   const handleSave = async () => {
@@ -109,8 +109,7 @@ const User=()=> {
       const formData = new FormData();
       formData.append('username', username);
       formData.append('email', email);
-      const formattedBirthday = birthday;
-      formData.append('birthday', formattedBirthday);
+      formData.append('birthday', birthday);
       formData.append('address',address)
       if (image) {
         formData.append('image', image);
@@ -118,7 +117,6 @@ const User=()=> {
       else {
         formData.append('image', new File([], users.find(item => item.id === editId).avatar.imageUrl.split('/').pop()));
       }
- 
       const res = await axios.put(`${baseURL.baseURL}/api/auth/${editId}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -132,7 +130,7 @@ const User=()=> {
         ...user,
         userName: username,
         email: email,
-        birthday: formattedBirthday,
+        birthday: birthday,
         address: address,
         image: image ? URL.createObjectURL(image) : user.avatar.imageUrl,
       } : user);
@@ -241,7 +239,7 @@ const User=()=> {
                         <th>{t('user_name')}</th>
                         <th>{t('email_placeholder')}</th>
                         <th>{t('birthday')}</th>
-                        <th>{t('address')}</th>
+                        <th>{t('user_address')}</th>
                         <th>{t('image')}</th>
                         <th>{t('actions')}</th>
                       </tr>
