@@ -1,5 +1,5 @@
 package com.project.pet.configuration;
-
+import com.project.pet.security.CustomAuthenticationSuccessHandler;
 import com.project.pet.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -12,11 +12,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-
 import java.util.List;
+
+
 
 @Configuration
 @EnableWebSecurity
@@ -24,6 +24,11 @@ import java.util.List;
 public class SecurityConfiguration {
   private final AuthenticationProvider authenticationProvider;
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+  @Autowired
+  private CustomAuthenticationSuccessHandler successHandler;
+
+
 
   public SecurityConfiguration(
       JwtAuthenticationFilter jwtAuthenticationFilter,
@@ -33,6 +38,7 @@ public class SecurityConfiguration {
     this.jwtAuthenticationFilter = jwtAuthenticationFilter;
   }
 
+
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.csrf()
@@ -40,6 +46,9 @@ public class SecurityConfiguration {
         .authorizeHttpRequests()
         .requestMatchers(
             "api/**",
+            "/",
+            "/api/auth/profile",
+            "/api/auth/login-with-google",
             "/v2/api-docs",
             "/v3/api-docs",
             "/v3/api-docs/**",
@@ -58,10 +67,18 @@ public class SecurityConfiguration {
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .authenticationProvider(authenticationProvider)
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .oauth2Login()
+        .loginPage("/api/auth/login-with-google")
+        .successHandler(successHandler) // Sử dụng handler tùy chỉnh
+        .userInfoEndpoint(); // Lấy thông tin người dùng
+
 
     return http.build();
   }
+
+
+
 
   @Bean
   public CorsFilter corsFilter() {
@@ -76,6 +93,8 @@ public class SecurityConfiguration {
 
     return new CorsFilter(source);
   }
+
+
 //  CorsConfigurationSource corsConfigurationSource() {
 //    CorsConfiguration configuration = new CorsConfiguration();
 //

@@ -138,11 +138,10 @@ const EditProductModalInShop = ({ visible, onClose, product, token }) => {
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ["images", "videos"],
         allowsEditing: false,
         allowsMultipleSelection: true,
         quality: 1,
-        multiple: true,
       });
 
       if (!result.cancelled) {

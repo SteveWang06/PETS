@@ -2,7 +2,6 @@ import { LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT, GET_USER_SUCCESS, 
 import { REGISTER_REQUEST, REGISTER_SUCCESS, REGISTER_FAILURE } from "../types";
 import { ApiPaths } from "../../services/ApiPaths";
 import { getUserByIdFromDatabase } from "../../services/requester/UserRequester";
-
 export const loginRequest = ({ email, password }) => {
   
   return async (dispatch) => {
@@ -43,29 +42,29 @@ export const registerRequest = ({ username, email, password }) => {
       formData.append("username", username);
       formData.append("email", email);
       formData.append("password", password);
-      formData.append("role", "user")
-      //formData.append("image", "")
+      formData.append("role", "user");
 
       const response = await fetch(ApiPaths.userRegister, {
         method: "POST",
         body: formData,
+        headers: {
+          "Content-Type": "multipart/form-data", // Cần khai báo
+        },
       });
 
       if (!response.ok) {
-        throw new Error("Email already exit");
+        throw new Error("Email already exists");
       }
 
       const data = await response.json();
       dispatch({ type: REGISTER_SUCCESS, payload: data });
-      
-      //console.log("user data in loginRequest: ", data);
+      return { success: true, message: data.message };
     } catch (error) {
       dispatch({ type: REGISTER_FAILURE, payload: error.message });
       throw error;
     }
   };
 };
-
 export const getUserById = ({userId, userToken}) => {
   
   return async (dispatch) => {

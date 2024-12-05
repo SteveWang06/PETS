@@ -70,12 +70,12 @@ const PostModal = ({ postId, visible, onClose, userRole }) => {
 
             const formattedUser = userId
               ? {
-                  id: userId.id,
-                  username: userId.userName,
-                  avatar: userId.avatar
-                    ? `${FORMAT_IMG_URL}/${userId.avatar.imageUrl}`
-                    : null,
-                }
+                id: userId.id,
+                username: userId.userName,
+                avatar: userId.avatar
+                  ? `${FORMAT_IMG_URL}/${userId.avatar.imageUrl}`
+                  : null,
+              }
               : null;
 
             return {
@@ -126,12 +126,13 @@ const PostModal = ({ postId, visible, onClose, userRole }) => {
       onRequestClose={onClose}
     >
       <SafeAreaView style={styles.container}>
-        <ScrollView style={styles.scrollView}>
-          <View>
-            {isLoading ? (
-              <ActivityIndicator size="large" color="#0000ff" />
-            ) : (
-              post && (
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          post && (
+            <FlatList
+              data={post.comments.slice().reverse()}
+              ListHeaderComponent={
                 <View style={styles.card}>
                   <View style={styles.header}>
                     <Image
@@ -146,13 +147,13 @@ const PostModal = ({ postId, visible, onClose, userRole }) => {
                     </View>
                   </View>
                   <Text style={styles.content}>{post.caption}</Text>
-
                   <View style={styles.listImage}>
                     <FlatList
                       data={post.images}
                       renderItem={renderItem}
                       keyExtractor={(item, index) => index.toString()}
                       numColumns={4}
+                      scrollEnabled={false} // Tắt cuộn ở đây
                     />
                   </View>
                   <View style={styles.likeIconAndLikeQuantity}>
@@ -163,38 +164,22 @@ const PostModal = ({ postId, visible, onClose, userRole }) => {
                     />
                     <Text style={styles.likeQuantity}>{post.like}</Text>
                   </View>
-
                   <View style={styles.line}></View>
-
-                  <View>
-                    {post && post.comments.length > 0 ? (
-                      <View>
-                        <FlatList
-                          data={post.comments.slice().reverse()}
-                          renderItem={({ item }) => (
-                            <RenderItemComments
-                              key={item.id}
-                              item={item}
-                              commentAuthorId={item.commentAuthorId}
-                            />
-                          )}
-                          keyExtractor={(item) => item.id}
-                          numColumns={1}
-                        />
-                      </View>
-                    ) : (
-                      <View style={styles.noCommentsContainer}>
-                        <Text style={styles.noCommentsText}>
-                          {t("notComment")}
-                        </Text>
-                      </View>
-                    )}
-                  </View>
                 </View>
-              )
-            )}
-          </View>
-        </ScrollView>
+              }
+              renderItem={({ item }) => (
+                <RenderItemComments
+                  key={item.id}
+                  item={item}
+                  commentAuthorId={item.commentAuthorId}
+                />
+              )}
+              keyExtractor={(item) => item.id}
+              numColumns={1}
+              contentContainerStyle={{ paddingBottom: 20 }}
+            />
+          )
+        )}
         <View style={styles.inputComment}>
           <TextInput
             style={styles.input}
@@ -222,7 +207,7 @@ const PostModal = ({ postId, visible, onClose, userRole }) => {
       </SafeAreaView>
     </Modal>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {

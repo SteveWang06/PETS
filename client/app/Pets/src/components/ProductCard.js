@@ -7,24 +7,22 @@ import {
   TouchableOpacity,
   Modal,
   FlatList,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
-import {
-  BASE_URL
-} from "../config";
-import {
-  FORMAT_IMG_URL
-} from "../config";
+import { BASE_URL } from "../config";
+import { FORMAT_IMG_URL } from "../config";
 import UserDetailsModal from "./UserDetailsModal";
-import EditProductModalInShop from "./EditProductModalInShop"; 
+import EditProductModalInShop from "./EditProductModalInShop";
 import { useSelector, useDispatch } from "react-redux";
 import { FontAwesome } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import ActionSheet from "react-native-actionsheet";
-import { getUserByIdFromDatabase, handleDeleteProduct } from "../services/requester/UserRequester";
+import {
+  getUserByIdFromDatabase,
+  handleDeleteProduct,
+} from "../services/requester/UserRequester";
 import { fetchUserById } from "../services/requester/fetcher/User";
-import { useQuery } from '@tanstack/react-query';
-
+import { useQuery } from "@tanstack/react-query";
 
 const ProductCard = ({ product, addToCart }) => {
   const [showModal, setShowModal] = useState(false);
@@ -36,7 +34,6 @@ const ProductCard = ({ product, addToCart }) => {
   const actionSheet = useRef();
   const userId = useSelector((state) => state.auth.userData.userId);
   const author = product.user.id;
-
 
   const dispatch = useDispatch();
   const toggleModal = () => {
@@ -51,11 +48,9 @@ const ProductCard = ({ product, addToCart }) => {
   const renderSmallImage = ({ item, index }) => (
     <TouchableOpacity onPress={() => setSelectedImageIndex(index)}>
       <Image
-        source = {
-          {
-            uri: `${FORMAT_IMG_URL}/${item}`
-          }
-        }
+        source={{
+          uri: `${FORMAT_IMG_URL}/${item}`,
+        }}
         style={[
           styles.smallImage,
           index === selectedImageIndex && styles.selectedImage,
@@ -85,34 +80,33 @@ const ProductCard = ({ product, addToCart }) => {
     handleDeleteProduct(product.id, token);
   };
 
-  
-  const { data: user, isLoading, error } = useQuery({
-    queryKey: ['user', author, token],
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["user", author, token],
     queryFn: fetchUserById,
     staleTime: 60000, // 1 minute
   });
 
-
   if (isLoading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return <ActivityIndicator size='large' color='#0000ff' />;
   }
-
 
   return (
     <TouchableOpacity style={styles.card} onPress={toggleModal}>
       <Image
-        source = {
-          {
-            uri: `${FORMAT_IMG_URL}/${product.imageUrl[0]}`
-          }
-        }
+        source={{
+          uri: `${FORMAT_IMG_URL}/${product.imageUrl[0]}`,
+        }}
         style={styles.image}
       />
       <View style={styles.nameEditContainer}>
         <Text style={styles.name}>{truncateDescription(product.name, 10)}</Text>
         {author === userId && (
           <TouchableOpacity style={styles.iconEdit} onPress={showActionSheet}>
-            <AntDesign name="ellipsis1" size={24} color="black" />
+            <AntDesign name='ellipsis1' size={24} color='black' />
           </TouchableOpacity>
         )}
       </View>
@@ -143,14 +137,13 @@ const ProductCard = ({ product, addToCart }) => {
       </Text>
       <TouchableOpacity
         style={styles.addToCartButton}
-        onPress={() => addToCart(product)}
-      >
+        onPress={() => addToCart(product)}>
         <Text style={styles.addToCartText}>Add to Cart</Text>
       </TouchableOpacity>
-      <Modal visible={showModal} transparent={true} animationType="slide">
+      <Modal visible={showModal} transparent={true} animationType='slide'>
         <View style={styles.modalContainer}>
           <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
-            <FontAwesome name="close" size={24} color="#000" />
+            <FontAwesome name='close' size={24} color='#000' />
           </TouchableOpacity>
           <Image
             source={{
@@ -159,8 +152,7 @@ const ProductCard = ({ product, addToCart }) => {
             style={styles.largeImage}
           />
           <TouchableOpacity
-            onPress={() => setShowFullDescription(!showFullDescription)}
-          >
+            onPress={() => setShowFullDescription(!showFullDescription)}>
             <Text style={styles.fullDescription}>
               {showFullDescription
                 ? product.description
@@ -169,18 +161,15 @@ const ProductCard = ({ product, addToCart }) => {
           </TouchableOpacity>
           <View style={styles.shopInfo}>
             <Image
-              source = {
-                {
-                  uri: `${FORMAT_IMG_URL}/${product.user.avatar.imageUrl}`
-                }
-              }
+              source={{
+                uri: `${FORMAT_IMG_URL}/${product.user.avatar.imageUrl}`,
+              }}
               style={styles.avatar}
             />
             <Text style={styles.userName}>{product.user.userName}</Text>
             <TouchableOpacity
               style={styles.viewShopButton}
-              onPress={toggleUserModal}
-            >
+              onPress={toggleUserModal}>
               <Text style={styles.viewShopButtonText}>View Shop</Text>
             </TouchableOpacity>
           </View>

@@ -111,11 +111,10 @@ const EditPostModal = ({
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ["images", "videos"],
         allowsEditing: false,
         allowsMultipleSelection: true,
         quality: 1,
-        multiple: true,
       });
 
       if (!result.cancelled) {
@@ -314,7 +313,13 @@ const EditPostModal = ({
               },
             ]}
             onPress={() => {
-                handleUpdatePost(id, postCaption, images, handleModalVisibility, kind);
+              handleUpdatePost(
+                id,
+                postCaption,
+                images,
+                handleModalVisibility,
+                kind
+              );
             }}
             disabled={images.length <= 0}>
             <Text style={styles.text}>{t("save")}</Text>

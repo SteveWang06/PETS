@@ -73,7 +73,7 @@ const PostCard = ({
     // setModalCommentVisible(!modalCommentVisible);
     setModalCommentVisible(!modalCommentVisible);
   };
-
+  
   const handlePressLiked = () => {
     // Cập nhật trạng thái like trong Redux
     dispatch(updatePostLike(id, !isLiked, userToken));
@@ -92,6 +92,7 @@ const PostCard = ({
     if (index === 1) askPetAI(imageUrl, userId);
   };
 
+  
   // Xin quyền truy cập thư viện ảnh
   const requestMediaLibraryPermission = async () => {
     const { status } = await MediaLibrary.requestPermissionsAsync();
@@ -265,7 +266,12 @@ const PostCard = ({
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Image source={{ uri: authorAvatar }} style={styles.avatar} />
+        <Image
+          source={{
+            uri: authorAvatar ? authorAvatar : require("../assets/logo.png"),
+          }}
+          style={styles.avatar}
+        />
         <View style={styles.cardHeader}>
           <View style={styles.authorAndRole}>
             <Text style={styles.author}>{authorName}</Text>

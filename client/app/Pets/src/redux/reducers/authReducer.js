@@ -1,4 +1,13 @@
-import { LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT, GET_USER_SUCCESS, UPDATE_PROFILE } from "../types";
+import {
+  LOGIN_REQUEST,
+  LOGIN_SUCCESS,
+  LOGIN_FAILURE,
+  LOGOUT,
+  GET_USER_SUCCESS,
+  UPDATE_PROFILE,
+  REGISTER_SUCCESS,
+  VERIFY_OTP_SUCCESS,
+} from "../types";
 
 const initialState = {
   isLoading: false,
@@ -7,6 +16,7 @@ const initialState = {
   isAuthenticated: false,
   userData: null,
   profileData: null,
+  isRegistered: false,
 };
 
 const authReducer = (state = initialState, action) => {
@@ -24,6 +34,16 @@ const authReducer = (state = initialState, action) => {
         error: null,
         isAuthenticated: true,
         userData: action.payload,
+      };
+    case REGISTER_SUCCESS:
+      return {
+        ...state,
+        isRegistered: true,
+      };
+    case VERIFY_OTP_SUCCESS:
+      return {
+        ...state,
+        isRegistered: false,
       };
     case GET_USER_SUCCESS:
       return {

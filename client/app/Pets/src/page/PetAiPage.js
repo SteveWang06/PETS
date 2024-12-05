@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, Image, StyleSheet } from "react-native";
 import { useSelector } from "react-redux";
 import axios from "axios";
+import { ApiPaths } from "../services/ApiPaths"
 
 const PetAiPage = () => {
   const userId = useSelector((state) => state.auth.userData.userId); // Lấy userId từ Redux
@@ -12,7 +13,7 @@ const PetAiPage = () => {
   const fetchChatData = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/chatbots/user/${userId}`
+        `${ApiPaths.getChatData}/${userId}`
       );
       setChatData(response.data); // Gán dữ liệu vào state
       setLoading(false);

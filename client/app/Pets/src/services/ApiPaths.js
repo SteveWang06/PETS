@@ -21,11 +21,15 @@ export const ApiPaths = {
   changeRole: `${BASE_URL}/api/role-requests`,
   deletePost: `${BASE_URL}/api/auth/post/`,
   updateProduct: `${BASE_URL}/api/products/`,
+  getAllProduct: `${BASE_URL}/api/products`,
+  addNewProduct: `${BASE_URL}/api/products`,
   deleteProduct: `${BASE_URL}/api/products/`,
   getUserQrCode: `${BASE_URL}/api/auth/qr`,
   checkLikes: `${BASE_URL}/api/likes/check`,
   likeToggle: `${BASE_URL}/api/likes/toggle`,
   getAllHospitalsAddress: `${BASE_URL}/api/auth/hospital-addresses`,
   predictPetBreed: `${BASE_URL_DEEP_LEARNING}/predict`,
+  getChatData: `${BASE_URL}/api/chatbots/user`,
+  verifyOtp: `${BASE_URL}/api/auth/verify-otp`,
 };
 

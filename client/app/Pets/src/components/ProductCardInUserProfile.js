@@ -7,14 +7,10 @@ import {
   TouchableOpacity,
   Modal,
   FlatList,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
-import {
-  BASE_URL
-} from "../config";
-import {
-  FORMAT_IMG_URL
-} from "../config";
+import { BASE_URL } from "../config";
+import { FORMAT_IMG_URL } from "../config";
 import UserDetailsModal from "./UserDetailsModal";
 import EditProductModal from "./EditProductModal"; // Import EditProductModal
 import { useSelector, useDispatch } from "react-redux";
@@ -24,8 +20,7 @@ import ActionSheet from "react-native-actionsheet";
 import { handleDeleteProduct } from "../services/requester/UserRequester";
 import { getUserById } from "../redux/actions/authAction";
 import { fetchUserById } from "../services/requester/fetcher/User";
-import { useQuery } from '@tanstack/react-query';
-
+import { useQuery } from "@tanstack/react-query";
 
 const ProductCardInUserProfile = ({ product, addToCart }) => {
   const [showModal, setShowModal] = useState(false);
@@ -33,7 +28,7 @@ const ProductCardInUserProfile = ({ product, addToCart }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [userModalVisible, setUserModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
-  
+
   const token = useSelector((state) => state.auth.userData.token);
   const actionSheet = useRef();
   const userId = useSelector((state) => state.auth.userData.userId);
@@ -42,14 +37,16 @@ const ProductCardInUserProfile = ({ product, addToCart }) => {
 
   const userData = useSelector((state) => state.auth.userData);
   const userToken = userData.token;
-  
 
-  const { data: user, isLoading, error } = useQuery({
-    queryKey: ['user', author, token],
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["user", author, token],
     queryFn: fetchUserById,
     staleTime: 60000, // 1 minute
   });
-
 
   const toggleModal = () => {
     setShowModal(!showModal);
@@ -60,15 +57,12 @@ const ProductCardInUserProfile = ({ product, addToCart }) => {
     setShowModal(!showModal);
   };
 
-
   const renderSmallImage = ({ item, index }) => (
     <TouchableOpacity onPress={() => setSelectedImageIndex(index)}>
       <Image
-        source = {
-          {
-            uri: `${FORMAT_IMG_URL}/${item.imageUrl}`
-          }
-        }
+        source={{
+          uri: `${FORMAT_IMG_URL}/${item.imageUrl}`,
+        }}
         style={[
           styles.smallImage,
           index === selectedImageIndex && styles.selectedImage,
@@ -98,26 +92,23 @@ const ProductCardInUserProfile = ({ product, addToCart }) => {
     handleDeleteProduct(product.id, token);
   };
 
-
   if (isLoading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return <ActivityIndicator size='large' color='#0000ff' />;
   }
 
   return (
     <TouchableOpacity style={styles.card} onPress={toggleModal}>
       <Image
-        source = {
-          {
-            uri: `${FORMAT_IMG_URL}/${product.imageUrl[0].imageUrl}`
-          }
-        }
+        source={{
+          uri: `${FORMAT_IMG_URL}/${product.imageUrl[0].imageUrl}`,
+        }}
         style={styles.image}
       />
       <View style={styles.nameEditContainer}>
         <Text style={styles.name}>{truncateDescription(product.name, 10)}</Text>
         {author === userId && (
           <TouchableOpacity style={styles.iconEdit} onPress={showActionSheet}>
-            <AntDesign name="ellipsis1" size={24} color="black" />
+            <AntDesign name='ellipsis1' size={24} color='black' />
           </TouchableOpacity>
         )}
       </View>
@@ -148,14 +139,13 @@ const ProductCardInUserProfile = ({ product, addToCart }) => {
       </Text>
       <TouchableOpacity
         style={styles.addToCartButton}
-        onPress={() => addToCart(product)}
-      >
+        onPress={() => addToCart(product)}>
         <Text style={styles.addToCartText}>Add to Cart</Text>
       </TouchableOpacity>
-      <Modal visible={showModal} transparent={true} animationType="slide">
+      <Modal visible={showModal} transparent={true} animationType='slide'>
         <View style={styles.modalContainer}>
           <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
-            <FontAwesome name="close" size={24} color="#000" />
+            <FontAwesome name='close' size={24} color='#000' />
           </TouchableOpacity>
           <Image
             source={{
@@ -164,8 +154,7 @@ const ProductCardInUserProfile = ({ product, addToCart }) => {
             style={styles.largeImage}
           />
           <TouchableOpacity
-            onPress={() => setShowFullDescription(!showFullDescription)}
-          >
+            onPress={() => setShowFullDescription(!showFullDescription)}>
             <Text style={styles.fullDescription}>
               {showFullDescription
                 ? product.description
@@ -174,18 +163,17 @@ const ProductCardInUserProfile = ({ product, addToCart }) => {
           </TouchableOpacity>
           <View style={styles.shopInfo}>
             <Image
-              source = {
-                {
-                  uri: product.user.avatar ? `${FORMAT_IMG_URL}/${product.user.avatar.imageUrl}` : "URL_ẢNH_MẶC_ĐỊNH"
-                }
-              }
+              source={{
+                uri: product.user.avatar
+                  ? `${FORMAT_IMG_URL}/${product.user.avatar.imageUrl}`
+                  : "URL_ẢNH_MẶC_ĐỊNH",
+              }}
               style={styles.avatar}
             />
             <Text style={styles.userName}>{product.user.userName}</Text>
             <TouchableOpacity
               style={styles.viewShopButton}
-              onPress={toggleUserModal}
-            >
+              onPress={toggleUserModal}>
               <Text style={styles.viewShopButtonText}>View Shop</Text>
             </TouchableOpacity>
           </View>

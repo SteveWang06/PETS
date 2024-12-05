@@ -155,6 +155,7 @@ const ProfilePage = () => {
         : require("../assets/logo.png")
     );
 
+    
     setUserName(profile?.user.userName);
     setUserBirthDay(profile?.user.birthday);
     setUserEmail(profile?.user.email);
@@ -399,26 +400,19 @@ const ProfilePage = () => {
         </View>
       </GestureHandlerRootView>
 
-      <View style={{ zIndex: -1, height: 650 }}>
+      <View style={{ zIndex: -1, height: 750 }}>
         <View style={styles.headerContainer}>
           <View style={styles.header}>
             <View style={styles.circle}></View>
 
             <Image
-              source={
-                selectedImage &&
-                typeof selectedImage === "string" &&
-                selectedImage.trim() !== ""
-                  ? { uri: selectedImage }
-                  : userAvatar &&
-                    typeof userAvatar === "string" &&
-                    userAvatar.trim() !== ""
-                  ? { uri: userAvatar }
-                  : require("../assets/logo.png") // Fallback nếu cả hai đều rỗng
-              }
+              source={{
+                uri: `${FORMAT_IMG_URL}/${profile?.user.avatar.imageUrl}`,
+              }}
               style={styles.avatar}
             />
 
+            
             <View style={styles.userInfoContainer}>
               <Text style={styles.userName}>
                 {" "}
@@ -455,7 +449,7 @@ const ProfilePage = () => {
               )}
             </View>
 
-            <View style={styles.textFollow}>
+            {/* <View style={styles.textFollow}>
               <View>
                 <Text style={styles.textFollowing}>Following</Text>
                 <Text style={styles.textFollowing}>0</Text>
@@ -464,7 +458,7 @@ const ProfilePage = () => {
                 <Text style={styles.textFollower}>Follower</Text>
                 <Text style={styles.textFollower}>0</Text>
               </View>
-            </View>
+            </View> */}
           </View>
 
           {currentRole != "USER" ? (
@@ -588,7 +582,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: "blue",
+    backgroundColor: "#E1DFDF",
     position: "absolute",
     bottom: 135,
     left: 45,
@@ -635,7 +629,7 @@ const styles = StyleSheet.create({
   },
   containerInBottomSheet: {
     padding: 16,
-    backgroundColor: "#fff",
+    backgroundColor: "#ffff",
     borderRadius: 10,
   },
   buttonLogout: {

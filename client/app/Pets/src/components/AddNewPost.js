@@ -111,7 +111,8 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
                 newUris.push(asset.uri);
                 
             });
-            setImages([...images, ...newUris]);
+        setImages([...images, ...newUris]);
+        
             
       }
     } catch (error) {
@@ -206,20 +207,20 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
 
           <Dropdown
             style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
-            placeholderStyle={styles.placeholderStyle || { fontSize: 16 }}
-            selectedTextStyle={styles.selectedTextStyle || { fontSize: 16 }}
+            placeholderStyle={styles.placeholderStyle ?? { fontSize: 16 }}
+            selectedTextStyle={styles.selectedTextStyle ?? { fontSize: 16 }}
             inputSearchStyle={
-              styles.inputSearchStyle || { height: 40, fontSize: 16 }
+              styles.inputSearchStyle ?? { height: 40, fontSize: 16 }
             }
-            iconStyle={styles.iconStyle || { width: 20, height: 20 }}
-            data={dataDropdown || []} // Default to an empty array if dataDropdown is undefined
+            iconStyle={styles.iconStyle ?? { width: 20, height: 20 }}
+            data={dataDropdown ?? []} 
             search={true}
             maxHeight={300}
             labelField='label'
             valueField='kind'
             placeholder={!isFocus ? t("selectKind") : "..."}
             searchPlaceholder={t("search")}
-            value={kind || null}
+            value={kind ?? null}
             onFocus={() => setIsFocus(true)}
             onBlur={() => setIsFocus(false)}
             onChange={(item) => {
@@ -228,7 +229,7 @@ const AddNewPost = ({ setModalVisible, authorName, avatar }) => {
             }}
             renderLeftIcon={() => (
               <AntDesign
-                style={styles.icon || {}}
+                style={styles.icon ?? {}}
                 color={isFocus ? "blue" : "black"}
                 name='Safety'
                 size={20}

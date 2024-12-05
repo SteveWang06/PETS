@@ -35,7 +35,7 @@ const HomepageHeader = () => {
       </View>
 
       <View style={styles.search}>
-        <SearchBar />
+        {/* <SearchBar /> */}
         <Pressable style={styles.iconAddPost} onPress={handlePress}>
           <AntDesign name='pluscircleo' size={24} color='black' />
         </Pressable>

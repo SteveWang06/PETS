@@ -12,8 +12,8 @@ const getPostsFromDatabase = async () => {
     const response = await axios.get(ApiPaths.getAllPost);
     return response.data;
   } catch (error) {
-    console.error("Error fetching posts:", error);
-    throw error;
+    // console.error("Error fetching posts:", error);
+    // throw error;
   }
 };
 
@@ -22,8 +22,8 @@ const getPostsByIdFromDatabase = async (postId) => {
     const response = await axios.get(`${ApiPaths.getPostById}${postId}`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching posts by id:", error);
-    throw error;
+    // console.error("Error fetching posts by id:", error);
+    // throw error;
   }
 };
 
@@ -42,7 +42,7 @@ const getUserIdFromAsyncStorage = async () => {
       return null;
     }
   } catch (error) {
-    console.error("Error getting userId from AsyncStorage:", error);
+    //console.error("Error getting userId from AsyncStorage:", error);
     return null;
   }
 };
@@ -67,7 +67,7 @@ const getUserNameAndAvatarFromAsyncStorage = async () => {
     console.log("Avatar:", imageUrl);
     return { userName, userAvatar };
   } catch (error) {
-    console.error("Error getting userId from AsyncStorage:", error);
+    //console.error("Error getting userId from AsyncStorage:", error);
     return null;
   }
 };
@@ -120,7 +120,7 @@ const uploadImages = async (
 
     console.log("Response from server:", response.data);
   } catch (error) {
-    console.error("Error uploading post:", error);
+    //console.error("Error uploading post:", error);
   }
 };
 
@@ -162,7 +162,7 @@ const handleUpdatePost = async (postId, caption, images, callback, kind) => {
       callback();
     }
   } catch (error) {
-    console.error("Error updating post:", error);
+    //console.error("Error updating post:", error);
     Alert.alert("Error", "An error occurred while updating post");
   }
 };
@@ -187,7 +187,7 @@ const handleDeletePost = async (token, postId) => {
       autoHide: true,
     });
   } catch (error) {
-    console.log("Error: ", error);
+    //console.log("Error: ", error);
   }
 }
 
@@ -196,8 +196,8 @@ const getPostKindFromDataBase = async () => {
     const response = await axios.get(ApiPaths.getAllPostKind);
     return response.data;
   } catch (error) {
-    console.error("Error fetching kind:", error);
-    throw error;
+    // console.error("Error fetching kind:", error);
+    // throw error;
   }
 };
 
@@ -215,7 +215,7 @@ const addLike = async (postId, token) => {
 
     console.log("Like added:", response.data);
   } catch (error) {
-    console.error("Error adding like:", error);
+    //console.error("Error adding like:", error);
   }
 };
 
@@ -233,7 +233,7 @@ const removeLike = async (postId, token) => {
     );
     console.log("Like added:", response.data);
   } catch (error) {
-    console.error("Error adding like:", error);
+    //console.error("Error adding like:", error);
   }
 };
 
@@ -265,7 +265,7 @@ const handleAddCommentToPost = async (postId, content, userId, token) => {
       autoHide: true,
     });
   } catch (error) {
-    console.error("Error: ", error);
+    //console.error("Error: ", error);
   }
 };
 
@@ -290,7 +290,7 @@ const handleDeleteComment = async (commentId, token) => {
       autoHide: true,
     });
   } catch (error) {
-    console.log("Error: ", error);
+    //console.log("Error: ", error);
   }
 };
 
@@ -321,7 +321,7 @@ const handleEditComment = async (commentId, content, token) => {
       autoHide: true,
     });
   } catch (error) {
-    console.error("Error: ", error);
+    //console.error("Error: ", error);
   }
 };
 
@@ -337,17 +337,17 @@ const getUserByIdFromDatabase = async (userId, token) => {
     return response.data;
     
   } catch (error) {
-    console.error('Error get product:', error);
-    if (error.response) {
-      // Server đã trả về phản hồi với mã lỗi khác 2xx
-      console.error('Server response:', error.response.data);
-    } else if (error.request) {
-      // Yêu cầu đã được gửi nhưng không nhận được phản hồi
-      console.error('Request made but no response received:', error.request);
-    } else {
-      // Đã xảy ra lỗi trong quá trình thiết lập yêu cầu
-      console.error('Error setting up request:', error.message);
-    }
+    // console.error('Error get product:', error);
+    // if (error.response) {
+    //   // Server đã trả về phản hồi với mã lỗi khác 2xx
+    //   console.error('Server response:', error.response.data);
+    // } else if (error.request) {
+    //   // Yêu cầu đã được gửi nhưng không nhận được phản hồi
+    //   console.error('Request made but no response received:', error.request);
+    // } else {
+    //   // Đã xảy ra lỗi trong quá trình thiết lập yêu cầu
+    //   console.error('Error setting up request:', error.message);
+    // }
   }
 };
 
@@ -365,8 +365,8 @@ const getQRcode = async (userId, token) => {
 
     return response;
   } catch (error) {
-    console.error("Error fetching QR code:", error);
-    throw error;
+    //console.error("Error fetching QR code:", error);
+    //throw error;
   }
 };
 
@@ -416,16 +416,23 @@ const handleSubmitEditProfile = async (
       console.error("Failed to update profile");
     }
   } catch (error) {
-    console.error("Error updating profile", error);
+    //console.error("Error updating profile", error);
   }
 };
 
-const handleRequestChangeRole = async (userId, userToken, requestedRole, address) => {
+const handleRequestChangeRole = async (userId, userToken, requestedRole, address, images) => {
   // Gởi yêu cầu lên server với userId và requestedRole
   const formData = new FormData();
   formData.append("userId", userId);
   formData.append("requestedRole", requestedRole);
   formData.append("address", address)
+  images.forEach((uri, index) => {
+      formData.append(`images`, {
+        uri: uri,
+        name: `image${index}.jpeg`,
+        type: "image/jpeg",
+      });
+    });
   try {
     const response = await fetch(ApiPaths.changeRole, {
       method: "POST",
@@ -436,12 +443,20 @@ const handleRequestChangeRole = async (userId, userToken, requestedRole, address
       body: formData,
     });
     const data = await response.json();
+    showMessage({
+      message: "successfully",
+      type: "success",
+      floating: true,
+      duration: 500,
+      autoHide: true,
+    });
     console.log("Response:", data);
     // Xử lý kết quả trả về từ server nếu cần
   } catch (error) {
-    console.error("Error:", error);
+    //console.error("Error:", error);
   }
-  setShowRoleModal(false);
+    
+  //setShowRoleModal(false);
 };
 
 const handleUpdateProduct = async (token, id, name, type, description, price, images, callback) => {

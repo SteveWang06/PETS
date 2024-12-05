@@ -19,6 +19,7 @@ import { FontAwesome, AntDesign, MaterialIcons } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import { BASE_URL } from "../config";
+import { FORMAT_IMG_URL } from "../config";
 import ActionSheet from "react-native-actionsheet";
 import { handleUpdateProduct } from "../services/requester/UserRequester";
 import { useSelector, useDispatch } from "react-redux";
@@ -43,7 +44,9 @@ const EditProductModal = ({ visible, onClose, product, token }) => {
   );
   const imageUrls = product.imageUrl;
   // console.log(product);
-  const allImageUrls = imageUrls.map((item) => `${BASE_URL}/${item.imageUrl}`);
+  const allImageUrls = imageUrls.map(
+    (item) => `${FORMAT_IMG_URL}/${item.imageUrl}`
+  );
 
   const [images, setImages] = useState(allImageUrls);
 
@@ -138,13 +141,12 @@ const EditProductModal = ({ visible, onClose, product, token }) => {
         return;
       }
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: false,
-        allowsMultipleSelection: true,
-        quality: 1,
-        multiple: true,
-      });
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images", "videos"],
+      allowsEditing: false,
+      allowsMultipleSelection: true,
+      quality: 1,
+    });
 
       if (!result.cancelled) {
         const newUris = [];

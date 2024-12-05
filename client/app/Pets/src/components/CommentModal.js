@@ -102,7 +102,7 @@ const CommentModal = ({
       };
       setPost(formattedPost);
     } catch (error) {
-      console.error("Comment modal Error fetching posts:", error);
+      //console.error("Comment modal Error fetching posts:", error);
     }
   };
   

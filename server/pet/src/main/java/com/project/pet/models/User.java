@@ -19,7 +19,6 @@ import java.util.*;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {
-    @UniqueConstraint(columnNames = "username"),
     @UniqueConstraint(columnNames = "email")
 })
 @Data
@@ -42,7 +41,7 @@ public class User implements UserDetails {
   @Email
   private String email;
 
-  @NotBlank
+  //@NotBlank
   private String password;
 
 

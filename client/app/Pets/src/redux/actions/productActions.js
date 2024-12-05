@@ -1,14 +1,17 @@
 import axios from "axios";
 import { FETCH_PRODUCTS_ERROR, FETCH_PRODUCTS_SUCCESS } from "../types";
 import { ADD_PRODUCT_SUCCESS, ADD_PRODUCT_ERROR, UPDATE_PROFILE } from "../types";
+import { ApiPaths } from "../../services/ApiPaths";
 
 export const fetchProducts = (token) => async (dispatch) => {
   try {
-    const response = await axios.get("http://localhost:8080/api/products", {
+    const response = await axios.get(ApiPaths.getAllProduct, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+    console.log(response);
+    
     dispatch({ type: FETCH_PRODUCTS_SUCCESS, payload: response.data });
   } catch (error) {
     dispatch({ type: FETCH_PRODUCTS_ERROR, payload: error.message });
@@ -33,7 +36,7 @@ export const addProduct = (userId, token, productData) => async (dispatch) => {
   
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/products",
+        ApiPaths.addNewProduct,
         formData,
         {
           headers: {

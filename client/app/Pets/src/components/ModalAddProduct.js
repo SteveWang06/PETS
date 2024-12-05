@@ -134,15 +134,20 @@ const ModalAddProduct = ({ visible, onClose, onAddProduct }) => {
   };
 
   return (
-    <Modal visible={visible} transparent={true} animationType="slide" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent={true}
+      animationType='slide'
+      onRequestClose={onClose}>
       <View style={styles.modalContainer}>
         <Text style={styles.modalTitle}>Add New Product</Text>
         <SafeAreaView style={{ height: 300 }}>
-          <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-            <Button title={t('selectImage')} onPress={showActionSheet} />
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+            <Button title={t("selectImage")} onPress={showActionSheet} />
             <ActionSheet
               ref={actionSheet}
-              title={t('chooseImageIn')}
+              title={t("chooseImageIn")}
               options={buttons}
               cancelButtonIndex={2}
               onPress={(index) => {
@@ -159,22 +164,58 @@ const ModalAddProduct = ({ visible, onClose, onAddProduct }) => {
               }}
             />
           </View>
-          <FlatList data={newProductData.images} renderItem={renderItem} keyExtractor={(item, index) => index.toString()} numColumns={3} />
+          <FlatList
+            data={newProductData.images}
+            renderItem={renderItem}
+            keyExtractor={(item, index) => index.toString()}
+            numColumns={3}
+          />
           {uploading && (
-            <View style={[StyleSheet.absoluteFill, { backgroundColor: "rgba(0,0,0,0.4)", alignItems: "center", justifyContent: "center" }]}>
+            <View
+              style={[
+                StyleSheet.absoluteFill,
+                {
+                  backgroundColor: "rgba(0,0,0,0.4)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                },
+              ]}>
               <ActivityIndicator color='#fff' animating size='large' />
             </View>
           )}
         </SafeAreaView>
-        <TextInput style={styles.input} placeholder="Name" value={newProductData.name} onChangeText={(text) => handleInputChange('name', text)} />
-        <TextInput style={styles.input} placeholder="Description" value={newProductData.description} onChangeText={(text) => handleInputChange('description', text)} />
-        <TextInput style={styles.input} placeholder="Type" value={newProductData.type} onChangeText={(text) => handleInputChange('type', text)} />
-        <TextInput style={styles.input} placeholder="Price" value={newProductData.price} onChangeText={(text) => handleInputChange('price', text)} keyboardType="numeric" />
+        <TextInput
+          style={styles.input}
+          placeholder='Name'
+          value={newProductData.name}
+          onChangeText={(text) => handleInputChange("name", text)}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder='Description'
+          value={newProductData.description}
+          onChangeText={(text) => handleInputChange("description", text)}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder='Type'
+          value={newProductData.type}
+          onChangeText={(text) => handleInputChange("type", text)}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder='Price'
+          value={newProductData.price}
+          onChangeText={(text) => handleInputChange("price", text)}
+          keyboardType='numeric'
+        />
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
             <Text style={styles.buttonText}>Cancel</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.postButton} onPress={handleAddProduct}>
+          <TouchableOpacity
+            style={styles.postButton}
+            onPress={handleAddProduct}>
             <Text style={styles.buttonText}>Post</Text>
           </TouchableOpacity>
         </View>

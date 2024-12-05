@@ -24,3 +24,7 @@ export const SET_POSTS = 'SET_POSTS';
 export const ADD_LIKE = 'ADD_LIKE';
 export const REMOVE_LIKE = "REMOVE_LIKE";
 export const LIKE_STATUS = 'LIKE_STATUS';
+
+
+export const VERIFY_OTP_SUCCESS = 'VERIFY_OTP_SUCCESS';
+

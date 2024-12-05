@@ -11,15 +11,8 @@ import Google from "../components/loginWithSocialMedia/Google";
 import { showMessage } from "react-native-flash-message";
 import FlashMessage from "react-native-flash-message";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-// import {
-//   GoogleSignin,
-//   statusCodes,
-// } from "@react-native-google-signin/google-signin";
+import VerifyOtpModal from "../components/VerifyOtpModal";
 
-// import * as Google from "expo-auth-session/providers/google";
-// import * as WebBrowser from "expo-web-browser";
-
-// WebBrowser.maybeCompleteAuthSession();
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -28,32 +21,97 @@ const LoginScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  
 
-  const handleLogin = async () => {
-    try {
-      await dispatch(loginRequest({ email, password }));
-    } catch (error) {
-      setError(error.message);
-    }
-  };
+  // const handleLogin = async () => {
+  //   try {
+  //     await dispatch(loginRequest({ email, password }));
+  //   } catch (error) {
+  //     setError(error.message);
+  //   }
+  // };
 
-  const handleRegister = async () => {
-    try {
-      await dispatch(registerRequest({ username, email, password }));
-      showMessage({
-        message: "Registration successful!",
-        type: "success",
-        floating: true,
-        duration: 2000,
-        autoHide: true,
-      });
-      setTimeout(() => setActiveTab("login"), 2000);
-    } catch (error) {
-      setError(error.message);
-    }
-  };
+    const handleLogin = async () => {
+      setIsLoading(true); // Hiển thị loader
+      try {
+        await dispatch(loginRequest({ email, password }));
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setIsLoading(false); // Ẩn loader
+      }
+    };
+
+  // const handleRegister = async () => {
+  //   try {
+  //     await dispatch(registerRequest({ username, email, password }));
+  //     showMessage({
+  //       message: "Registration successful!",
+  //       type: "success",
+  //       floating: true,
+  //       duration: 2000,
+  //       autoHide: true,
+  //     });
+  //     setTimeout(() => setActiveTab("login"), 2000);
+  //   } catch (error) {
+  //     setError(error.message);
+  //   }
+  // };
+
+  // const handleRegister = async () => {
+  //   try {
+  //     // Gửi yêu cầu đăng ký qua Redux action
+  //     const response = await dispatch(
+  //       registerRequest({ username, email, password })
+  //     );
+
+      
+
+  //     if (response.success) {
+  //       setIsModalVisible(true);
+
+  //     } else {
+  //       showMessage({
+  //         message: response.message, // "Error: <chi tiết lỗi>"
+  //         type: "danger",
+  //       });
+  //     }
+  //   } catch (error) {
+  //     // Xử lý lỗi trong trường hợp có sự cố
+  //     showMessage({
+  //       message: error.message || "An error occurred during registration.",
+  //       type: "danger",
+  //     });
+  //   }
+  // };
+
+    const handleRegister = async () => {
+      setIsLoading(true); // Hiển thị loader
+      try {
+        const response = await dispatch(
+          registerRequest({ username, email, password })
+        );
+        if (response.success) {
+          setIsModalVisible(true);
+        } else {
+          showMessage({
+            message: response.message,
+            type: "danger",
+          });
+        }
+      } catch (error) {
+        showMessage({
+          message: error.message || "An error occurred during registration.",
+          type: "danger",
+        });
+      } finally {
+        setIsLoading(false); // Ẩn loader
+      }
+    };
+
+
 
   const handleTogglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -63,23 +121,22 @@ const LoginScreen = ({ navigation }) => {
     setError(null);
   }, [email, password, username]);
 
-  // const signInWithGoogle = async () => {
-  //   try {
-  //     await GoogleSignin.hasPlayServices();
-  //     const userInfo = await GoogleSignin.signIn();
-  //     Alert.alert("Đăng nhập thành công!", JSON.stringify(userInfo));
-  //   } catch (error) {
-  //     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-  //       Alert.alert("Bạn đã hủy đăng nhập.");
-  //     } else if (error.code === statusCodes.IN_PROGRESS) {
-  //       Alert.alert("Đang xử lý, vui lòng chờ.");
-  //     } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-  //       Alert.alert("Dịch vụ Google Play không khả dụng.");
-  //     } else {
-  //       Alert.alert("Đăng nhập thất bại.", error.message);
-  //     }
-  //   }
-  // };
+  const handleOtpSubmit = (otp) => {
+    showMessage({ message: "OTP verified successfully", type: "success" });
+  };
+
+  const generateRandomPassword = () => {
+    const length = 12;
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * chars.length);
+      password += chars[randomIndex];
+    }
+    return password;
+  };
+
 
   return (
     <Background>
@@ -140,8 +197,16 @@ const LoginScreen = ({ navigation }) => {
             label='Password'
             value={password}
             onChangeText={(text) => setPassword(text)}
+            onFocus={() => {
+              if (activeTab === "register" && password.length === 0) {
+                const randomPassword = generateRandomPassword();
+                setPassword(randomPassword);
+                
+              }
+            }}
             secureTextEntry={!showPassword}
           />
+
           <TouchableOpacity
             onPress={handleTogglePasswordVisibility}
             style={styles.icon}>
@@ -155,10 +220,10 @@ const LoginScreen = ({ navigation }) => {
 
         {error && <Text style={styles.errorText}>{error}</Text>}
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => navigation.replace("ForgotPasswordScreen")}>
           <Text style={styles.forgot}>Forgot your password?</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity
           onPress={activeTab === "login" ? handleLogin : handleRegister}
@@ -177,7 +242,7 @@ const LoginScreen = ({ navigation }) => {
           </Text>
         </TouchableOpacity>
 
-        <View
+        {/* <View
           style={{
             flexDirection: "row",
             justifyContent: "center",
@@ -189,8 +254,16 @@ const LoginScreen = ({ navigation }) => {
           <TouchableOpacity>
             <Google />
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
+
+      {/* Modal OTP */}
+      <VerifyOtpModal
+        isVisible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        onSubmit={handleOtpSubmit}
+        email={email}
+      />
 
       <FlashMessage position='top' style={{ marginBottom: 50 }} />
     </Background>
@@ -268,6 +341,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+
+  
 });
 
 export default LoginScreen;

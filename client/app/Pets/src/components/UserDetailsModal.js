@@ -27,9 +27,8 @@ const ProductCardInUserProfile = React.lazy(() =>
 
 import MapModal from "./MapModal"; // Import MapModal component
 import * as Location from "expo-location";
-import Geocoder from 'react-native-geocoding';
+import Geocoder from "react-native-geocoding";
 import { GOOGLE_MAPS_API_KEY } from "@env";
-
 
 Geocoder.init(GOOGLE_MAPS_API_KEY);
 
@@ -52,18 +51,16 @@ const UserDetailsModal = ({
   const [currentLocation, setCurrentLocation] = useState(null);
   const [destination, setDestination] = useState(null);
   const [showMapModal, setShowMapModal] = useState(false);
-  const [userCurrentAddress, setUserCurrentAddress] = useState(null)
+  const [userCurrentAddress, setUserCurrentAddress] = useState(null);
 
   useEffect(() => {
     const address = user.user?.addresses?.[0]?.address;
 
-    
     if (user) {
       handleSearch();
-      setDestination(address) 
+      setDestination(address);
     }
   }, [user, searchText, searchType, searchPrice]);
-
 
   const handleSearch = () => {
     if (!user) return;
@@ -131,7 +128,7 @@ const UserDetailsModal = ({
       const { lat, lng } = response.results[0].geometry.location;
       return { latitude: lat, longitude: lng };
     } catch (error) {
-      console.error('Error fetching address coordinates:', error);
+      console.error("Error fetching address coordinates:", error);
       return null;
     }
   };
@@ -150,9 +147,6 @@ const UserDetailsModal = ({
       alert("Address not available.");
     }
   };
-
-
-
 
   const renderPosts = () => (
     <ScrollView style={{ width }}>
@@ -202,11 +196,9 @@ const UserDetailsModal = ({
   );
 
   if (isLoading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return <ActivityIndicator size='large' color='#0000ff' />;
   }
 
-  
-  
   return (
     <Modal visible={visible} transparent={true} animationType='slide'>
       <View style={styles.modalContainer}>

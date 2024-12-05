@@ -32,6 +32,8 @@ const ProductList = ({ addToCart }) => {
   }, [dispatch, userToken]);
 
   const handleSearch = () => {
+    if (!Array.isArray(products)) return []; // Trả về mảng rỗng nếu products không phải mảng
+
     const filteredProducts = products.filter(
       (product) =>
         (searchText === "" ||
@@ -42,9 +44,9 @@ const ProductList = ({ addToCart }) => {
           parseFloat(product.price) <= parseFloat(searchPrice))
     );
 
-    // Đảo ngược danh sách sản phẩm
     return filteredProducts.reverse();
   };
+
 
   const onRefresh = () => {
     setRefreshing(true);

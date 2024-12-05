@@ -25,8 +25,7 @@ public class Product {
   @Column(length = 1000)
   private String description;
 
-  @OneToMany(cascade = CascadeType.ALL)
-  @JoinColumn(name = "image_id")
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonManagedReference
   private List<Image> imageUrl;
 

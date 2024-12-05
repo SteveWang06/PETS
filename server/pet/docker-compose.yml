@@ -30,9 +30,11 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
 
     volumes:
-      - /home/ubuntu/pet_uploads/products:/springboot/public/products
-      - /home/ubuntu/pet_uploads/images:/springboot/public/images
-      - /home/ubuntu/pet_uploads/avatar:/springboot/public/avatar
+      - /home/ubuntu/pet_uploads/products:/public/products
+      - /home/ubuntu/pet_uploads/images:/public/images
+      - /home/ubuntu/pet_uploads/avatar:/public/avatar
+      - /home/ubuntu/pet_uploads/certificates:/public/certificates/
+      - /home/ubuntu/pet_uploads/defaultAvatar:/public/defaultAvatar
     depends_on:
       - mysql
     networks:
