@@ -16,11 +16,16 @@ const Profile = () => {
         user: {
             userName: '',
             birthday: '',
-            role: { description: '' },
             email: '',
             addresses: [{ address: '' }],
-        }
+            avatar:{imageUrl: ''},
+        },
     });
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [birthday, setBirthday] = useState('');
+    const [address, setAddress] = useState('');
+    const [newImage, setNewImage] = useState(null);
 
     useEffect(() => {
         fetchData();
@@ -48,34 +53,60 @@ const Profile = () => {
             });
             setData(res.data);
             setPosts(res.data.posts);
+            setUsername(res.data.user.userName);
+            setEmail(res.data.user.email);
+            if(res.data.user.birthday){
+                const localDate = new Date(res.data.user.birthday);
+                const year = localDate.getFullYear();
+                const month = String(localDate.getMonth()+1).padStart(2,'0');
+                const day = String(localDate.getDate()).padStart(2,'0');
+                setBirthday(`${year}-${month}-${day}`);
+            }else{
+                setBirthday('');
+            }
+            setAddress(res.data.user.addresses[0]?.address);
         } catch (error) {
             console.error('Error fetching data:', error);
             setError('Error fetching data');
         }
     };
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setData((prevData) => ({
-            ...prevData,
-            user: { ...prevData.user, [name]: value },
-        }));
-    };
-
-    const handleSave = async () => {
-        try {
-            const token = localStorage.getItem('userToken');
-            const userId = localStorage.getItem('userId');
-            await axios.put(`${baseURL.baseURL}/api/auth/user/${userId}`, data.user, {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
-            setIsEditing(false);
-            setSuccess("Profile updated successfully!");
-        } catch (error) {
-            console.error("Error updating profile", error);
-            setError("Error updating profile");
+    const handleImageChange = (e)=>{
+        const file = e.target.files[0];
+        if(file){
+            setNewImage(file);
         }
-    };
+    }
+      const handleSave = async () => {
+        try {
+          const token = localStorage.getItem('userToken');
+          const userId = localStorage.getItem('userId');
+          if (!token || !userId) {
+            throw new Error('No token or data found');
+          }
+          const formData = new FormData();
+          formData.append('username', username);
+          formData.append('email', email);
+          formData.append('birthday', birthday);
+          formData.append('address',address);
+          if(newImage){
+            formData.append('image',newImage);
+          }
+          await axios.put(`${baseURL.baseURL}/api/auth/${userId}`, formData, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+
+          fetchData();
+          setIsEditing(false);
+          setSuccess('Edit Success');
+        } catch (error) {
+          console.error('Error updating data: ', error.response ? error.response.data : error.message);
+          setError('Error updating data');
+        }
+      };
 
     return (
         <div>
@@ -99,11 +130,21 @@ const Profile = () => {
                                 <div className="card card-primary card-outline">
                                     <div className="card-body box-profile">
                                         <div className="text-center">
-                                            <img
-                                                src={`${formatImageUrl.formatImageUrl}/${data.user.avatar?.imageUrl}`}
+                                            {isEditing ? (
+                                                <div>
+                                                    <input
+                                                        type="file"
+                                                        className="form-control mt-3"
+                                                        onChange={handleImageChange}
+                                                    />
+                                                </div>
+                                            ):(
+                                                <img
+                                                src={`${formatImageUrl.formatImageUrl}/${data.user.avatar.imageUrl}`}
                                                 style={{ width: '150px', height: '150px' }}
                                                 alt="Profile"
                                             />
+                                            )}
                                         </div>
                                         <h3 className="profile-username text-center">
                                             {data.user.userName}
@@ -123,8 +164,8 @@ const Profile = () => {
                                                         type="text"
                                                         className="form-control"
                                                         name="userName"
-                                                        value={data.user.userName}
-                                                        onChange={handleInputChange}
+                                                        value={username}
+                                                        onChange={(e) => setUsername(e.target.value)}
                                                     />
                                                 ) : (
                                                     <p>{data.user.userName}</p>
@@ -142,12 +183,12 @@ const Profile = () => {
                                                         type="date"
                                                         className="form-control"
                                                         name="birthday"
-                                                        value={data.user.birthday}
-                                                        onChange={handleInputChange}
+                                                        value={birthday}
+                                                        onChange={(e) => setBirthday(e.target.value)}
                                                     />
                                                 ) : (
                                                     <div>
-                                                    <p>{data.user.birthday[0]}/{data.user.birthday[1]}/{data.user.birthday[2]}</p>                                      
+                                                    <p>{new Date(data.user.birthday).toLocaleDateString()}</p>                                      
                                                     </div>
                                                 )}
                                             </div>
@@ -158,17 +199,17 @@ const Profile = () => {
                                                     <i className="fas fa-users-cog" style={{ marginRight: '8px' }}></i>
                                                     {t('role')} :
                                                 </label>
-                                                {isEditing ? (
+                                                {/* {isEditing ? (
                                                     <input
                                                         type="text"
                                                         className="form-control"
                                                         name="role.description"
-                                                        value={data.user.role?.description}
-                                                        onChange={handleInputChange}
+                                                        value={role.description}
+                                                        onChange={(e) => setRole(e.target.value)}
                                                     />
-                                                ) : (
+                                                ) : ( */}
                                                     <p>{data.user.role?.description}</p>
-                                                )}
+                                                {/* )} */}
                                             </div>
                                         </div>
                                         <div className="col-12">
@@ -182,8 +223,8 @@ const Profile = () => {
                                                         type="email"
                                                         className="form-control"
                                                         name="email"
-                                                        value={data.user.email}
-                                                        onChange={handleInputChange}
+                                                        value={email}
+                                                        onChange={(e) => setEmail(e.target.value)}
                                                     />
                                                 ) : (
                                                     <p>{data.user.email}</p>
@@ -201,8 +242,8 @@ const Profile = () => {
                                                         type="text"
                                                         className="form-control"
                                                         name="addresses.0.address"
-                                                        value={data.user.addresses[0]?.address}
-                                                        onChange={handleInputChange}
+                                                        value={address}
+                                                        onChange={(e) => setAddress(e.target.value)}
                                                     />
                                                 ) : (
                                                     <p>{data.user.addresses[0]?.address}</p>
@@ -250,9 +291,7 @@ const Profile = () => {
                                                                 alt="Profile"
                                                             />
                                                             <span className="username">{post.author?.userName || 'Unknown User'}</span>
-                                                            <span className="description">
-                                                                Shared by - {post.uploadAt}
-                                                            </span>
+                                                            
                                                         </div>
                                                         <p>{post.caption || 'No caption provided.'}</p>
                                                         {(post.postImages || []).map((image) => (
