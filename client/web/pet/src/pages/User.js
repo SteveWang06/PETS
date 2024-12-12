@@ -96,8 +96,17 @@ const User=()=> {
     setUsername(user.userName);
     setEmail(user.email);
     setImage(null);
-    setAddress(user.address || '');
-    setBirthday(user.birthday);
+    setAddress(user.addresses[0]?.address);
+    if(user.birthday){
+      const localDate = new Date(user.birthday);
+      const year = localDate.getFullYear();
+      const month = String(localDate.getMonth()+1).padStart(2,'0');
+      const day = String(localDate.getDate()).padStart(2,'0');
+      setBirthday(`${year}-${month}-${day}`);
+    }
+    else{
+      setBirthday('');
+    }
   };
  
   const handleSave = async () => {
@@ -241,7 +250,7 @@ const User=()=> {
                         <th>{t('birthday')}</th>
                         <th>{t('user_address')}</th>
                         <th>{t('image')}</th>
-                        <th>{t('actions')}</th>
+                        <th style={{width:'200px'}}>{t('actions')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -270,7 +279,7 @@ const User=()=> {
                               <td>
                                 <input
                                   type="date"
-                                  value={birthday}
+                                  value={birthday[0]}
                                   onChange={(e) => setBirthday(e.target.value)}
                                   style={{ width: '100%' }}
                                 />
@@ -298,7 +307,7 @@ const User=()=> {
                             <>
                               <td>{user.userName}</td>
                               <td>{user.email}</td>
-                              <td>{user.birthday}</td>
+                              <td>{new Date(user.birthday).toLocaleDateString()}</td>
                               <td>{user.addresses[0]?.address}</td>
                               <td>
                                 <img src={`${formatImageUrl.formatImageUrl}/${user.avatar?.imageUrl}`} alt="User" style={{ width: '50px', height: '50px' }} />
