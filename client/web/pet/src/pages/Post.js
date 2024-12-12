@@ -14,7 +14,7 @@ const Post = () => {
   const [editId, setEditId] = useState(null);
   const [Caption, setCaption] = useState('');
   const [Kind, setKind] = useState('');
-  const [Image, setImage] = useState(null);
+  const [Image, setImage] = useState([]);
   const [filter, setFilter] = useState('');
   const [original, setOriginal] = useState([]);
   const [success, setSuccess] = useState('');
@@ -107,8 +107,8 @@ const Post = () => {
       formData.append('kind', newKind || selectedKind);
       formData.append('userId', userId);
 
-      if (Image) {
-        formData.append('images', Image);
+      if (Image.length > 0) {
+        Image.forEach((img) => formData.append('images', img));
       }
 
       await axios.post(`${baseURL.baseURL}/api/auth/post/`, formData, {
@@ -121,7 +121,7 @@ const Post = () => {
       fetchData();
       setCaption('');
       setKind('');
-      setImage(null);
+      setImage([]);
       setSelectedKind('');
       setSuccess('Create Success');
       setShowCreate(false);
@@ -156,7 +156,7 @@ const Post = () => {
     setEditId(item.id);
     setCaption(item.caption);
     setKind(item.postKind);
-    setImage(null);
+    setImage(item.postImages || []);
   };
 
   const handleSave = async () => {
@@ -174,11 +174,8 @@ const Post = () => {
       formData.append('caption', Caption);
       formData.append('kind', newKind || Kind);
 
-      if (Image) {
-        formData.append('images', Image);
-      } else {
-        const existingImage = data.find(item => item.id === editId).postImages[0].imageUrl;
-        formData.append('images', new File([], existingImage.split('/').pop()));
+      if (Image.length > 0) {
+        Image.forEach((img) => formData.append('images', img));
       }
 
       console.log('Updating data with:', {
@@ -211,7 +208,7 @@ const Post = () => {
       setEditId(null);
       setCaption('');
       setKind('');
-      setImage(null);
+      setImage([]);
       setSuccess('Edit Success')
     } catch (error) {
       console.error('Error updating data: ', error);
@@ -305,7 +302,7 @@ const Post = () => {
                             </select>
                           </div>
                         </th>
-                        <th>{t('actions')}</th>
+                        <th style={{width:'50px'}}>{t('actions')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -317,7 +314,7 @@ const Post = () => {
                               <td>
                                 <input
                                   type="file"
-                                  onChange={(e) => setImage(e.target.files[0])}
+                                  onChange={(e) => setImage([...e.target.files])}
                                   placeholder="Edit Image"
                                   multiple
                                 />
@@ -427,7 +424,7 @@ const Post = () => {
                 </datalist>
                 <input
                   type="file"
-                  onChange={(e) => setImage(e.target.files[0])}
+                  onChange={(e) => setImage([...e.target.files])}
                   className="form-control mb-2"
                   multiple
                 />
