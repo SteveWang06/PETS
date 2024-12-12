@@ -111,14 +111,14 @@ function SideNav() {
                                     </p>
                                 </Link>
                             </li>
-                            {/* <li className="nav-item">
+                            <li className="nav-item">
                                 <Link to="/doctors" className={getNavLinkClass('/doctors')}>
                                     <i className="nav-icon fas fa-user-md" />
                                     <p>
                                         {t('doctors')}
                                     </p>
                                 </Link>
-                            </li> */}
+                            </li>
                             <li className="nav-item">
                                 <Link to="/post" className={getNavLinkClass('/post')}>
                                     <i className="nav-icon far fa-newspaper" />

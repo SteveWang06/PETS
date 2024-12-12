@@ -11,6 +11,7 @@ import Register from './pages/register';
 import Shop from './pages/Shop';
 import Product from './pages/Product';
 import Hospital from './pages/Hospital';
+import Doctor from './pages/Doctor';
 import Profile from './pages/Profile';
 
 
@@ -67,6 +68,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <Hospital/>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="doctors"
+              element={
+                <PrivateRoute>
+                  <Doctor/>
                 </PrivateRoute>
               }
             />

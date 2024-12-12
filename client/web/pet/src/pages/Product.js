@@ -11,8 +11,6 @@ const Products = () => {
   const { t, i18n } = useTranslation();
   const [data, setData] = useState([]);
   const [error, setError] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [postsPerPage] = useState(10);
   const [editId, setEditId] = useState(null);
   const [name, setName] = useState('');
   const [type, setType] = useState('');
@@ -140,8 +138,11 @@ const Products = () => {
       formData.append('price', price);
       formData.append('description', description);
 
-      if (image.length > 0) {
-        image.forEach((img) => formData.append('images', img));
+      if (image) {
+        formData.append('images', image);
+      } else {
+        const existingImageUrl = data.find(item => item.id === editId)?.imageUrl?.[0] || '';
+        formData.append('images', new File([], existingImageUrl.split('/').pop()));
       }
 
       console.log('Updating data with:', {
@@ -196,24 +197,6 @@ const Products = () => {
     setData(searchedUsers);
   };
 
-  const indexOfLastPost = currentPage * postsPerPage;
-  const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = data.slice(indexOfFirstPost, indexOfLastPost);
-
-  const pageinate = (pageNumber) => setCurrentPage(pageNumber);
-
-  const nextPage = () => {
-    if (currentPage < Math.ceil(data.length / postsPerPage)) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const prevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
   return (
     <div>
       <Header />
@@ -245,7 +228,7 @@ const Products = () => {
                   <table id="example2" className="table table-bordered table-hover">
                     <thead>
                       <tr>
-                        <th>{t('hospital_name')}</th>
+                        <th>{t('user_name')}</th>
                         <th>{t('type')}</th>
                         <th>{t('price')}</th>
                         <th>{t('description')}</th>
@@ -332,13 +315,6 @@ const Products = () => {
                       ))}
                     </tbody>
                   </table>
-                  <div className="pagination">
-                    <button onClick={prevPage} className="btn btn-light" disabled={currentPage === 1}>&laquo;</button>
-                    {Array.from({ length: Math.ceil(data.length / postsPerPage) }, (_, index) => (
-                      <button key={index + 1} onClick={() => pageinate(index + 1)} className={`btn ${currentPage === index + 1 ? `btn-primary` : 'btn-light'}`}>{index + 1}</button>
-                    ))}
-                    <button onClick={nextPage} className="btn btn-light" disabled={currentPage === Math.ceil(data.length / postsPerPage)}>&raquo;</button>
-                  </div>
                 </div>
               </div>
             </div>
@@ -358,7 +334,7 @@ const Products = () => {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder={t('product_name')}
+                  placeholder={t('enter_username')}
                   className="form-control mb-2"
                 />
                 <input

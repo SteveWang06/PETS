@@ -68,6 +68,5 @@
   "user_address":"Address",
   "profile":"Profile",
   "role":"Role",
-  "create_admin":"Create Admin",
-  "product_name":"Enter Name"
+  "create_admin":"Create Admin"
 }
