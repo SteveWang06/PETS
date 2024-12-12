@@ -8,7 +8,7 @@ import { LengthContext } from '../context/AuthProvider';
  
 function Home() {
     const { t, i18n } = useTranslation();    
-    const {postLength,userLength,productLength}=useContext(LengthContext);
+    const {postLength,userLength,productLength,shopLength,hospitalLength}=useContext(LengthContext);
 
         return (
             <div>
@@ -71,7 +71,7 @@ function Home() {
                                     <div className="small-box bg-info">
                                         <div className="inner">
                                             <p>{t('total_shop')}</p>
-                                            <h3>--</h3>
+                                            <h3>{shopLength}</h3>
                                         </div>
                                         <div className="icon">
                                             <i className="nav-icon fas fa-store" />
@@ -99,7 +99,7 @@ function Home() {
                                     <div className="small-box bg-danger">
                                         <div className="inner">
                                             <p>{t('total_hospital')}</p>
-                                            <h3>--</h3>
+                                            <h3>{hospitalLength}</h3>
                                         </div>
                                         <div className="icon">
                                             <i className="nav-icon fas fa-clinic-medical" />
@@ -107,20 +107,7 @@ function Home() {
                                         <Link to="/hospital" className="small-box-footer">{t('moreinfo')} <i className="fas fa-arrow-circle-right" /></Link>
                                     </div>
                                 </div>
-                                {/* Total Doctor */}
-                                <div className="col-lg-3 col-6">
-                                    {/* small box */}
-                                    <div className="small-box bg-danger">
-                                        <div className="inner">
-                                            <p>{t('total_doctor')}</p>
-                                            <h3>--</h3>
-                                        </div>
-                                        <div className="icon">
-                                            <i className="nav-icon fas fa-user-md" />
-                                        </div>
-                                        <Link to="/doctors" className="small-box-footer">{t('moreinfo')} <i className="fas fa-arrow-circle-right" /></Link>
-                                    </div>
-                                </div>
+                                
                             </div>
                         </div>{/* /.container-fluid */}
                     </section>
