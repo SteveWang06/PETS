@@ -67,5 +67,6 @@
   "user_address":"地址",
   "profile":"個人資料",
   "role":"角色",
-  "create_admin":"新增管理員"
+  "create_admin":"新增管理員",
+  "product_name":"輸入產品名稱"
 }
